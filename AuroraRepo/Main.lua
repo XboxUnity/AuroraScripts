@@ -48,8 +48,11 @@ function MakeMainMenu()
 	Menu.SetTitle(scriptTitle);
 	Menu.SetGoBackText("..");
 	for _, v in pairs(repoIniSections) do
-		if (repoIni:ReadValue(v, "name", "") ~= "") then
-			Menu.AddMainMenuItem(Menu.MakeMenuItem(repoIni:ReadValue(v, "name", ""), repoIni:GetSection(v)))
+		local title = repoIni:ReadValue(v, "scriptTitle", "");
+		local ver = repoIni:ReadValue(v, "scriptVersion", "");
+		local author = repoIni:ReadValue(v, "scriptAuthor", "");
+		if (title ~= "" and ver ~= "" and author ~= "") then
+			Menu.AddMainMenuItem(Menu.MakeMenuItem(title .. " v" .. ver .. " by " .. author, repoIni:GetSection(v)))
 		end
 	end
 end
@@ -93,14 +96,14 @@ end
 
 function HandleSelection(selection, repo, menu)
 	local info = "";
-	info = info .. "Name: "..selection.name.."\n";
-	if selection.author ~= nil and selection.author ~= "" then
-		info = info .. "Author: "..selection.author.."\n";
+	info = info .. "Name: "..selection.scriptTitle.."\n";
+	if selection.scriptAuthor ~= nil and selection.scriptAuthor ~= "" then
+		info = info .. "Author: "..selection.scriptAuthor.."\n";
 	else
 		info = info .. "Author: N/A\n";
 	end
-	if selection.description ~= nil and selection.description ~= "" then
-		info = info .. "Description:\n"..string.gsub(selection.description, "\\n", "\n");
+	if selection.scriptDescription ~= nil and selection.scriptDescription ~= "" then
+		info = info .. "Description:\n"..string.gsub(selection.scriptDescription, "\\n", "\n");
 	else 
 		info = info .. "Description: N/A";
 	end
@@ -164,14 +167,17 @@ function HandleLuaInstall(selection, path, type)
 end
 
 function HandleZipInstall(selection, path, type, checkExists)
-	local installPath = path..selection.path;
-	local filename = selection.path;
-	if FileSystem.FileExists(installPath) and checkExists == true then
-		if  not HandleAlreadyExists(type, filename) then
-			while FileSystem.FileExists(installPath) do
-				installPath, filename, canceled = GetNewName(filename, path, "Select new folder name:");
-				if canceled then
-					return false; -- We're not going to continue trying this
+	local installPath = path;
+	if checkExists == true then
+		installPath = installPath .. selection.path;
+		local filename = selection.path;
+		if FileSystem.FileExists(installPath) then
+			if  not HandleAlreadyExists(type, filename) then
+				while FileSystem.FileExists(installPath) do
+					installPath, filename, canceled = GetNewName(filename, path, "Select new folder name:");
+					if canceled then
+						return false; -- We're not going to continue trying this
+					end
 				end
 			end
 		end
@@ -244,8 +250,8 @@ function CheckUpdate()
 		local http = Http.Get(url);
 		if http.Success then
 			local ini = IniFile.LoadString(http.OutputData);
-			local section = ini:GetSection("update");
-			if section.version ~= scriptVersion then
+			local section = ini:GetSection("AuroraRepo");
+			if section.scriptVersion ~= scriptVersion then
 				local ret = Script.ShowMessageBox("Repo Update Available", "A new version of the repo browser is available, do you want to download it now?", "Yes", "No");
 				if ret.Button == 1 then
 					refreshRequired = HandleZipInstall(section, Script.GetBasePath(), "", false);
