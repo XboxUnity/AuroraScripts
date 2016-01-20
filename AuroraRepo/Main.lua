@@ -48,11 +48,9 @@ function MakeMainMenu()
 	Menu.SetTitle(scriptTitle);
 	Menu.SetGoBackText("..");
 	for _, v in pairs(repoIniSections) do
-		local title = repoIni:ReadValue(v, "scriptTitle", "");
-		local ver = repoIni:ReadValue(v, "scriptVersion", "");
-		local author = repoIni:ReadValue(v, "scriptAuthor", "");
-		if (title ~= "" and ver ~= "" and author ~= "") then
-			Menu.AddMainMenuItem(Menu.MakeMenuItem(title .. " v" .. ver .. " by " .. author, repoIni:GetSection(v)))
+		local title = repoIni:ReadValue(v, "name", "");
+		if title ~= "" then
+			Menu.AddMainMenuItem(Menu.MakeMenuItem(title, repoIni:GetSection(v)))
 		end
 	end
 end
@@ -76,7 +74,12 @@ function DoShowMenu(menu)
 				Script.SetProgress(50);
 				local ini = IniFile.LoadString(http.OutputData);
 				for _, v in pairs(ini:GetAllSections()) do
-					Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(ini:ReadValue(v, "name", ""), ini:GetSection(v)));					
+					local title = ini:ReadValue(v, "scriptTitle", "");
+					local ver = ini:ReadValue(v, "scriptVersion", "");
+					local author = ini:ReadValue(v, "scriptAuthor", "");
+					if (title ~= "" and ver ~= "" and author ~= "") then
+						Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title .. " v" .. ver .. " by " .. author, ini:GetSection(v)))
+					end
 				end
 			else
 				Script.ShowMessageBox("ERROR", "An error occurred while downloading repo data...\n\nPlease try again later", "OK");
@@ -104,7 +107,7 @@ function HandleSelection(selection, repo, menu)
 	end
 	if selection.scriptDescription ~= nil and selection.scriptDescription ~= "" then
 		info = info .. "Description:\n"..string.gsub(selection.scriptDescription, "\\n", "\n");
-	else 
+	else
 		info = info .. "Description: N/A";
 	end
 	info = info .. "\n\n\nDo you want to install this ".. repo.type .."?";
