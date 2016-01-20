@@ -1,7 +1,7 @@
 scriptTitle = "Aurora Repo Browser"
 scriptAuthor = "Phoenix"
 scriptVersion = "0.1"
-scriptDescription = "Aurora Script Browser... Need i say more?"
+scriptDescription = "The Phoenix script repository browser, Download and install new Content Scripts (Filters, Sorts and Subtitles) or new Utility Scripts"
 scriptIcon = "icon.png"
 scriptPermissions = { "http", "filesystem" }
 
@@ -12,6 +12,10 @@ local refreshRequired = false;
 
 -- Main entry point to script
 function main()
+	if !Aurora.HasInternet() then
+		Script.ShowMessageBox("ERROR", "ERROR: This script requires an active internet connection to work...\n\nPlease make sure you have internet to your console before running the script", "OK");
+		return;
+	end
 	print("-- " .. scriptTitle .. " Started...");
 	init();
 	if CheckUpdate() then
@@ -61,8 +65,12 @@ function DoShowMenu(menu)
 	end
 	if not canceled then
 		if Menu.IsMainMenu(menu) and menu.SubMenu == nil then
+			Script.SetStatus("Downloading Repo Data...");
+			Script.SetProgress(0);
 			local http = Http.Get(ret.iniurl);
 			if http.Success then
+				Script.SetStatus("Processing Repo Data...");
+				Script.SetProgress(50);
 				local ini = IniFile.LoadString(http.OutputData);
 				for _, v in pairs(ini:GetAllSections()) do
 					Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(ini:ReadValue(v, "name", ""), ini:GetSection(v)));					
@@ -70,6 +78,7 @@ function DoShowMenu(menu)
 			else
 				Script.ShowMessageBox("ERROR", "An error occurred while downloading repo data...\n\nPlease try again later", "OK");
 				DoShowMenu(menu);
+				return;
 			end
 		end
 		if menuItem.SubMenu ~= nil then
@@ -77,8 +86,7 @@ function DoShowMenu(menu)
 		elseif not Menu.IsMainMenu(menu) then
 			HandleSelection(ret, menu.Parent.Data, menu);
 		else
-			Script.ShowMessageBox("ERROR", "An unknown error occurred!", "OK");
-			DoShowMenu(menu);
+			Script.ShowMessageBox("ERROR", "An unknown error occurred!\n\nExiting...", "OK");
 		end
 	end
 end
@@ -135,10 +143,15 @@ function HandleLuaInstall(selection, path, type)
 			end
 		end
 	end
-	local dlpath = downloadsPath..selection.filename;
-	local http = Http.Get(selection.luaurl, dlpath);
+	Script.SetStatus("Downloading LUA script...");
+	Script.SetProgress(0);
+	local http = Http.Get(selection.luaurl, downloadsPath..selection.filename);
 	if http.Success then
+		Script.SetStatus("Installing LUA script...");
+		Script.SetProgress(50);
 		local result = FileSystem.MoveFile(http.OutputPath, installPath, true);
+		Script.SetStatus("Done! Returning to menu...");
+		Script.SetProgress(100);
 		if result == true then
 			return true;
 		else
@@ -163,9 +176,13 @@ function HandleZipInstall(selection, path, type, checkExists)
 			end
 		end
 	end
+	Script.SetStatus("Downloading Script...");
+	Script.SetProgress(0);
 	local dlpath = downloadsPath.."tmp.7z";
 	local http = Http.Get(selection.zipurl, dlpath);
 	if http.Success then
+		Script.SetStatus("Extracting Script...");
+		Script.SetProgress(25);
 		local zip = ZipFile.OpenFile(dlpath);
 		if zip == nil then
 			Script.ShowMessageBox("ERROR", "Extraction failed!", "OK");
@@ -175,8 +192,11 @@ function HandleZipInstall(selection, path, type, checkExists)
 		if result == false then
 			Script.ShowMessageBox("ERROR", "Extraction failed!", "OK");
 		else
-			print("Moving " .. absoluteDownloadsPath.."tmp\\" .. " to "..installPath);
+			Script.SetStatus("Installing Script...");
+			Script.SetProgress(75);
 			result = FileSystem.MoveDirectory(absoluteDownloadsPath.."tmp\\", installPath, true);
+			Script.SetStatus("Done! Returning to menu...");
+			Script.SetProgress(100);
 			if result == true then
 				return true;
 			else
