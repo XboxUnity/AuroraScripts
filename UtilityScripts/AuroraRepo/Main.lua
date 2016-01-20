@@ -2,6 +2,7 @@ scriptTitle = "Aurora Repo Browser"
 scriptAuthor = "Phoenix"
 scriptVersion = "0.1"
 scriptDescription = "Aurora Script Browser... Need i say more?"
+scriptIcon = "icon.png"
 scriptPermissions = { "http", "filesystem" }
 
 require("MenuSystem");
