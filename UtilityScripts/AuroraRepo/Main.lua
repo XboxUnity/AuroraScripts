@@ -12,7 +12,7 @@ local refreshRequired = false;
 
 -- Main entry point to script
 function main()
-	if Aurora.HasInternet() ~= true then
+	if Aurora.HasInternetConnection() ~= true then
 		Script.ShowMessageBox("ERROR", "ERROR: This script requires an active internet connection to work...\n\nPlease make sure you have internet to your console before running the script", "OK");
 		return;
 	end
