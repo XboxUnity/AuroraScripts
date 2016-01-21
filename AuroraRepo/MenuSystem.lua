@@ -4,9 +4,13 @@ local TitleText = "Menu";
 local EmptyText = "No Menu Available";
 local ExitOnCancel = false;
 local GoBackText = "Go Back";
+local SortAlphaBetically = true;
 
 _ShowMenu = function(menuItem)
 	local menu = {}
+	if SortAlphaBetically then
+		table.sort(menuItem, function(a, b) return type(a) == "table" and type(b) == "table" and a.Name < b.Name; end);
+	end	
 	for k, v in ipairs(menuItem) do
 		if type(v) == "table" then
 			menu[k] = v.Name;
@@ -85,10 +89,13 @@ Menu = {
 		EmptyText = emptyText; -- Set the text to be shown if the menu is empty
 	end,
 	SetExitOnCancel = function(exitOnCancel)
-		ExitOnCancel = exitOnCancel; -- Set the flag that tells the menu system to exit upon being canceled (B being pressed)
+		ExitOnCancel = exitOnCancel == true; -- Set the flag that tells the menu system to exit upon being canceled (B being pressed)
 	end,
 	SetGoBackText = function(goBackText)
 		GoBackText = goBackText; -- Set the text for the return/back menu item
+	end,
+	SetSortAlphaBetically = function(sortAlphaBetically)
+		SortAlphaBetically = sortAlphaBetically == true; -- Set the flag that tells us if we should sort alphabetically
 	end,
 	IsMainMenu = function(menu)
 		return menu == TopLevelMenu.SubMenu;
