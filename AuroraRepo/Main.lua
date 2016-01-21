@@ -46,7 +46,7 @@ end
 
 function MakeMainMenu()
 	Menu.SetTitle(scriptTitle);
-	Menu.SetGoBackText("..");
+	Menu.SetGoBackText("");
 	for _, v in pairs(repoIniSections) do
 		local title = repoIni:ReadValue(v, "name", "");
 		if title ~= "" then

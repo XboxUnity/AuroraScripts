@@ -11,7 +11,9 @@ _ShowMenu = function(menuItem)
 		if type(v) == "table" then
 			menu[k] = v.Name;
 		else
-			menu[k] = GoBackText;
+			if GoBackText ~= nil and GoBackText ~= "" then
+				menu[k] = GoBackText; -- Only show the "Go Back" option if we actually have it set to something
+			end
 		end
 	end
 	local ret = Script.ShowPopupList(TitleText, EmptyText, menu);
