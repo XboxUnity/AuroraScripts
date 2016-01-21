@@ -20,10 +20,16 @@ function main()
   Script.CreateDirectory( "GameIcons" );
 
   -- Run our method to obtain the LiNK top-5
-  local linkInfo = DownloadLiNKTop5();
+  local linkInfo = nil;
+  ::DownloadTop5::
+  linkInfo = DownloadLiNKTop5();
   if linkInfo ~= nil then    
     -- Pass our LiNK data to our gizmo and run the scene 
-    gizmo.run( linkInfo );
+    local cmd = gizmo.run( linkInfo );
+    if cmd.Result == "refresh" then    
+      Script.SetStatus("Refreshing..."); 
+      goto DownloadTop5;
+    end
   else 
     Script.ShowNotification( "" );
   end

@@ -6,22 +6,11 @@ function Gizmo.run( scriptData )
   local hGizmo = GizmoUI.CreateInstance();
   if hGizmo ~= nil then  
     hGizmo:RegisterCallback( XuiMessage.Init, GP.fnOnInit ); 
+    hGizmo:RegisterCallback( XuiMessage.Command, GP.fnOnCommand );    
+    
     return hGizmo:InvokeUI(Script.GetBasePath(), "LiNK Top 5", "scene.xur", "skin.xur", scriptData );
   end
 end
-
-function format_int(number)
-
-  local i, j, minus, int, fraction = tostring(number):find('([-]?)(%d+)([.]?%d*)')
-
-  -- reverse the int-string and append a comma to all blocks of 3 digits
-  int = int:reverse():gsub("(%d%d%d)", "%1,")
-
-  -- reverse the int-string back remove an optional comma and put the 
-  -- optional minus and fractional part back
-  return minus .. int:reverse():gsub("^,", "") .. fraction
-end
-
 
 function GP.fnOnInit( this, initData )
   -- Find our total controls 
@@ -54,12 +43,12 @@ function GP.fnOnInit( this, initData )
   Xui["g5users"] = this:RegisterControl( XuiObject.Label, "game5users" );  
  
   -- Disable the A button
-  this:SetCommandEnabled( GizmoCommand.A, false ); 
-  this:SetCommandText( GizmoCommand.A, "Refresh" ); 
+  this:SetCommandEnabled( GizmoCommand.A, true ); 
+  this:SetCommandText( GizmoCommand.A, "Refresh" );
  
   -- Apply total counts 
-  Xui.totalusers:SetText( format_int(initData.total) .. " Users" );
-  Xui.totalonline:SetText( format_int(initData.online) .. " Players Online" );
+  Xui.totalusers:SetText( (initData.total) .. " Users" );
+  Xui.totalonline:SetText( (initData.online) .. " Players Online" );
   
  
   -- Apply images
@@ -77,12 +66,19 @@ function GP.fnOnInit( this, initData )
   Xui.g5title:SetText( initData.rooms[5].room );
   
   -- Apply Player Count 
-  Xui.g1users:SetText( format_int(initData.rooms[1].users) .. " Players" );
-  Xui.g2users:SetText( format_int(initData.rooms[2].users) .. " Players" );
-  Xui.g3users:SetText( format_int(initData.rooms[3].users) .. " Players" );
-  Xui.g4users:SetText( format_int(initData.rooms[4].users) .. " Players" );
-  Xui.g5users:SetText( format_int(initData.rooms[5].users) .. " Players" );    
+  Xui.g1users:SetText( (initData.rooms[1].users) .. " Players" );
+  Xui.g2users:SetText( (initData.rooms[2].users) .. " Players" );
+  Xui.g3users:SetText( (initData.rooms[3].users) .. " Players" );
+  Xui.g4users:SetText( (initData.rooms[4].users) .. " Players" );
+  Xui.g5users:SetText( (initData.rooms[5].users) .. " Players" );    
 end
+
+function GP.fnOnCommand( this, commandType )
+  if commandType == GizmoCommand.A then
+    -- A button was pressed- so let's dismiss our UI and refresh
+    this:Dismiss("refresh");  
+  end
+end 
 
 -- Return our script functionality
 return Gizmo;
