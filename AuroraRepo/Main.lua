@@ -79,6 +79,8 @@ function DoShowMenu(menu)
 					local author = ini:ReadValue(v, "scriptAuthor", "");
 					if (title ~= "" and ver ~= "" and author ~= "") then
 						Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title .. " v" .. ver .. " by " .. author, ini:GetSection(v)))
+					elseif (title ~= "" and author ~= "") then
+						Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title .. " by " .. author, ini:GetSection(v)))				
 					end
 				end
 			else
@@ -251,8 +253,12 @@ end
 function CheckUpdate()
 	local url = repoIni:ReadValue("Global", "updateurl", "");
 	if url ~= "" then
+		Script.SetStatus("Downloading Update information...");
+		Script.SetProgress(0);
 		local http = Http.Get(url);
 		if http.Success then
+			Script.SetStatus("Parsing Update information...");
+			Script.SetProgress(50);
 			local ini = IniFile.LoadString(http.OutputData);
 			local section = ini:GetSection("AuroraRepo");
 			if section.scriptVersion ~= scriptVersion then
@@ -262,6 +268,8 @@ function CheckUpdate()
 					return refreshRequired;
 				end
 			end
+			Script.SetStatus("Update check finished...");
+			Script.SetProgress(100);
 		else
 			Script.ShowNotification("Error downloading update information...");
 		end
