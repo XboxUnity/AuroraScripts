@@ -198,7 +198,6 @@ function HandleZipInstall(selection, path, type, checkExists)
 			return false;
 		end
 		local result = zip.Extract(zip, downloadsPath.."tmp\\");
-		zip.Close(zip);
 		FileSystem.DeleteFile(http.OutputPath);
 		if result == false then
 			Script.ShowMessageBox("ERROR", "Extraction failed!", "OK");
