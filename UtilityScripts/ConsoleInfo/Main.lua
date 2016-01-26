@@ -13,13 +13,13 @@ function main()
 	msg = msg .. "Console ID: " .. Kernel.GetConsoleId() .. "\n";
 	local key = Kernel.GetDVDKey();
 	if key ~= nil then
-		msg = msg .. "DVDKey: " .. Kernel.GetDVDKey() .. "\n";
+		msg = msg .. "DVDKey: " .. key .. "\n";
 	else
 		msg = msg .. "DVDKey: N\\A\n";
 	end
 	key = Kernel.GetCPUKey();
 	if key ~= nil then
-		msg = msg .. "CPUKey: " .. Kernel.GetDVDKey() .. "\n";
+		msg = msg .. "CPUKey: " .. key .. "\n";
 	else
 		msg = msg .. "CPUKey: N\\A\n";
 	end
