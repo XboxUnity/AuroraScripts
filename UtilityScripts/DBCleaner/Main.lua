@@ -38,7 +38,7 @@ function main()
 		Script.ShowMessageBox("Unmounted devices detected...", "There was scanpaths which could not be checked\n\nYour options for these devices are:\n\n1. Attach it and run the script again\n2. Remove the scanpath", "OK");
 	end
 	Script.SetStatus("Cleanup finished...");
-	Script.ShowNotification(string.format("%d Titles effected by the script", cleanedCounter));
+	Script.ShowNotification(string.format("%d Titles affected by the script", cleanedCounter));
 	if cleanedCounter > 0 then
 		local ret = Script.ShowMessageBox("Reload Required", "In order for the changes to take effect you need to reload Aurora\nDo you want to reload Aurora now?", "No", "Yes");
 		if ret.Button == 2 then
