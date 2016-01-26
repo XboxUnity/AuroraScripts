@@ -1,6 +1,6 @@
 scriptTitle = "Aurora Repo Browser"
 scriptAuthor = "Phoenix"
-scriptVersion = "0.1"
+scriptVersion = "0.2"
 scriptDescription = "The Phoenix script repository browser, Download and install new Content Scripts (Filters, Sorts and Subtitles) or new Utility Scripts"
 scriptIcon = "icon.png"
 scriptPermissions = { "http", "filesystem" }
