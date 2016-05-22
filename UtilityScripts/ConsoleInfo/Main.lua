@@ -1,6 +1,6 @@
 scriptTitle = "Console Info Viewer"
 scriptAuthor = "Phoenix"
-scriptVersion = 0.1
+scriptVersion = 1
 scriptDescription = "This script displays valuable information about your console"
 scriptPermissions = { "kernel" }
 

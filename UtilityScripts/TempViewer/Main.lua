@@ -1,6 +1,6 @@
 scriptTitle = "Temperature Viewer"
 scriptAuthor = "Phoenix"
-scriptVersion = 0.1
+scriptVersion = 1
 scriptDescription = "This script displays the current console temperatures in both Celsius and Fahrenheit"
 -- Request all libraries to be loaded even if we don't use them here...
 --scriptPermissions = { "http", "content", "filesystem", "settings", "sql", "kernel" }

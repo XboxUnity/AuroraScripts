@@ -1,6 +1,6 @@
 scriptTitle = "LiNK Top-5"
 scriptAuthor = "Phoenix"
-scriptVersion = 1.0
+scriptVersion = 1
 scriptDescription = "See the top-5 active games on LiNK."
 scriptIcon = "icon.png";
  

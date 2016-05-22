@@ -1,6 +1,6 @@
 scriptTitle = "Aurora Database Cleaner"
 scriptAuthor = "Phoenix"
-scriptVersion = 0.1
+scriptVersion = 1
 scriptDescription = "A database cleaner for Aurora (Removes database entries for titles which no longer exists)"
 scriptIcon = "icon.png"
 

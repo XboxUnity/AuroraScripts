@@ -1,6 +1,6 @@
 scriptTitle = "Aurora Weather"
 scriptAuthor = "Phoenix"
-scriptVersion = 1.0
+scriptVersion = 1
 scriptDescription = "A sample weather application."
 scriptIcon = "icon\\icon.xur";
  
