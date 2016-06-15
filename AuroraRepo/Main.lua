@@ -261,7 +261,7 @@ function CheckUpdate()
 			Script.SetProgress(50);
 			local ini = IniFile.LoadString(http.OutputData);
 			local section = ini:GetSection("AuroraRepo");
-			if section.scriptVersion ~= scriptVersion then
+			if tonumber(section.scriptVersion) > tonumber(scriptVersion) then
 				local ret = Script.ShowMessageBox("Repo Update Available", "A new version of the repo browser is available, do you want to download it now?", "Yes", "No");
 				if ret.Button == 1 then
 					refreshRequired = HandleZipInstall(section, Script.GetBasePath(), "", false);
