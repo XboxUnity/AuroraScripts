@@ -54,8 +54,16 @@ function main()
   queryUrl = GetWeatherQueryURL( configFile, apiKey );    -- Example:  queryUrl = "/q/zmw:36420.3.99999"
   if queryUrl == "" then 
     print("No valid QueryURL was provided- abandoning script." );
-    goto EndScript; 
-  end  
+    -- output message that no locations were found 
+    local msgData = Script.ShowMessageBox( "Location Not Found", "The location entered was not found.  Would you like to enter another location?", "Yes", "No" );
+    if msgData.Button == 1 then
+      goto RequestQuery;
+    else 
+      goto EndScript; 
+    end
+  elseif queryUrl == "___" then 
+    goto EndScript;
+  end
   
   -- Increment script progress bar
   Script.SetProgress( 60 );      
@@ -239,7 +247,9 @@ end
           end
         end
       end
-    end   
+    else 
+       queryUrl = "___";
+    end
   end
   
   if needsave == true then 
