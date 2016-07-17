@@ -138,8 +138,8 @@ function progressRoutine(totalfilesize, filesize, chunksize, totalchunksize, chu
     -- Initialize continue
     local continue = DiscInstallerReturnCommand.Continue
     
-    -- Calculate and set progressbar
-    Script.SetProgress(filesize / totalfilesize * 100);
+    -- Set progressbar
+    Script.SetProgress(filesize, totalfilesize);
 
     -- Allow abort when not parsing or cleaning up
     if callbackreason >= DiscInstallerCallbackReason.PathsPrepared and callbackreason < DiscInstallerCallbackReason.CleanupStart then
