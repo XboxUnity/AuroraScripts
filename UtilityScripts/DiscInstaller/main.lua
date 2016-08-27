@@ -1,6 +1,6 @@
 scriptTitle = "Aurora Disc to GOD installer"
 scriptAuthor = "Phoenix"
-scriptVersion = 0
+scriptVersion = 1
 scriptDescription = "Installs the current disc as Game On Demand (GOD) on a local storage device."
 scriptIcon = "icon\\icon.xur"
 
