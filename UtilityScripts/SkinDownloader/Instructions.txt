@@ -1,0 +1,20 @@
+[ Skin Downloader ]
+   by Dan Martí
+
+Version: 1.01 (06, Dec, 2016)
+Website: http://aurorascripts.tuars.com
+Contact: http://www.fb.com/Danotopia
+
+
+To install it just copy the SkinDownloader folder 
+to Game:\User\Scripts\Utility on your Xbox 360 and it
+will be shown on the Aurora's scripts menu.
+If you can't find that directory, search for
+the Aurora installation wherever you have it.
+
+If you are a developer or if simply want to contribute 
+go to the website above and follow the instructions to
+upload a skin.
+
+Hope you enjoy it! :D
+Dan
