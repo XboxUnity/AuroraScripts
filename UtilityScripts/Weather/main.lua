@@ -1,6 +1,6 @@
 scriptTitle = "Aurora Weather"
 scriptAuthor = "Phoenix"
-scriptVersion = 1
+scriptVersion = 2
 scriptDescription = "A sample weather application."
 scriptIcon = "icon\\icon.xur";
  
@@ -223,37 +223,45 @@ end
   if queryUrl == "" then 
     -- Ask user to enter city name for the search
     local lastDefault = "";
-    local keyboardData = Script.ShowKeyboard( "Aurora Weather", "Enter the name of a location to search.", lastDefault, KeyboardFlag.Highlight );
+    local keyboardData = Script.ShowKeyboard( "Aurora Weather", "Enter the name of a location to search. (or advanced location taken from a websearch url, zmw:...)", lastDefault, KeyboardFlag.Highlight );
     if keyboardData.Canceled == false then 
-      Script.SetStatus("Searching for matching locations..." );
-      -- Entered in key, so let's test if valid key 
-      local url = "http://api.wunderground.com/api/" .. apikey .. "/q/" .. keyboardData.Buffer .. ".json";
-      local httpData = Http.Get( url );
-      if httpData.Success == true then
-        -- Parse our results 
-        local o = json:decode(httpData.OutputData);
-        if o.response.results ~= nil then 
-          Script.SetStatus("Building location list..." );
-          local listContent = {};
-          for k,v in pairs(o.response.results) do
-            listContent[k] = v.city .. ", " .. v.state .. ", " .. v.country_name;
-          end
-          
-          -- At this point we have a content list, so lets create a list
-          local popupData = Script.ShowPopupList( "Select Location", "No Locations Found", listContent );
-          if popupData.Selected ~= nil then 
-            queryUrl = o.response.results[popupData.Selected.Key].l;
+	  if string.find(keyboardData.Buffer, "^zmw:") then 
+			queryUrl = "/q/"..keyboardData.Buffer;			
             needsave = true;
-          end
-        end
-      end
+	  elseif string.find(keyboardData.Buffer, "^%d*%.%d*%.%d*") then 
+			queryUrl = "/q/zmw:"..keyboardData.Buffer;			
+            needsave = true;
+	  else 	
+		Script.SetStatus("Searching for matching locations..." );
+		-- Entered in key, so let's test if valid key 
+		local url = "http://api.wunderground.com/api/" .. apikey .. "/q/" .. keyboardData.Buffer .. ".json";
+		local httpData = Http.Get( url );
+		if httpData.Success == true then
+			-- Parse our results 
+			local o = json:decode(httpData.OutputData);
+			if o.response.results ~= nil then 
+			Script.SetStatus("Building location list..." );
+			local listContent = {};
+			for k,v in pairs(o.response.results) do
+				listContent[k] = v.city .. ", " .. v.state .. ", " .. v.country_name;
+			end
+			
+			-- At this point we have a content list, so lets create a list
+			local popupData = Script.ShowPopupList( "Select Location", "No Locations Found", listContent );
+			if popupData.Selected ~= nil then 
+				queryUrl = o.response.results[popupData.Selected.Key].l;
+				needsave = true;
+			end
+			end
+		end
+	  end
     else 
        queryUrl = "___";
     end
   end
   
   if needsave == true then 
-    local retval = iniFile:WriteValue( "config", "query", queryUrl );
+	local retval = iniFile:WriteValue( "config", "query", queryUrl );
     if retval == false then 
       local msgData = Script.ShowMessageBox( "Aurora Weather", "There was an error saving your location.\n\nContinue?", "Yes", "No");
       if msgData.Button == 1 then 
