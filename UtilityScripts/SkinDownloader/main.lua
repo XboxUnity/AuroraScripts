@@ -1,6 +1,6 @@
 scriptTitle = "Skin Downloader"
 scriptAuthor = "Dan Martí"
-scriptVersion = 1
+scriptVersion = 1.01
 scriptDescription = "Download skins for Aurora 0.6b\nfb.com/Danotopia\nWEB: aurorascripts.tuars.com"
 scriptIcon = "icon.png";
 
@@ -46,11 +46,15 @@ function MakeMainMenu()
 	if http.Success then
 		lista = json:decode(http.OutputData);
 		for k, v in pairs(lista.skins) do
-		-- for _, v in pairs(ini:GetAllSections()) do
 			local autor = v.autor;
 			local nombre = v.nombre;
 			local version = v.version;
-			Menu.AddMainMenuItem(Menu.MakeMenuItem(nombre .. " v" .. version .. " by " .. autor, lista.skins[counter]))
+			if FileSystem.FileExists("Game:\\Skins\\" .. v.archivo) then
+				Menu.AddMainMenuItem(Menu.MakeMenuItem("√ "..nombre .. " v" .. version .. " by " .. autor, lista.skins[counter]))
+			else
+				Menu.AddMainMenuItem(Menu.MakeMenuItem(nombre .. " v" .. version .. " by " .. autor, lista.skins[counter]))
+			end
+			
 			counter = counter + 1;
 		end
 		
