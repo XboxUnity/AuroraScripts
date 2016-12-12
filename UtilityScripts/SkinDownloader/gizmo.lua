@@ -1,14 +1,16 @@
 local Gizmo = {};         -- public namespace
 local GP = {};            -- private namespace
 local Xui = {};
-
-function Gizmo.run( scriptData )
+local tipos = {};
+local filetipo="";
+function Gizmo.run( scriptData, tipo )
   local hGizmo = GizmoUI.CreateInstance();
   if hGizmo ~= nil then
     hGizmo:RegisterCallback( XuiMessage.Init, GP.fnOnInit ); 
     hGizmo:RegisterCallback( XuiMessage.Command, GP.fnOnCommand );    
-    
-    return hGizmo:InvokeUI(Script.GetBasePath(), "Skin Downloader", "scene.xur", "skin.xur", scriptData );
+	filetipo=tipo;
+	
+    return hGizmo:InvokeUI(Script.GetBasePath(), tipo:sub(1,-2):gsub("^%l", string.upper) .. " " .. scriptData.nombre, "scene.xur", "skin.xur", scriptData );
   end
 end
 
@@ -29,14 +31,18 @@ function GP.fnOnInit( this, initData )
   this:SetCommandEnabled( GizmoCommand.X, true );
   this:SetCommandText( GizmoCommand.X, "More info" );
   
-  -- Apply total counts 
-  Xui.Nombre:SetText( (initData.nombre) .. " v" .. (initData.version) );
-  Xui.Autor:SetText( (initData.autor) );
-  
- 
-  -- Apply images
+  -- Apply info
+  if filetipo=="backgrounds" then
+	Xui.Nombre:SetText( initData.nombre );
+	Xui.Autor:SetText( "" );
+	Xui.lblAutor:SetText( "" );
+  else
+	Xui.Nombre:SetText( (initData.nombre) .. " v" .. (initData.version) );
+	Xui.Autor:SetText( (initData.autor) );
+	Xui.lblAutor:SetText( "Author:" );
+  end
+  -- Apply screenshot
   Xui.Captura:SetImagePath( "screenshots\\" .. initData.id .. "_" .. initData.version .. ".jpg" );
-  
 end
 
 

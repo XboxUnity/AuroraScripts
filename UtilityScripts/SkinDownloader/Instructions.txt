@@ -1,7 +1,7 @@
 [ Skin Downloader ]
    by Dan Martí
 
-Version: 1.01 (06, Dec, 2016)
+Version: 1.1
 Website: http://aurorascripts.tuars.com
 Contact: http://www.fb.com/Danotopia
 
@@ -14,7 +14,7 @@ the Aurora installation wherever you have it.
 
 If you are a developer or if simply want to contribute 
 go to the website above and follow the instructions to
-upload a skin.
+upload content.
 
 Hope you enjoy it! :D
 Dan
