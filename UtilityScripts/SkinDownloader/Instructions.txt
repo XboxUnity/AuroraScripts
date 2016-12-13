@@ -1,7 +1,7 @@
 [ Skin Downloader ]
    by Dan Martí
 
-Version: 1.1
+Version: 2
 Website: http://aurorascripts.tuars.com
 Contact: http://www.fb.com/Danotopia
 
