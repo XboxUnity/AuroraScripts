@@ -53,7 +53,7 @@ end
       local filename = "GameIcons\\" .. v.titleid .. ".png";
       if Script.FileExists( filename ) == false then 
         local httpIcon = Http.Get( iconUrl, filename );
-        if httpData.Success == true then 
+        if httpIcon.Success == true then 
           print("icon '" .. filename .. "' download successfully" );
         end
       end
