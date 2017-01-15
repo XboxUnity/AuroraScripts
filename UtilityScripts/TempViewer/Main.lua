@@ -15,6 +15,6 @@ function main()
 	local msg = "CPU: " .. string.format("%.2f", temps["CPU"]) .. "°C / " .. string.format("%.2f", toFahrenheit(temps["CPU"])) .. "°F\n";
 	msg = msg .. "GPU: " .. string.format("%.2f", temps["GPU"]) .. "°C / " .. string.format("%.2f", toFahrenheit(temps["GPU"])) .. "°F\n";
 	msg = msg .. "RAM: " .. string.format("%.2f", temps["RAM"]) .. "°C / " .. string.format("%.2f", toFahrenheit(temps["RAM"])) .. "°F\n";
-	msg = msg .. "CPU: " .. string.format("%.2f", temps["BRD"]) .. "°C / " .. string.format("%.2f", toFahrenheit(temps["BRD"])) .. "°F\n";
+	msg = msg .. "CASE: " .. string.format("%.2f", temps["BRD"]) .. "°C / " .. string.format("%.2f", toFahrenheit(temps["BRD"])) .. "°F\n";
 	Script.ShowMessageBox("Current Temperatures", msg, "OK");
 end
