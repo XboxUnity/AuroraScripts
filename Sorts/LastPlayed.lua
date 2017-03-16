@@ -6,7 +6,7 @@ GameListSorters["Last Played"] = function(Item1, Item2, Type)
 			return false
 		elseif ((Item1.LastPlayed.HighPart == 0) and (Item2.LastPlayed.HighPart ~= 0)) then
 			return true
-		elseif (Item1.LastPlayed.HighPart == Item2.LastPlayed.HighPart) then
+		elseif (Item1.LastPlayed.HighPart ~= Item2.LastPlayed.HighPart) then
 			return (Item1.LastPlayed.HighPart < Item2.LastPlayed.HighPart)
 		else
 			return (Item1.LastPlayed.LowPart < Item2.LastPlayed.LowPart)
@@ -18,7 +18,7 @@ GameListSorters["Last Played"] = function(Item1, Item2, Type)
 			return true
 		elseif ((Item1.LastPlayed.HighPart == 0) and (Item2.LastPlayed.HighPart ~= 0)) then
 			return false
-		elseif (Item1.LastPlayed.HighPart == Item2.LastPlayed.HighPart) then
+		elseif (Item1.LastPlayed.HighPart ~= Item2.LastPlayed.HighPart) then
 			return (Item1.LastPlayed.HighPart > Item2.LastPlayed.HighPart)
 		else
 			return (Item1.LastPlayed.LowPart > Item2.LastPlayed.LowPart)
