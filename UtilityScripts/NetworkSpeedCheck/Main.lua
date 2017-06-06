@@ -13,7 +13,13 @@ local results = { localIp         = "n/a",
                   remoteIp        = "n/a",
                   serverIp        = "n/a",
                   hops            = "n/a",
-                  ping            = "n/a",
+                  ping            = 
+                  {
+                    ["min"] = "n/a",
+                    ["avg"] = "n/a",
+                    ["max"] = "n/a",
+                    ["mdev"]= "n/a"
+                  },
                   jitter          = "n/a",
                   downstreamInBPS = 0,
                   upstreamInBPS   = 0};
@@ -96,7 +102,7 @@ function determinePingJitterHops()
   Script.SetStatus( "Determining Additional Ping-Info...");
   local data = Http.Get("http://scope.avm.de/zackAVM2015/ping2.php");
 
-  if data.Success then
+  if data.Success and (not data.OutputData:find("100%% packet loss")) then
     results["hops"]    = getHops(data.OutputData);
     results["ping"]    = getPing(data.OutputData);
     results["jitter"]  = getJitter();
