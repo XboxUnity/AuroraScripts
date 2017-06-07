@@ -99,12 +99,15 @@ function determineServerIp()
 end
 
 function determinePingJitterHops()
-  Script.SetStatus( "Determining Additional Ping-Info...");
+  Script.SetStatus( "Determining Ping-Info...");
   local data = Http.Get("http://scope.avm.de/zackAVM2015/ping2.php");
 
-  if data.Success and (not data.OutputData:find("100%% packet loss")) then
+  if data.Success and data.OutputData:find("ttl=") then
     results["hops"]    = getHops(data.OutputData);
     results["ping"]    = getPing(data.OutputData);
+    results["jitter"]  = getJitter();
+  else
+    results["ping"] = getPingAlternative();
     results["jitter"]  = getJitter();
   end
 end
@@ -149,6 +152,27 @@ function getPing(data)
           ["avg"] = tonumber(pingAvg),
           ["max"] = tonumber(pingMax),
           ["mdev"]= tonumber(mdev)};
+end
+
+function getPingAlternative()
+  local url = "http://scope.avm.de/zackAVM2015/test.txt";
+  local pingTimes = {};
+  
+  for i=1, 10 do
+    local timeSnap = getCurrentTimeInMilliseconds();
+    local httpData = Http.Get(url);
+    
+    if httpData.Success then
+      local elapsedTime = (getCurrentTimeInMilliseconds() - timeSnap);
+      pingTimes[i] = elapsedTime;
+    end
+  end
+  
+  table.sort(pingTimes);
+  
+  return {["min"] = pingTimes[1],
+          ["avg"] = getAverage(pingTimes),
+          ["max"] = pingTimes[#pingTimes]};
 end
 
 function getJitter()
