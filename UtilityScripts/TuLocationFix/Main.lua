@@ -1,6 +1,7 @@
 scriptTitle = "TULocationFix"
 scriptAuthor = "Swizzy"
 scriptVersion = 1
+scriptIcon = "icon\\icon.png";
 scriptDescription = "TU Location Fix (adds support for USB#:\\ paths for TU's) This is only needed on 0.6b and only if you didn't do a fresh install"
 
 scriptPermissions = { "settings" }
