@@ -17,7 +17,7 @@
 <Width>64.000000</Width>
 <Height>61.000000</Height>
 <Position>714.000000,50.000004,0.000000</Position>
-<ImagePath>images\upstreamArrow.png</ImagePath>
+<ImagePath>Images\upstreamArrow.png</ImagePath>
 </Properties>
 </XuiImage>
 <XuiLabel>
@@ -58,7 +58,7 @@
 <Width>64.000000</Width>
 <Height>61.000000</Height>
 <Position>233.000015,50.000000,0.000000</Position>
-<ImagePath>images\downstreamArrow.png</ImagePath>
+<ImagePath>Images\downstreamArrow.png</ImagePath>
 </Properties>
 </XuiImage>
 <XuiLabel>

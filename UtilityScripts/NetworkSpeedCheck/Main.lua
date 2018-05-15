@@ -6,40 +6,70 @@ scriptIcon = "icon\\icon.xur";
 scriptPermissions = { "http", "filesystem" };
 
 require("AuroraUI");
-gizmo = require("Gizmo");
 require("helper\\helper");
+resultGizmo = require("GizmoResult");
+optionGizmo = require("GizmoOption");
 
-local results = { localIp         = "n/a",
-                  remoteIp        = "n/a",
-                  serverIp        = "n/a",
-                  hops            = "n/a",
-                  ping            = "n/a",
-                  jitter          = "n/a",
-                  downstreamInBPS = 0,
-                  upstreamInBPS   = 0};
-                  
-local downloadFileUrl = "http://scope.avm.de/zackAVM2015_Test/50MB.data";
-local downloadDataFile = "data\\downloadData.data";                  
-local uploadUrl = "http://scope.avm.de/zackAVM2015/upload_2015.php";
-local uploadDataFile = "data\\uploadData.txt";
+-- default Options
+local options = { ["additionalInfoTest"] = { ["localIp"]  = true,
+                                             ["remoteIp"] = true,
+                                             ["serverIp"] = true},
+                  ["pingJitterHopsTest"] = true,
+                  ["downloadTest"]       = { ["enabled"] = true,
+                                             ["count"]   = 2,
+                                             ["url"]     = "http://scope.avm.de/zackAVM2015_Test/50MB.data",
+                                             ["path"]    = "data\\downloadData.data" },
+                  ["uploadTest"]         = { ["enabled"] = true,
+                                             ["count"]   = 4,
+                                             ["url"]     = "http://scope.avm.de/zackAVM2015/upload_2015.php",
+                                             ["path"]    = "data\\uploadData.txt" }};
+-- default Results
+local results = { ["localIp"]         = "n/a",
+                  ["remoteIp"]        = "n/a",
+                  ["serverIp"]        = "n/a",
+                  ["hops"]            = "n/a",
+                  ["ping"]            = { ["min"]  = "n/a",
+                                          ["avg"]  = "n/a",
+                                          ["max"]  = "n/a",
+                                          ["mdev"] = "n/a" },
+                  ["jitter"]          = "n/a",
+                  ["downstreamInBPS"] = 0,
+                  ["upstreamInBPS"]   = 0};
             
 function main()  
   if isInitSuccessful() then
-    
-    local selection = Script.ShowMessageBox("Attention", "This Script will download a file to determine you Network speed. \nDepending on your Network Connection Speed, this can take up to 10 Minutes. \n\nTo get reliable results, please stop any other Network Traffic. \n\nPlease be patient!", "Accept", "Abort");
-    
-    if selection.Button == 1 then
-      determineLocalIp();
-      determineRemoteIp();
-      determineServerIp();
-      determinePingJitterHops();
-      determineDownloadSpeed();
-      determineUploadSpeed();
+    local selection = Script.ShowMessageBox("Attention", 
+                                            "This Script will download a file to determine you Network speed. \n" ..
+                                            "Depending on your Network Connection Speed, this can take up to 10 Minutes. \n\n" ..
+                                            "To get reliable results, please stop any other Network Traffic. \n\n" .. 
+                                            "Please be patient!", 
+                                            "Accept", 
+                                            "Abort");
+                                            
+    if selection.Button == 1 and optionGizmo.run(options).Result == "continue" then
+      if options.additionalInfoTest.localIp then
+        determineLocalIp();
+      end
+      if options.additionalInfoTest.remoteIp then
+        determineRemoteIp();
+      end
+      if options.additionalInfoTest.serverIp then
+        determineServerIp();
+      end
+      if options.pingJitterHopsTest then
+        determinePingJitterHops();
+      end
+      if options.downloadTest.enabled then
+        determineDownloadSpeed();
+      end
+      if options.uploadTest.enabled then
+        determineUploadSpeed();
+      end
       
       Script.SetStatus( "Displaying Results...");
       Script.SetProgress( 99 );
       
-      gizmo.run( results );
+      resultGizmo.run( results );
     end
     
     Script.SetStatus( "Script Finished...");
@@ -54,7 +84,7 @@ function isInitSuccessful()
   local initSuccess = true;
   
   Script.SetStatus( "Clearing data folder...");
-  FileSystem.DeleteFile(Script.GetBasePath() .. downloadDataFile);
+  FileSystem.DeleteFile(Script.GetBasePath() .. options.downloadTest.path);
   
   Script.SetStatus( "Checking Internet Connection...");
   if not Aurora.HasInternetConnection() then
@@ -93,12 +123,15 @@ function determineServerIp()
 end
 
 function determinePingJitterHops()
-  Script.SetStatus( "Determining Additional Ping-Info...");
+  Script.SetStatus( "Determining Ping-Info...");
   local data = Http.Get("http://scope.avm.de/zackAVM2015/ping2.php");
 
-  if data.Success then
+  if data.Success and data.OutputData:find("ttl=") then
     results["hops"]    = getHops(data.OutputData);
     results["ping"]    = getPing(data.OutputData);
+    results["jitter"]  = getJitter();
+  else
+    results["ping"] = getPingAlternative();
     results["jitter"]  = getJitter();
   end
 end
@@ -145,6 +178,27 @@ function getPing(data)
           ["mdev"]= tonumber(mdev)};
 end
 
+function getPingAlternative()
+  local url = "http://scope.avm.de/zackAVM2015/test.txt";
+  local pingTimes = {};
+  
+  for i=1, 10 do
+    local timeSnap = getCurrentTimeInMilliseconds();
+    local httpData = Http.Get(url);
+    
+    if httpData.Success then
+      local elapsedTime = (getCurrentTimeInMilliseconds() - timeSnap);
+      pingTimes[i] = elapsedTime;
+    end
+  end
+  
+  table.sort(pingTimes);
+  
+  return {["min"] = pingTimes[1],
+          ["avg"] = getAverage(pingTimes),
+          ["max"] = pingTimes[#pingTimes]};
+end
+
 function getJitter()
   return round(((results["ping"]["max"] - results["ping"]["min"]) / 2), 3);
 end
@@ -156,16 +210,16 @@ function determineDownloadSpeed()
   local downstreamTimes = {};
   local downloadFileSize;
   
-  for i=1, 2 do
+  for i=1, options.downloadTest.count do
     Script.SetStatus( "Determining Download Speed Test " .. i .. "...");
-    Script.SetProgress( Script.GetProgress() + 15);
+    Script.SetProgress( Script.GetProgress() + 10);
   
     local timeSnap = getCurrentTimeInMilliseconds();
-    local httpData = Http.Get(downloadFileUrl, downloadDataFile);
+    local httpData = Http.Get(options.downloadTest.url, options.downloadTest.path);
     
     if httpData.Success then 
       local elapsedTime = (getCurrentTimeInMilliseconds() - timeSnap) / 1000;
-      downloadFileSize = FileSystem.GetFileSize( Script.GetBasePath() .. downloadDataFile );
+      downloadFileSize = FileSystem.GetFileSize( Script.GetBasePath() .. options.downloadTest.path );
       downstreamTimes[i] = elapsedTime;
     end
   end
@@ -178,15 +232,15 @@ function determineUploadSpeed()
   Script.SetStatus( "Determining Upload Speed ...");
   
   local uploadData = {};
-  uploadData["data"] = FileSystem.ReadFile( Script.GetBasePath() .. uploadDataFile );
-  local uploadFileSize = FileSystem.GetFileSize( Script.GetBasePath() .. uploadDataFile );
+  uploadData["data"] = FileSystem.ReadFile( Script.GetBasePath() .. options.uploadTest.path );
+  local uploadFileSize = FileSystem.GetFileSize( Script.GetBasePath() .. options.uploadTest.path );
   local upstreamTimes = {};
   
-  for i=1, 3 do
+  for i=1, options.uploadTest.count do
     Script.SetStatus( "Determining Upload Speed Test " .. i .. "...");
-    Script.SetProgress( Script.GetProgress() + 10);
+    Script.SetProgress( Script.GetProgress() + 3);
     local timeSnap = getCurrentTimeInMilliseconds();
-    local httpData = Http.Post(uploadUrl, uploadData);
+    local httpData = Http.Post(options.uploadTest.url, uploadData);
     
     if httpData.Success then
       local elapsedTime = (getCurrentTimeInMilliseconds() - timeSnap) / 1000;
