@@ -1,6 +1,6 @@
 scriptTitle = "Language Pack Downloader"
 scriptAuthor = "Swizzy"
-scriptVersion = 1
+scriptVersion = 2
 scriptDescription = "Swizzy's Language Pack Downloader, downloads Language Packs compatible with your version of Aurora"
 scriptPermissions = { "http", "filesystem" }
 
@@ -88,7 +88,7 @@ function HandleInstall(selection, path)
 	if FileSystem.FileExists(installPath) then
 		if  not HandleAlreadyExists(filename) then
 			while FileSystem.FileExists(installPath) do
-				installPath, filename, canceled = GetNewName(filename, path, "Select new filename:", ".lua");
+				installPath, filename, canceled = GetNewName(filename, path, "Select new filename:", ".xzp");
 				if canceled then
 					return false; -- We're not going to continue trying this
 				end
