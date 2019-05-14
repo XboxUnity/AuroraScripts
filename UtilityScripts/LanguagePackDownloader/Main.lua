@@ -1,12 +1,12 @@
 scriptTitle = "Language Pack Downloader"
 scriptAuthor = "Swizzy"
-scriptVersion = 2
+scriptVersion = 3
 scriptDescription = "Swizzy's Language Pack Downloader, downloads Language Packs compatible with your version of Aurora"
-scriptPermissions = { "http", "filesystem" }
+scriptPermissions = { "http", "filesystem", "settings" }
 
 require("MenuSystem");
 
-listurl="http://lang.gxarena.com/list.ini"
+listurl="http://zucattostricot.000webhostapp.com/list.ini"
 
 -- Main entry point to script
 function main()
@@ -102,8 +102,13 @@ function HandleInstall(selection, path)
 		Script.SetStatus("Installing Language Pack...");
 		Script.SetProgress(50);
 		local result = FileSystem.MoveFile(http.OutputPath, installPath, true);
+		Settings.SetSystem("LanguagePack", filename);
 		Script.SetStatus("Done! Returning to menu...");
 		Script.SetProgress(100);
+		local ret = Script.ShowMessageBox("Reload Required", "A Reload is required for your changes to take effect\n\nDo you want to reload Aurora now?", "Yes", "No");
+		if ret.Button == 1 then
+			Aurora.Restart();
+		end
 		if result == true then
 			return true;
 		else
