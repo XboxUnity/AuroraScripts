@@ -1,7 +1,7 @@
 scriptTitle = "Simple Game Disc to HDD Copy"
 scriptAuthor = "TheNicNic"
 scriptVersion = 1
-scriptDescription = "Copy Disc To Directory"
+scriptDescription = "Copy Disc Files To Directory"
 scriptIcon = "icon.png"
 
 -- Define script permissions to enable access to libraries
@@ -26,28 +26,24 @@ NotificationType = enum {
 }
 
 -- Global variables
-glTotalSize = 0
-glCopyProgress = 0
-glSizeDiff = 0
-glAbort = false
-glExitCode = 2
+glTotalSize = 0;
+glCopyProgress = 0;
+glSizeDiff = 0;
+glExitCode = 2;
 
 -- Main entry point to script
 function main()
     Script.SetCancelEnable(true);
-    
-    -- Return values
-    local ret
-    
-    -- Initialize targetPath and createContentDir
-    local targetPath = ""
-    local createContentDirs = false
-    local originPath = "Dvd:"
+   
+    local ret;
+    local targetPath = "";
+    local createContentDirs = false;
+    local originPath = "Dvd:";
     local dirCreated = false;
     
     Script.SetStatus("Select destination directory");
     
-    if Aurora.GetDVDTrayState() ~= 2 then
+    if Aurora.GetDVDTrayState() ~= 2 then -- Abort if tray isn't closed
       glExitCode = 1;
       Aurora.CloseDVDTray();
       goto ExitScript;
@@ -132,9 +128,9 @@ function main()
       end
     end
     
-    Aurora.OpenDVDTray();
+    Aurora.OpenDVDTray(); -- Cause you don't need it anymore after successful read
    
-    ::ExitScript::
+    ::ExitScript:: -- Exit handling
     if glExitCode == 0 then
       Script.ShowNotification("Copy completed", NotificationType.Information);
       ret = Script.ShowMessageBox("Scan for content", "Scan for new content now?\n\nThis will add the installed title if it is installed in a scan path location.", "Yes", "No");
@@ -159,7 +155,7 @@ function main()
     end
 end
 
-function todouble(number) -- Enforce double instead of 32-bit Int because of Signed Int max value limit
+function todouble(number) -- Enforce double instead of 32-bit in because of signed int max value limit
   if number == nil then
     return 0.0;
   else
@@ -168,7 +164,7 @@ function todouble(number) -- Enforce double instead of 32-bit Int because of Sig
 end
 
 function round(number)
-  return math.floor(number * 10 + 0.5) / 10
+  return math.floor(number * 10 + 0.5) / 10;
 end
 
 function suggestDirName(existingDirs, platform, startNumber)
@@ -185,9 +181,7 @@ end
 function progressRoutine(totalfilesize, filesize)
   if Script.IsCanceled() then
     glExitCode = 2;
-    glAbort = true;
-    Aurora.OpenDVDTray(); --This forces the "CopyFile" and "CopyDirectory" operations to abort
-    glAbort = false;
+    Aurora.OpenDVDTray(); -- This forces the "CopyFile" and "CopyDirectory" operations to abort
   end
           
   glCopyProgress = glCopyProgress + (todouble(filesize) - glSizeDiff);
