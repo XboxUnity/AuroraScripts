@@ -1,6 +1,6 @@
 scriptTitle = "Simple Game Disc to HDD Copy"
 scriptAuthor = "TheNicNic"
-scriptVersion = 1
+scriptVersion = 2
 scriptDescription = "Copy Disc Files To Directory"
 scriptIcon = "icon.png"
 
@@ -67,7 +67,7 @@ function main()
       root = root:gsub("\\Xbox360\\System\\", "");
       root = root:gsub("\\", "") .. ":";
       
-      targetPath = root .. "\\" .. selectedDir.RelativePath .. "\\" .. selectedDir.Name .. "\\";
+      targetPath = root .. selectedDir.RelativePath .. "\\" .. selectedDir.Name .. "\\";
       
       if FileSystem.FileExists("Dvd:\\default.xbe") then -- Xbox (OG) game detected
         -- Suggest iterating directory name
@@ -133,7 +133,7 @@ function main()
     ::ExitScript:: -- Exit handling
     if glExitCode == 0 then
       Script.ShowNotification("Copy completed", NotificationType.Information);
-      ret = Script.ShowMessageBox("Scan for content", "Scan for new content now?\n\nThis will add the installed title if it is installed in a scan path location.", "Yes", "No");
+      ret = Script.ShowMessageBox(scriptTitle, "Scan for new content now?\n\nThis will add the installed title if it is installed in a scan path location.", "Yes", "No");
       if ret.Button == 1 then
         if Content.StartScan() == true then
           Script.ShowNotification("Content Scan started");
@@ -145,7 +145,7 @@ function main()
       Script.ShowNotification("Tray was open, please insert a Xbox or Xbox 360 game disc and run again", NotificationType.Warning);
     elseif glExitCode == 2 then
       if dirCreated == true then
-        ret = Script.ShowMessageBox("Delete directory?", "Incomplete copy due user abortion.\nDo you want to cleanup the created directory?", "Yes", "No");
+        ret = Script.ShowMessageBox(scriptTitle, "Incomplete copy due user abortion.\nDo you want to cleanup the created directory?", "Yes", "No");
         if ret.Button == 1 then
           FileSystem.DeleteDirectory(targetPath);
           Script.SetStatus("Deleting: " .. targetPath);
