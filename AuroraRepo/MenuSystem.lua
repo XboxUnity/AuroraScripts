@@ -21,12 +21,11 @@ _ShowMenu = function(menuItem)
 		end
 	end
 	local ret = Script.ShowPopupList(TitleText, EmptyText, menu);
-	if ret.Canceled == true or (ret.Selected.Key == 1 and ret.Selected.Value == GoBackText) then
-		if ret.Canceled == true then
-			if ExitOnCancel == true then
-				return nil, menuItem, ret.Canceled, nil;
-			end
+	if ret.Canceled == true then
+		if ExitOnCancel == true then
+			return nil, menuItem, ret.Canceled, nil;
 		end
+	elseif ret.Selected.Key == 1 and ret.Selected.Value == GoBackText Then
 		if menuItem.Parent == nil or menuItem.Parent.Parent == nil then
 			return nil, menuItem, ret.Canceled, nil;
 		else
