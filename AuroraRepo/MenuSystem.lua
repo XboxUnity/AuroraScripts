@@ -25,7 +25,7 @@ _ShowMenu = function(menuItem)
 		if ExitOnCancel == true then
 			return nil, menuItem, ret.Canceled, nil;
 		end
-	elseif ret.Selected.Key == 1 and ret.Selected.Value == GoBackText Then
+	elseif ret.Selected.Key == 1 and ret.Selected.Value == GoBackText then
 		if menuItem.Parent == nil or menuItem.Parent.Parent == nil then
 			return nil, menuItem, ret.Canceled, nil;
 		else
