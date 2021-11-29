@@ -1,6 +1,6 @@
-#Aurora's Utility Script
+# Aurora's Utility Script
 
-##Library Functions 
+## Library Functions 
 
 **Global Methods**
 
