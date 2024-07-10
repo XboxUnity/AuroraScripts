@@ -1,7 +1,7 @@
 scriptTitle = "Xefu Spoofer"
 scriptAuthor = "Derf"
 scriptVersion = 1.0
-scriptDescription = "Forces original Xbox games to use your selected xefu version.\n\nConsoleMods.org"
+scriptDescription = "Forces original Xbox games to use your selected xefu version.\n\nCompatibility list:\nConsoleMods.org/fusion"
 scriptIcon = "icon.png"
 scriptPermissions = { "filesystem" }
 require("MenuSystem");
