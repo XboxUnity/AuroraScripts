@@ -1,7 +1,7 @@
 scriptTitle = "Xefu Spoofer"
 scriptAuthor = "Derf"
 scriptVersion = 1.0
-scriptDescription = "Forces original Xbox games to use your selected xefu version.\n\nCompatibility list:\nConsoleMods.org/fusion"
+scriptDescription = "Forces original Xbox games to use your selected xefu version. Compatibility list: ConsoleMods.org/fusion"
 scriptIcon = "icon.png"
 scriptPermissions = { "filesystem" }
 require("MenuSystem");
@@ -19,7 +19,7 @@ function main()
 
 	MakeMainMenu();
 	DoShowMenu();
-	
+
 	::scriptend::
 end
 
@@ -37,7 +37,7 @@ function xefu_files_all_present(path)
 		end
 		return false;
 	end
-	
+
 	if not ( FileSystem.FileExists( path .. "xefutitle5.xex" )
 	and FileSystem.FileExists( path .. "xefutitle6.xex" )
 	and FileSystem.FileExists( path .. "xefutitle7.xex" )
@@ -199,7 +199,7 @@ function DoShowMenu(menu)
 		if Menu.IsMainMenu(menu) then
 			Script.SetStatus("Loading xefu options...");
 			Script.SetProgress(25);
-			
+
 			if (ret == "RESET") then
 				-- Set xefu files to default
 				--Script.ShowMessageBox("DEBUG","Resetting to default","OK");
