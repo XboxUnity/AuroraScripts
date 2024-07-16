@@ -1,6 +1,6 @@
 # Aurora Scripts
 
-This document provides a reference for the scripting API available in Aurora. The API exposes numerous global, script and library objects and functions for extending the functionality of Aurora through Lua scripting.
+Aurora's Lua scripting API can be used to extend the functionality of Aurora through custom community-contributed filters, sorts, subtitles, and utility scripts. The API exposes global, script, and library functions for integrating into Aurora's user interface, and accessing underlying system internals.
 
 ## Table of Contents
 
