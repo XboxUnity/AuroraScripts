@@ -1,7 +1,7 @@
 scriptTitle = "Aurora Repo Browser"
 scriptAuthor = "Phoenix"
 scriptVersion = 2
-scriptDescription = "The Phoenix script repository browser, Download and install new Content Scripts (Filters, Sorts and Subtitles) or new Utility Scripts"
+scriptDescription = "The Phoenix script repository browser: Download and install new Content (Filters, Sorts and Subtitles) and Utility Scripts"
 scriptIcon = "icon.png"
 scriptPermissions = { "http", "filesystem" }
 
@@ -80,7 +80,7 @@ function DoShowMenu(menu)
 					if (title ~= "" and ver ~= "" and author ~= "") then
 						Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title .. " v" .. ver .. " by " .. author, ini:GetSection(v)))
 					elseif (title ~= "" and author ~= "") then
-						Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title .. " by " .. author, ini:GetSection(v)))				
+						Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title .. " by " .. author, ini:GetSection(v)))
 					end
 				end
 			else
