@@ -26,33 +26,33 @@ function GP.fnOnInit(this, initData)
     Xui["weather"] = this:RegisterControl(XuiObject.Label, "weather");
     Xui["imgIcon"] = this:RegisterControl(XuiObject.Image, "imgIcon");
 
-    -- Define our control tables for our forecast controls
-    Xui["forecast"] = {}
-    Xui.forecast["day1"] = {}
-    Xui.forecast["day2"] = {}
-    Xui.forecast["day3"] = {}
-    Xui.forecast["day4"] = {}
-
-    -- Locate and register our tab2 controls (4-day forecast)
-    Xui.forecast.day1["temphi"] = this:RegisterControl(XuiObject.Label, "d1temphi");
-    Xui.forecast.day1["templo"] = this:RegisterControl(XuiObject.Label, "d1templo");
-    Xui.forecast.day1["dayofweek"] = this:RegisterControl(XuiObject.Label, "d1dayofweek");
-    Xui.forecast.day1["image"] = this:RegisterControl(XuiObject.Image, "d1image");
-
-    Xui.forecast.day2["temphi"] = this:RegisterControl(XuiObject.Label, "d2temphi");
-    Xui.forecast.day2["templo"] = this:RegisterControl(XuiObject.Label, "d2templo");
-    Xui.forecast.day2["dayofweek"] = this:RegisterControl(XuiObject.Label, "d2dayofweek");
-    Xui.forecast.day2["image"] = this:RegisterControl(XuiObject.Image, "d2image");
-
-    Xui.forecast.day3["temphi"] = this:RegisterControl(XuiObject.Label, "d3temphi");
-    Xui.forecast.day3["templo"] = this:RegisterControl(XuiObject.Label, "d3templo");
-    Xui.forecast.day3["dayofweek"] = this:RegisterControl(XuiObject.Label, "d3dayofweek");
-    Xui.forecast.day3["image"] = this:RegisterControl(XuiObject.Image, "d3image");
-
-    Xui.forecast.day4["temphi"] = this:RegisterControl(XuiObject.Label, "d4temphi");
-    Xui.forecast.day4["templo"] = this:RegisterControl(XuiObject.Label, "d4templo");
-    Xui.forecast.day4["dayofweek"] = this:RegisterControl(XuiObject.Label, "d4dayofweek");
-    Xui.forecast.day4["image"] = this:RegisterControl(XuiObject.Image, "d4image");
+    ---- Locate and register our tab2 controls (4-day forecast)
+    Xui["forecast"] = {
+        day1 = {
+            temphi = this:RegisterControl(XuiObject.Label, "d1temphi"),
+            templo = this:RegisterControl(XuiObject.Label, "d1templo"),
+            dayofweek = this:RegisterControl(XuiObject.Label, "d1dayofweek"),
+            image = this:RegisterControl(XuiObject.Image, "d1image"),
+        },
+        day2 = {
+            temphi = this:RegisterControl(XuiObject.Label, "d2temphi"),
+            templo = this:RegisterControl(XuiObject.Label, "d2templo"),
+            dayofweek = this:RegisterControl(XuiObject.Label, "d2dayofweek"),
+            image = this:RegisterControl(XuiObject.Image, "d2image"),
+        },
+        day3 = {
+            temphi = this:RegisterControl(XuiObject.Label, "d3temphi"),
+            templo = this:RegisterControl(XuiObject.Label, "d3templo"),
+            dayofweek = this:RegisterControl(XuiObject.Label, "d3dayofweek"),
+            image = this:RegisterControl(XuiObject.Image, "d3image"),
+        },
+        day4 = {
+            temphi = this:RegisterControl(XuiObject.Label, "d4temphi"),
+            templo = this:RegisterControl(XuiObject.Label, "d4templo"),
+            dayofweek = this:RegisterControl(XuiObject.Label, "d4dayofweek"),
+            image = this:RegisterControl(XuiObject.Image, "d4image"),
+        },
+    }
 
     -- Set our command buttons
     this:SetCommandEnabled(GizmoCommand.A, false);
