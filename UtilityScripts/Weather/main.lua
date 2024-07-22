@@ -5,7 +5,7 @@ scriptDescription = "A simple weather application"
 scriptIcon = "icon\\icon.xur"
 
 -- Define script permissions to enable access to libraries
-scriptPermissions = { "http" }
+scriptPermissions = { "Http", "FileSystem" }
 
 -- Include our helper functions / enumerations
 require("AuroraUI")
@@ -16,18 +16,33 @@ gizmo = require("Gizmo")
 State = {} -- Stores the current state of the gizmo
 Xui = {}   -- Stores handles of XUI objects
 
-local cfgFilename = "settings.ini"
+local CFG_FILENAME = "settings.ini"
 
 -- Main entry point to script
 function main()
     -- Using our IniFile library, let's open our config file (file will be created if not found)
-    -- TODO: Reset ini if missing "version" key or if version is less than 3
-    local configFile = IniFile.LoadFile("settings.ini")
+    local configFile = IniFile.LoadFile(CFG_FILENAME)
     if configFile == nil then
-        print("Error opening the script configuration file.")
+        print("Error opening script configuration file: " .. CFG_FILENAME)
         goto EndScript
     end
     Script.SetProgress(20)
+
+    -- Validate the config version, resetting the config file if necessary
+    local configVersion = tonumber(configFile:ReadValue("config", "version", "0"))
+    if configVersion < scriptVersion then
+        if FileSystem.DeleteFile(Script.GetBasePath() .. CFG_FILENAME) == false then
+            print("Error resetting script configuration file: " .. CFG_FILENAME)
+            Script.ShowNotification("Error resetting configuration file: " .. CFG_FILENAME)
+            goto EndScript
+        end
+
+        configFile = IniFile.LoadFile(CFG_FILENAME)
+
+        if not TryWriteConfigValue(configFile, "config", "version", scriptVersion) then
+            goto EndScript
+        end
+    end
 
     -- Call our function to obtain Imperial or Metric unit system
     -- TODO: Convert to boolean, store as "true" or "false"
@@ -40,9 +55,9 @@ function main()
     local params = GetLocation(configFile)
     if params == nil then
         local msgData = Script.ShowMessageBox("Location Not Found",
-            "The location entered was not found. " ..
-            "Would you like to enter another location?",
-            "Yes", "No")
+            "The location entered was not found. Would you like to enter another location?",
+            "Yes",
+            "No")
         if msgData.Button == 1 then goto RequestQuery else goto EndScript end
     end
     Script.SetProgress(60)
@@ -58,29 +73,26 @@ function main()
     end
     Script.SetProgress(80)
 
-    local scriptData = {}
-    ---@diagnostic disable-next-line: need-check-nil
-    scriptData["location"] = params.location -- if we made it here, we have a location
-    scriptData["weather"] = weatherData
+    local scriptData = {
+        ---@diagnostic disable-next-line: need-check-nil
+        location = params.location, -- if we made it here, we have a location
+        weather = weatherData
+    }
 
     -- Pass our weather data to our gizmo and run the scene
     local cmd = gizmo.run(scriptData)
-    if cmd.Result == "location" then
+
+    -- Handle gizmo commands
+    if cmd.Result == "reset_location" then
         Script.SetStatus("Resetting location...")
         Script.SetProgress(40)
 
-        -- Clear our query string from our config
-        local savedLat = configFile:WriteValue("config", "latitude", "")
-        local savedLon = configFile:WriteValue("config", "longitude", "")
-        if savedLat == false or savedLon == false then
-            local msgData = Script.ShowMessageBox("Aurora Weather",
-                "There was an error reseting your location.", "OK")
-            if msgData.Button == 1 then
-                goto EndScript
-            end
+        if not TryWriteConfigValue(configFile, "config", "location", "") or
+            not TryWriteConfigValue(configFile, "config", "latitude", "") or
+            not TryWriteConfigValue(configFile, "config", "longitude", "") then
+            goto EndScript
         end
 
-        -- Request new location
         goto RequestQuery
     end
     Script.SetProgress(100)
@@ -88,7 +100,25 @@ function main()
     ::EndScript::
 end
 
--- Helper function to retrieve or set configured measurement system
+-- Writes a value to the configuration file, displaying an error message box if the write fails.
+-- Returns true if the write was successful, false otherwise.
+function TryWriteConfigValue(iniFile, section, key, value)
+    local retval = iniFile:WriteValue(section, key, value)
+    if retval == false then
+        print("Error writing to [" .. section .. "] section of configuration file: " .. key .. " = " .. value)
+        local msgData = Script.ShowMessageBox(scriptTitle .. "Error",
+            "Error writing " .. key .. " value to configuration file.",
+            "OK")
+        if msgData.Button == 1 then
+            return false
+        end
+    end
+
+    return true
+end
+
+-- Retrieves the saved measurement system from the configuration file.
+-- If not found, prompts the user to select one, and saves it to the configuration file.
 -- Params: The INI file object to read and write configuration settings.
 -- Returns: A string containing the metric flag (0 = Imperial, 1 = Metric).
 function IsUnitSystemMetric(iniFile)
@@ -109,24 +139,14 @@ function IsUnitSystemMetric(iniFile)
 
     -- Now that we have a valid metric selection, let's save it to our config INI
     if needsave == true then
-        local retval = iniFile:WriteValue("config", "metric", metric)
-        if retval == false then
-            local msgData = Script.ShowMessageBox("Aurora Weather",
-                "There was an error saving unit system.",
-                "OK")
-            if msgData.Button == 1 then
-                goto CleanUp
-            end
-        end
+        TryWriteConfigValue(iniFile, "config", "metric", metric)
     end
-
-    ::CleanUp::
 
     return metric
 end
 
--- Helper function to retrieve or set configured location and coordinates
--- using the Open-Meteo Geocoding API (https://open-meteo.com/en/docs/geocoding-api).
+-- Retrieves the saved location and coordinates using the Open-Meteo Geocoding API (https://open-meteo.com/en/docs/geocoding-api).
+-- If not found, prompts the user to set them, and saves them to the configuration file.
 -- Params: The INI file object to read and write configuration settings.
 -- Returns: A table with the location name, latitude, and longitude, or nil if lookup failed.
 function GetLocation(iniFile)
@@ -140,11 +160,12 @@ function GetLocation(iniFile)
     -- If the coordinates are empty, prompt the user for input
     if latitude == "" or longitude == "" or location == "" then
         local lastDefault = ""
-        local keyboardData = Script.ShowKeyboard("Aurora Weather",
-            "Enter city, postal code, or geo-coordinates (eg, 26.71534,-80.05337).",
+        local keyboardData = Script.ShowKeyboard(scriptTitle, "Enter city, postal code, or geo-coordinates (eg, 26.71534,-80.05337).",
             lastDefault, KeyboardFlag.Highlight)
 
         if keyboardData.Canceled == false then
+            -- TODO: Handle empty input or cancellation
+
             -- Check if input is in latitude,longitude format
             local input = keyboardData.Buffer
             local lat, lon = nil, nil
@@ -201,18 +222,12 @@ function GetLocation(iniFile)
 
     -- Save the coordinates if necessary
     if needsave == true then
-        local savedLoc = iniFile:WriteValue("config", "location", location)
-        local savedLat = iniFile:WriteValue("config", "latitude", latitude)
-        local savedLon = iniFile:WriteValue("config", "longitude", longitude)
-        if savedLoc == false or savedLat == false or savedLon == false then
-            local msgData = Script.ShowMessageBox("Aurora Weather",
-                "There was an error saving your location.", "OK")
-            if msgData.Button == 1 then
-                location = nil
-                latitude = nil
-                longitude = nil
-                goto CleanUp
-            end
+        if not TryWriteConfigValue(iniFile, "config", "location", location) or
+            not TryWriteConfigValue(iniFile, "config", "latitude", latitude) or
+            not TryWriteConfigValue(iniFile, "config", "longitude", longitude) then
+            location = nil
+            latitude = nil
+            longitude = nil
         end
     end
 
@@ -230,8 +245,7 @@ function GetLocation(iniFile)
     return coords
 end
 
--- Helper function to request current conditions and forecast data from the
--- Open-Meteo Weather Forecast API (https://open-meteo.com/en/docs).
+-- Requests current conditions and forecast data from the Open-Meteo Weather Forecast API (https://open-meteo.com/en/docs).
 -- Params: A table containing the requesting location's latitude, longitude, and metric flag.
 -- Returns: A table containing the current conditions and forecast data, or nil if the request failed.
 function RequestWeatherData(params)
@@ -246,8 +260,8 @@ function RequestWeatherData(params)
             if weather then
                 weatherData = {
                     Conditions = weather.current,
-                    Forecast = weather.daily,
                     ConditionsUnits = weather.current_units,
+                    Forecast = weather.daily,
                     ForecastUnits = weather.daily_units
                 }
             end
@@ -257,7 +271,7 @@ function RequestWeatherData(params)
     return weatherData
 end
 
--- Helper function to construct the endpoint URL and query string for weather forecast API requests
+-- Constructs the endpoint URL and query string for weather forecast API requests.
 -- Params: A table containing the requesting location's latitude and longitude, and metric flag.
 -- Returns: A string containing the full URL to the API endpoint.
 function GetAPIEndpointUrl(params)

@@ -18,7 +18,7 @@ end
 
 function GP.fnOnInit(this, initData)
     -- Register our tab1 controls (current conditions)
-    Xui["current"] = {
+    Xui["conditions"] = {
         location = this:RegisterControl(XuiObject.Label, "location"),
         temp = this:RegisterControl(XuiObject.Label, "temperature"),
         dewpoint = this:RegisterControl(XuiObject.Label, "dewpoint"),
@@ -65,20 +65,20 @@ function GP.fnOnInit(this, initData)
     --print(initData)
 
     -- Set location name
-    Xui.current.location:SetText(GP.location)
+    Xui.conditions.location:SetText(GP.location)
 
     -- Set current conditions
-    Xui.current.temp:SetText(initData.Conditions.temperature_2m .. initData.ConditionsUnits.temperature_2m)
-    Xui.current.dewpoint:SetText(initData.Conditions.dew_point_2m .. initData.ConditionsUnits.dew_point_2m)
-    Xui.current.humidity:SetText(initData.Conditions.relative_humidity_2m .. initData.ConditionsUnits.relative_humidity_2m)
-    if initData.Conditions.wind_speed_10m ~= 0 then
-        Xui.current.windspeed:SetText(GP.degreesToCardinal(initData.Conditions.wind_direction_10m) .. " at " ..
+    Xui.conditions.temp:SetText(initData.Conditions.temperature_2m .. initData.ConditionsUnits.temperature_2m)
+    Xui.conditions.dewpoint:SetText(initData.Conditions.dew_point_2m .. initData.ConditionsUnits.dew_point_2m)
+    Xui.conditions.humidity:SetText(initData.Conditions.relative_humidity_2m .. initData.ConditionsUnits.relative_humidity_2m)
+    if math.floor(initData.Conditions.wind_speed_10m) >= 1 then
+        Xui.conditions.windspeed:SetText(GP.degreesToCardinal(initData.Conditions.wind_direction_10m) .. " at " ..
             initData.Conditions.wind_speed_10m .. " " .. initData.ConditionsUnits.wind_speed_10m)
     else
-        Xui.current.windspeed:SetText(initData.Conditions.wind_speed_10m .. " " .. initData.ConditionsUnits.wind_speed_10m)
+        Xui.conditions.windspeed:SetText(initData.Conditions.wind_speed_10m .. " " .. initData.ConditionsUnits.wind_speed_10m)
     end
-    Xui.current.weather:SetText(GP.lookupWeatherCode(initData.Conditions.weather_code).description)
-    Xui.current.imgIcon:SetImagePath(GP.lookupWeatherCode(initData.Conditions.weather_code).image)
+    Xui.conditions.weather:SetText(GP.lookupWeatherCode(initData.Conditions.weather_code).description)
+    Xui.conditions.imgIcon:SetImagePath(GP.lookupWeatherCode(initData.Conditions.weather_code).image)
 
     -- Set forecast day of week
     Xui.forecast.day1.dayofweek:SetText("Today")
@@ -108,7 +108,7 @@ end
 function GP.fnOnCommand(this, commandType)
     if commandType == GizmoCommand.X then
         -- X button was pressed, so let's dismiss our UI and request a new location from the user
-        this:Dismiss("location")
+        this:Dismiss("reset_location")
     end
 end
 
@@ -151,8 +151,8 @@ end
 -- Converts a wind direction in degrees to a cardinal direction
 function GP.degreesToCardinal(degrees)
     local cardinals = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" }
-    local index = math.floor((degrees + 22.5) / 45)
-    return cardinals[index % 8]
+    local index = math.floor((degrees + 22.5) / 45) + 1
+    return cardinals[(index - 1) % 8 + 1]
 end
 
 -- Converts a date string ("2024-07-20") to the day of the week (Saturday) using Zeller's Congruence Algorithm
