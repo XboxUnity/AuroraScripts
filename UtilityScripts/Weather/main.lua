@@ -2,74 +2,79 @@ scriptTitle = "Aurora Weather"
 scriptAuthor = "Phoenix"
 scriptVersion = 3
 scriptDescription = "A simple weather application"
-scriptIcon = "icon\\icon.xur";
+scriptIcon = "icon\\icon.xur"
 
 -- Define script permissions to enable access to libraries
-scriptPermissions = { "http" };
+scriptPermissions = { "http" }
 
 -- Include our helper functions / enumerations
-require("AuroraUI");
-json = require("json");
-gizmo = require("Gizmo");
+require("AuroraUI")
+json = require("json")
+gizmo = require("Gizmo")
 
 -- Global variables
-State = {}; -- Stores the current state of the gizmo
-Xui = {};   -- Stores handles of XUI objects
+State = {} -- Stores the current state of the gizmo
+Xui = {}   -- Stores handles of XUI objects
+
+local cfgFilename = "settings.ini"
 
 -- Main entry point to script
 function main()
-    -- Using our INI library, let's open our config file (file will be created if not found)
+    -- Using our IniFile library, let's open our config file (file will be created if not found)
     -- TODO: Reset ini if missing "version" key or if version is less than 3
-    local configFile = IniFile.LoadFile("settings.ini");
+    local configFile = IniFile.LoadFile("settings.ini")
     if configFile == nil then
-        print("Error opening the script configuration file.");
+        print("Error opening the script configuration file.")
         goto EndScript
     end
-    Script.SetProgress(20);
+    Script.SetProgress(20)
 
     -- Call our function to obtain Imperial or Metric unit system
     -- TODO: Convert to boolean, store as "true" or "false"
-    local metric = IsUnitSystemMetric(configFile);
-    Script.SetProgress(40);
+    local metric = IsUnitSystemMetric(configFile)
+    Script.SetProgress(40)
 
     ::RequestQuery::
 
     -- Call our function to obtain our location
-    local params = GetLocation(configFile);
+    local params = GetLocation(configFile)
     if params == nil then
         local msgData = Script.ShowMessageBox("Location Not Found",
-            "The location entered was not found. Would you like to enter another location?", "Yes", "No");
+            "The location entered was not found. " ..
+            "Would you like to enter another location?",
+            "Yes", "No")
         if msgData.Button == 1 then goto RequestQuery else goto EndScript end
     end
-    Script.SetProgress(60);
+    Script.SetProgress(60)
 
     -- Add our metric flag to our params table for convenience
-    params["metric"] = metric == "1";
+    params["metric"] = metric == "1"
 
     -- Call our function to obtain the weather forecast data
-    local weatherData = RequestWeatherData(params);
+    local weatherData = RequestWeatherData(params)
     if weatherData == nil then
-        Script.ShowNotification("Error downloading weather info. Please try again later.");
+        Script.ShowNotification("Error downloading weather info. Please try again later.")
         goto EndScript
     end
-    Script.SetProgress(80);
+    Script.SetProgress(80)
 
-    local scriptData = {};
----@diagnostic disable-next-line: need-check-nil
-    scriptData["location"] = params.location; -- if we made it here, we have a location
-    scriptData["weather"] = weatherData;
+    local scriptData = {}
+    ---@diagnostic disable-next-line: need-check-nil
+    scriptData["location"] = params.location -- if we made it here, we have a location
+    scriptData["weather"] = weatherData
 
     -- Pass our weather data to our gizmo and run the scene
-    local cmd = gizmo.run(scriptData);
+    local cmd = gizmo.run(scriptData)
     if cmd.Result == "location" then
-        Script.SetStatus("Resetting location...");
-        Script.SetProgress(40);
+        Script.SetStatus("Resetting location...")
+        Script.SetProgress(40)
 
         -- Clear our query string from our config
-        local savedLat = configFile:WriteValue("config", "latitude", "");
-        local savedLon = configFile:WriteValue("config", "longitude", "");
+        local savedLat = configFile:WriteValue("config", "latitude", "")
+        local savedLon = configFile:WriteValue("config", "longitude", "")
         if savedLat == false or savedLon == false then
-            local msgData = Script.ShowMessageBox("Aurora Weather", "There was an error reseting your location.", "OK");
+            local msgData = Script.ShowMessageBox("Aurora Weather",
+                "There was an error reseting your location.", "OK")
             if msgData.Button == 1 then
                 goto EndScript
             end
@@ -78,7 +83,7 @@ function main()
         -- Request new location
         goto RequestQuery
     end
-    Script.SetProgress(100);
+    Script.SetProgress(100)
 
     ::EndScript::
 end
@@ -88,24 +93,27 @@ end
 -- Returns: A string containing the metric flag (0 = Imperial, 1 = Metric).
 function IsUnitSystemMetric(iniFile)
     -- Retrieve our unit system
-    local metric = iniFile:ReadValue("config", "metric", "");
-    local needsave = false;
+    local metric = iniFile:ReadValue("config", "metric", "")
+    local needsave = false
 
     -- If our metric flag is invalid, show message box UI for user selection
     if metric == "" then
-        metric = "0";
-        local msgData = Script.ShowMessageBox("Units", "Which measurement system would you like to use?",
+        metric = "0"
+        local msgData = Script.ShowMessageBox("Units",
+            "Which measurement system would you like to use?",
             "Imperial (US)",
-            "Metric");
-        metric = msgData.Button == 1 and "0" or "1";
-        needsave = true;
+            "Metric")
+        metric = msgData.Button == 1 and "0" or "1"
+        needsave = true
     end
 
     -- Now that we have a valid metric selection, let's save it to our config INI
     if needsave == true then
-        local retval = iniFile:WriteValue("config", "metric", metric);
+        local retval = iniFile:WriteValue("config", "metric", metric)
         if retval == false then
-            local msgData = Script.ShowMessageBox("Aurora Weather", "There was an error saving unit system.", "OK");
+            local msgData = Script.ShowMessageBox("Aurora Weather",
+                "There was an error saving unit system.",
+                "OK")
             if msgData.Button == 1 then
                 goto CleanUp
             end
@@ -114,7 +122,7 @@ function IsUnitSystemMetric(iniFile)
 
     ::CleanUp::
 
-    return metric;
+    return metric
 end
 
 -- Helper function to retrieve or set configured location and coordinates
@@ -197,7 +205,8 @@ function GetLocation(iniFile)
         local savedLat = iniFile:WriteValue("config", "latitude", latitude)
         local savedLon = iniFile:WriteValue("config", "longitude", longitude)
         if savedLoc == false or savedLat == false or savedLon == false then
-            local msgData = Script.ShowMessageBox("Aurora Weather", "There was an error saving your location.", "OK")
+            local msgData = Script.ShowMessageBox("Aurora Weather",
+                "There was an error saving your location.", "OK")
             if msgData.Button == 1 then
                 location = nil
                 latitude = nil
