@@ -45,7 +45,6 @@ function main()
     end
 
     -- Call our function to obtain Imperial or Metric unit system
-    -- TODO: Convert to boolean, store as "true" or "false"
     local metric = IsUnitSystemMetric(configFile)
     Script.SetProgress(40)
 
@@ -62,11 +61,8 @@ function main()
     end
     Script.SetProgress(60)
 
-    -- Add our metric flag to our params table for convenience
-    params["metric"] = metric == "1"
-
     -- Call our function to obtain the weather forecast data
-    local weatherData = RequestWeatherData(params)
+    local weatherData = RequestWeatherData(params, metric)
     if weatherData == nil then
         Script.ShowNotification("Error downloading weather info. Please try again later.")
         goto EndScript
@@ -119,27 +115,26 @@ end
 
 -- Retrieves the saved measurement system from the configuration file.
 -- If not found, prompts the user to select one, and saves it to the configuration file.
+-- Valid config ini values are "true/false", "yes/no", "1/0" (case-insensitive)
 -- Params: The INI file object to read and write configuration settings.
--- Returns: A string containing the metric flag (0 = Imperial, 1 = Metric).
+-- Returns: A boolean representing the metric flag (false = Imperial, true = Metric).
 function IsUnitSystemMetric(iniFile)
-    -- Retrieve our unit system
-    local metric = iniFile:ReadValue("config", "metric", "")
-    local needsave = false
+    local truthy = {["true"] = true, ["yes"] = true, ["1"] = true}
+    local falsey = {["false"] = true, ["no"] = true, ["0"] = true}
 
-    -- If our metric flag is invalid, show message box UI for user selection
-    if metric == "" then
-        metric = "0"
+    -- Retrieve our configured unit system
+    local metricStr = iniFile:ReadValue("config", "metric", ""):lower()
+    local metric = truthy[metricStr] or false
+
+    -- If invalid, show message box UI for user selection
+    if not truthy[metricStr] and not falsey[metricStr] then
         local msgData = Script.ShowMessageBox("Units",
             "Which measurement system would you like to use?",
             "Imperial (US)",
             "Metric")
-        metric = msgData.Button == 1 and "0" or "1"
-        needsave = true
-    end
-
-    -- Now that we have a valid metric selection, let's save it to our config INI
-    if needsave == true then
-        TryWriteConfigValue(iniFile, "config", "metric", metric)
+        metric = msgData.Button ~= 1
+        metricStr = metric and "true" or "false"
+        TryWriteConfigValue(iniFile, "config", "metric", metricStr)
     end
 
     return metric
@@ -248,13 +243,13 @@ end
 -- Requests current conditions and forecast data from the Open-Meteo Weather Forecast API (https://open-meteo.com/en/docs).
 -- Params: A table containing the requesting location's latitude, longitude, and metric flag.
 -- Returns: A table containing the current conditions and forecast data, or nil if the request failed.
-function RequestWeatherData(params)
+function RequestWeatherData(params, metric)
     local weatherData = nil
     if params ~= nil then
         Script.SetStatus("Fetching weather data...")
 
         -- Get weather data response
-        local resp = Http.Get(GetAPIEndpointUrl(params))
+        local resp = Http.Get(GetAPIEndpointUrl(params, metric))
         if resp.Success == true then
             local weather = json:decode(resp.OutputData)
             if weather then
@@ -274,15 +269,15 @@ end
 -- Constructs the endpoint URL and query string for weather forecast API requests.
 -- Params: A table containing the requesting location's latitude and longitude, and metric flag.
 -- Returns: A string containing the full URL to the API endpoint.
-function GetAPIEndpointUrl(params)
+function GetAPIEndpointUrl(params, metric)
     local baseUrl = "https://api.open-meteo.com/v1/forecast/"
     local queryParams = {
         latitude = params.latitude,
         longitude = params.longitude,
         timezone = "auto",
-        temperature_unit = params.metric and "celsius" or "fahrenheit",
-        wind_speed_unit = params.metric and "kmh" or "mph",
-        precipitation_unit = params.metric and "mm" or "inch",
+        temperature_unit = metric and "celsius" or "fahrenheit",
+        wind_speed_unit = metric and "kmh" or "mph",
+        precipitation_unit = metric and "mm" or "inch",
         forecast_days = 4,
         current = "temperature_2m,dew_point_2m,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code",
         daily = "temperature_2m_min,temperature_2m_max,weather_code",
