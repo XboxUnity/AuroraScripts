@@ -71,11 +71,11 @@ function GP.fnOnInit(this, initData)
     Xui.conditions.temp:SetText(initData.Conditions.temperature_2m .. initData.ConditionsUnits.temperature_2m)
     Xui.conditions.dewpoint:SetText(initData.Conditions.dew_point_2m .. initData.ConditionsUnits.dew_point_2m)
     Xui.conditions.humidity:SetText(initData.Conditions.relative_humidity_2m .. initData.ConditionsUnits.relative_humidity_2m)
-    if math.floor(initData.Conditions.wind_speed_10m) >= 1 then
-        Xui.conditions.windspeed:SetText(GP.degreesToCardinal(initData.Conditions.wind_direction_10m) .. " at " ..
-            initData.Conditions.wind_speed_10m .. " " .. initData.ConditionsUnits.wind_speed_10m)
+    local windSpeedStr = initData.Conditions.wind_speed_10m .. " " .. string.gsub(initData.ConditionsUnits.wind_speed_10m, "/", ""):upper()
+    if math.floor(initData.Conditions.wind_speed_10m) > 0 then
+        Xui.conditions.windspeed:SetText(GP.degreesToCardinal(initData.Conditions.wind_direction_10m) .. " at " .. windSpeedStr)
     else
-        Xui.conditions.windspeed:SetText(initData.Conditions.wind_speed_10m .. " " .. initData.ConditionsUnits.wind_speed_10m)
+        Xui.conditions.windspeed:SetText(windSpeedStr)
     end
     Xui.conditions.weather:SetText(GP.lookupWeatherCode(initData.Conditions.weather_code).description)
     Xui.conditions.imgIcon:SetImagePath(GP.lookupWeatherCode(initData.Conditions.weather_code).image)
