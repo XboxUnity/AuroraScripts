@@ -1,6 +1,6 @@
 scriptTitle = "Xefu Spoofer"
 scriptAuthor = "Derf"
-scriptVersion = 2
+scriptVersion = 1
 scriptDescription = "Forces original Xbox games to use your selected xefu version. Compatibility list: ConsoleMods.org/fusion"
 scriptIcon = "icon.png"
 scriptPermissions = { "filesystem" }
