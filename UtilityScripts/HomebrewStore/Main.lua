@@ -169,7 +169,7 @@ end
 function HandleSelection(selection, repo, menu)
 	local info = "";
 	info = info .. "Name: " .. selection.itemTitle .. "\n";
-	if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
+	if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
 		info = info .. "Version: " .. selection.itemVersion .. "\n";
 	else 
 		info = info .. "Version: " .. "Unknown\n";
