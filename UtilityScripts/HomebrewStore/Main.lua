@@ -8,6 +8,8 @@ scriptPermissions = { "http", "sql", "filesystem" }
 require("MenuSystem");
 
 local reloadRequired = false;
+downloadsPath = "Downloads\\";
+absoluteDownloadsPath = Script.GetBasePath() .. downloadsPath;
 
 -- Main entry point to script
 function main()
@@ -39,8 +41,6 @@ end
 
 function init()
 	-- Clear out unfinished downloads
-	downloadsPath = "Downloads\\";
-	absoluteDownloadsPath = Script.GetBasePath() .. downloadsPath;
 	FileSystem.DeleteDirectory(absoluteDownloadsPath);
 
 	-- Update saved repos
