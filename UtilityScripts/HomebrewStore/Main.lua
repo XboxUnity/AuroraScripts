@@ -1,6 +1,6 @@
 scriptTitle = "Homebrew Store"
 scriptAuthor = "Derf / Cheato"
-scriptVersion = 1.0
+scriptVersion = 2.0
 scriptDescription = "Download homebrew from ConsoleMods.org and other repos!"
 scriptIcon = "icon.png"
 scriptPermissions = { "http", "sql", "filesystem" }
@@ -113,7 +113,7 @@ function DoShowMenu(menu)
 
 			if (ret.iniurl == "PROMPT") then
 				-- Prompt user for URL to .ini file
-				local keyboardData = Script.ShowKeyboard( "Aurora Keyboard", "Enter the full URL to a valid .ini file", "https://", 64 );
+				local keyboardData = Script.ShowKeyboard( "Aurora Keyboard", "Enter the full URL to a valid .ini file", "https://", 0 );
 				if keyboardData.Canceled == false then 
 					iniurl = keyboardData.Buffer;
 				else
@@ -124,7 +124,12 @@ function DoShowMenu(menu)
 				FileSystem.CreateDirectory( iniRepoPath );
 				local newRepoName = string.match(iniurl,"^https?://([^/]+)");
 				http = Http.Get(iniurl, "\\Repos\\" .. newRepoName .. ".ini" );
-				Script.ShowNotification(newRepoName .. " repo installed!");
+				if http.Success then
+					Script.ShowNotification(newRepoName .. " repo installed!");
+				else
+					Script.ShowMessageBox("ERROR", "Failed to download .ini file:\n\n" .. iniurl, "OK");
+				end
+
 				return
 			else
 				-- Load .ini from Repo .ini entry
@@ -171,27 +176,25 @@ function HandleSelection(selection, repo, menu)
 	info = info .. "Name: " .. selection.itemTitle .. "\n";
 	if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
 		info = info .. "Version: " .. selection.itemVersion .. "\n";
-	else 
-		info = info .. "Version: " .. "Unknown\n";
 	end
 
 	if selection.itemAuthor ~= nil and selection.itemAuthor ~= "" then
 		info = info .. "Author: " .. selection.itemAuthor .. "\n";
-	else
-		info = info .. "Author: N/A\n";
 	end
 
-	if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
-		info = info .. "Description:\n" .. string.gsub(selection.itemDescription, "\\n", "\n") .. "\n\n";
-	else
-		info = info .. "Description: N/A";
+	if selection.itemSize ~= nil and selection.itemSize ~= "" then
+		info = info .. "Size: " .. selection.itemSize .. "\n";
 	end
 
 	local destinationPath = GetDestinationPath(selection, repo.type);
 	if destinationPath ~= nil and destinationPath ~= "" then
-		info = info .. "Installation Path:\n" .. destinationPath .. "\n";
+		info = info .. "Path: " .. destinationPath .. "\n";
 	else
 		return nil;
+	end
+
+	if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
+		info = info .. "Description:\n" .. string.gsub(selection.itemDescription, "\\n", "\n") .. "\n\n";
 	end
 
 	info = info .. "\n\n\nDo you want to install this ".. repo.type .."?";
