@@ -1,0 +1,52 @@
+{
+	"[lua]": {
+		"editor.defaultFormatter": "sumneko.lua"
+	},
+	"Lua.runtime.version": "Lua 5.3",
+	"Lua.workspace.library": [
+		"definitions",
+	],
+	"Lua.diagnostics.globals": [
+		"main",
+
+		// script metadata
+		"scriptTitle",
+		"scriptAuthor",
+		"scriptDescription",
+		"scriptVersion",
+		"scriptIcon",
+		"scriptPermissions",
+
+		// global functions
+		"print",
+		"tprint",
+		"enum",
+		"wait",
+		"tounsigned",
+
+		// library modules
+		"Script",
+		"Aurora",
+		"Content",
+		"FileSystem",
+		"Http",
+		"IniFile",
+		"Kernel",
+		"Profile",
+		"Settings",
+		"Sql",
+		"Thread",
+		"ZipFile",
+		"GizmoUI",
+	],
+	"Lua.diagnostics.disable": [
+		//"need-check-nil",
+		//"undefined-doc-name",
+		//"undefined-field",
+	],
+	"Lua.codeLens.enable": true,
+	"Lua.hint.enable": true,
+	"Lua.hint.setType": true,
+	"Lua.hover.enumsLimit": 50,
+	"Lua.hover.expandAlias": false,
+}

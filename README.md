@@ -1,43 +1,91 @@
 # Aurora Scripts
 
-Aurora's Lua scripting API can be used to extend the functionality of Aurora through custom community-contributed filters, sorts, subtitles, and utility scripts. The API exposes global, script, and library functions for integrating into Aurora's user interface, and accessing underlying system internals.
+Aurora's Lua scripting API can be used to extend the functionality of Aurora through custom community-contributed Content (Filter, Sort, and Subtitle) and Utility scripts.
 
-## Table of Contents
+**Content Scripts** - These scripts provide custom filters, sorters, or subtitle generators for game content. They are executed automatically when Aurora loads.
+- **Filters** - Modify the list of games displayed in Aurora based on custom criteria.
+- **Sorters** - Change the order in which games are displayed in Aurora.
+- **Subtitles** - Generate custom subtitles for games displayed in Aurora.
+
+**Utility Scripts** - These scripts provide additional functionality for Aurora, and are downloaded from the Aurora Repo Browser. They are run on-demand by the user with their own UI.
+
+## Contributing
+
+Aurora Scripts are a community effort that help enhance the functionality and versatility of Aurora for all users. To ensure a smooth integration of your script into Aurora's ecosystem, review the script requirements below.
+
+### Script Metadata
+
+Each script must include the following metadata at the beginning of the main script file, defined as global variables.
+
+**Content Scripts:**
+
+```lua
+ContentScriptMeta = {
+    Title       = "Cool Factor Filter",
+    Author      = "Stelio Kontos",
+    Description = "Filters games based on their cool factor",
+}
+```
+
+**Utility Scripts:**
+
+```lua
+scriptTitle = "Rick Roll"
+scriptAuthor = "Stelio Kontos"
+scriptVersion = 1
+scriptDescription = "Randomly plays the Stelio Kontos theme song when Aurora starts"
+scriptIcon = "icon\\icon.xur" -- or .png
+scriptPermissions = { "http", "filesystem" } -- if using modules requiring permissions
+```
+
+### Script Permissions
+
+Some modules must be explicitly enabled in the script's `scriptPermissions` metadata in order to be loaded at runtime and be called by the script. Modules requiring permissions are:
+
+- Content
+- FileSystem
+- Http
+- Kernel
+- Settings
+- Sql
+
+Example:
+
+```lua
+scriptPermissions = { "http", "filesystem" } -- case-insensitive
+```
+
+## API Reference
+
+Aurora's scripting library API exposes several [global objects and functions](definitions/aurorascriptlib/library/Globals.lua), and includes numerous feature-rich modules designed to extend the functionality of custom scripts by interfacing with Aurora's UI, filesystem, and system internals.
+
+The included modules are available for use in all Content and Utility Scripts, and are preloaded into the Lua execution environment at runtime, eliminating the need to `require` them in your script.
+
+Library documentation is provided as [LuaDoc](https://luals.github.io/wiki/annotations/) annotations, allowing for intellisense support and type checking when used in conjunction with the VS Code extension [Lua Language Server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) by sumneko.
+
+Note that these annotations are a work in progress; contributions through pull requests are welcome.
+
+### Library Documentation
 
 - [Global Functions](#global-functions)
-- [Script Functions](#script-functions)
-- [Library Methods](#library-methods)
-  - [Aurora](#library--aurora)
-  - [Content](#library--content)
-  - [FileSystem](#library--filesystem)
-  - [Http](#library--http)
-  - [IniFile](#library--inifile)
-  - [Kernel](#library--kernel)
-  - [Profile](#library--profile)
-  - [Settings](#library--settings)
-  - [Sql](#library--sql)
-  - [Thread](#library--thread)
-  - [ZipFile](#library--zipfile)
-  - [GizmoUI](#library--gizmoui)
-- [XUI](#xui)
-  - [XuiObject](#xuiobject)
-    - [XuiElement](#xuielement--xuiobject)
-    - [XuiText](#xuitext--xuielement--xuiobject)
-    - [XuiImage](#xuiimage--xuielement--xuiobject)
-    - [XuiControl](#xuicontrol--xuielement--xuiobject)
-      - [XuiButton](#xuibutton--xuicontrol--xuielement--xuiobject)
-      - [XuiRadioButton](#xuiradiobutton--xuicontrol--xuielement--xuiobject)
-      - [XuiRadioGroup](#xuiradiogroup--xuicontrol--xuielement--xuiobject)
-      - [XuiLabel](#xuilabel--xuicontrol--xuielement--xuiobject)
-      - [XuiEdit](#xuiedit--xuicontrol--xuielement--xuiobject)
-      - [XuiList](#xuilist--xuicontrol--xuielement--xuiobject)
-      - [XuiProgressBar](#xuiprogressbar--xuicontrol--xuielement--xuiobject)
-      - [XuiSlider](#xuislider--xuicontrol--xuielement--xuiobject)
-      - [XuiCheckbox](#xuicheckbox--xuicontrol--xuielement--xuiobject)
-      - [XuiScene](#xuiscene--xuicontrol--xuielement--xuiobject)
-        - [XuiTabScene](#xuitabscene--xuiscene--xuicontrol--xuielement--xuiobject)
+- [Library Modules](#library-modules)
+  - [Script](#script)
+  - [Aurora](#aurora)
+  - [Content](#content)*
+  - [FileSystem](#filesystem)*
+  - [Http](#http)*
+  - [IniFile](#inifile)
+  - [Kernel](#kernel)*
+  - [Profile](#profile)
+  - [Settings](#settings)*
+  - [Sql](#sql)*
+  - [Thread](#thread)
+  - [ZipFile](#zipfile)
+  - [GizmoUI](#gizmoui)
 
-## Global Functions
+*Requires script permissions.
+
+#### Global Functions
 
 ```lua
 void print( string val );
@@ -47,18 +95,20 @@ void wait( unsigned val );
 unsigned tounsigned( int val );
 ```
 
-## Script Functions
+#### Library Modules
+
+##### Script
 
 ```lua
-void Script.SetRefreshListOnExit( bool refreshList );
+string Script.GetBasePath( void );
 void Script.FileExists( string relativePath );
 void Script.CreateDirectory( string relativePath );
-void Script.SetProgress( unsigned val );
-void Script.SetStatus( string text );
+bool Script.IsCanceled( void );
 unsigned Script.GetProgress( void );
 string Script.GetStatus( void );
-bool Script.IsCanceled( void );
-string Script.GetBasePath( void );
+void Script.SetProgress( unsigned val );
+void Script.SetStatus( string text );
+void Script.SetRefreshListOnExit( bool refreshList );
 void Script.ShowNotification( string message, DWORD type );
 table Script.ShowKeyboard( string title, string prompt, string default, [DWORD flags] );
 table Script.ShowPopupList( string title, string emptyList, table listContent );
@@ -67,14 +117,13 @@ table Script.ShowMessageBox( string title, string prompt, string button1text, [s
 table Script.ShowFilebrowser( string basePath, string selectedItem, [DWORD flags] );
 ```
 
-## Library Methods
-
-### Aurora
+##### Aurora
 
 ```lua
 table Aurora.GetDashVersion( void );
 table Aurora.GetSkinVersion( void );
 table Aurora.GetFSPluginVersion( void );
+bool Aurora.HasInternetConnection( void );
 string Aurora.GetIPAddress( void );
 string Aurora.GetMACAddress( void );
 table Aurora.GetTime( void );
@@ -83,10 +132,9 @@ table Aurora.GetTemperatures( void );
 table Aurora.GetMemoryInfo( void );
 table Aurora.GetCurrentSkin( void );
 table Aurora.GetCurrentLanguage( void );
+unsigned Aurora.GetDVDTrayState( void );
 void Aurora.OpenDVDTray( void );
 void Aurora.CloseDVDTray( void );
-unsigned Aurora.GetDVDTrayState( void );
-bool Aurora.HasInternetConnection( void );
 void Aurora.Restart( void );
 void Aurora.Reboot( void );
 void Aurora.Shutdown( void );
@@ -98,7 +146,7 @@ string Aurora.Md5HashFile( string filePath );
 string Aurora.Crc32HashFile( string filePath );
 ```
 
-### Content
+##### Content
 
 ```lua
 table Content.GetInfo( DWORD contentId );
@@ -111,7 +159,7 @@ bool Content.SetAsset( string imagePath, enum assetType, [DWORD screenshotIndex]
 table Content.FindContent( DWORD titleId, [string searchText]);
 ```
 
-### FileSystem
+##### FileSystem
 
 ```lua
 bool FileSystem.CopyDirectory( string srcDir, string dstDir, bool overwrite, [function progressRoutine] );
@@ -133,7 +181,7 @@ table FileSystem.GetDirectories( string path );
 bool FileSystem.Rename( string original, string new );
 ```
 
-### Http
+##### Http
 
 ```lua
 table Http.Get( string url, [string relativeFilePath] );
@@ -142,7 +190,7 @@ string Http.UrlEncode( string input );
 string Http.UrlDecode( string input );
 ```
 
-### IniFile
+##### IniFile
 
 ```lua
 userdata IniFile.LoadFile( string relativeFilePath );
@@ -155,11 +203,11 @@ userdata IniFile.LoadString( string fileData );
 string userdata:ReadValue( string section, string key, string default );
 bool userdata:WriteValue( string section, string key, string value );
 table userdata:GetAllSections( void );
-table userdata:GetSection( string section );
 table userdata:GetAllKeys( string section );
+table userdata:GetSection( string section );
 ```
 
-### Kernel
+##### Kernel
 
 ```lua
 table Kernel.GetVersion( void );
@@ -182,7 +230,7 @@ bool Kernel.SetDate(unsigned Year, unsigned Month, unsigned Day);
 bool Kernel.SetTime(unsigned Hour, [unsigned Minute, unsigned Second, unsigned Millisecond]);
 ```
 
-### Profile
+##### Profile
 
 ```lua
 string Profile.GetXUID( unsigned playerIndex );
@@ -191,7 +239,7 @@ unsigned Profile.GetGamerScore( unsigned playerIndex );
 table Profile.GetTitleAchievement( unsigned playerIndex, unsigned titleId );
 ```
 
-### Settings
+##### Settings
 
 ```lua
 table Settings.GetSystem( [string, ...] );
@@ -203,20 +251,20 @@ table Settings.GetUserOptions( string name );
 table Settings.GetOptions( string name, unsigned settingType );
 ```
 
-### Sql
+##### Sql
 
 ```lua
 bool Sql.Execute( string query );
 bool Sql.ExecuteFetchRows( string query );
 ```
 
-### Thread
+##### Thread
 
 ```lua
 void Thread.Sleep( unsigned );
 ```
 
-### ZipFile
+##### ZipFile
 
 ```lua
 userdata ZipFile.OpenFile( string relativeFilePath );
@@ -228,7 +276,7 @@ userdata ZipFile.OpenFile( string relativeFilePath );
 bool userdata:Extract( string relativeDestDir );
 ```
 
-### GizmoUI
+##### GizmoUI
 
 ```lua
 userdata GizmoUI.CreateInstance( void );
@@ -253,14 +301,32 @@ table userdata:ShowKeyboard( unsigned identifier, string title, string prompt, s
 void userdata:ShowNotification( string message, DWORD type );
 ```
 
-## XUI
+### XUI Object Tree
 
-### XuiObject
+- [XUI](#xui)
+  - [XuiObject](#xuiobject)
+    - [XuiElement](#xuielement--xuiobject)
+      - [XuiText](#xuitext--xuielement--xuiobject)
+      - [XuiImage](#xuiimage--xuielement--xuiobject)
+      - [XuiControl](#xuicontrol--xuielement--xuiobject)
+        - [XuiButton](#xuibutton--xuicontrol--xuielement--xuiobject)
+        - [XuiRadioButton](#xuiradiobutton--xuicontrol--xuielement--xuiobject)
+        - [XuiRadioGroup](#xuiradiogroup--xuicontrol--xuielement--xuiobject)
+        - [XuiLabel](#xuilabel--xuicontrol--xuielement--xuiobject)
+        - [XuiEdit](#xuiedit--xuicontrol--xuielement--xuiobject)
+        - [XuiList](#xuilist--xuicontrol--xuielement--xuiobject)
+        - [XuiProgressBar](#xuiprogressbar--xuicontrol--xuielement--xuiobject)
+        - [XuiSlider](#xuislider--xuicontrol--xuielement--xuiobject)
+        - [XuiCheckbox](#xuicheckbox--xuicontrol--xuielement--xuiobject)
+        - [XuiScene](#xuiscene--xuicontrol--xuielement--xuiobject)
+          - [XuiTabScene](#xuitabscene--xuiscene--xuicontrol--xuielement--xuiobject)
+
+#### XuiObject
 
     call
     typeOf
 
-### XuiElement : XuiObject
+#### XuiElement : XuiObject
 
     GetBounds
     GetId
@@ -272,18 +338,18 @@ void userdata:ShowNotification( string message, DWORD type );
     GetOpacity
     IsShown
 
-### XuiText : XuiElement : XuiObject
+#### XuiText : XuiElement : XuiObject
 
     GetText
     MeasureText
     SetText
 
-### XuiImage : XuiElement : XuiObject
+#### XuiImage : XuiElement : XuiObject
 
     GetImagePath
     SetImagePath
 
-### XuiControl : XuiElement : XuiObject
+#### XuiControl : XuiElement : XuiObject
 
     GetImagePath
     IsBackButton
@@ -294,24 +360,24 @@ void userdata:ShowNotification( string message, DWORD type );
     SetImagePath
     SetText
 
-### XuiButton : XuiControl : XuiElement : XuiObject
+#### XuiButton : XuiControl : XuiElement : XuiObject
 
     (none)
 
-### XuiRadioButton : XuiControl : XuiElement : XuiObject
+#### XuiRadioButton : XuiControl : XuiElement : XuiObject
 
     (none)
 
-### XuiRadioGroup : XuiControl : XuiElement : XuiObject
+#### XuiRadioGroup : XuiControl : XuiElement : XuiObject
 
     GetCurSel
     SetCurSel
 
-### XuiLabel : XuiControl : XuiElement : XuiObject
+#### XuiLabel : XuiControl : XuiElement : XuiObject
 
     (none)
 
-### XuiEdit : XuiControl : XuiElement : XuiObject
+#### XuiEdit : XuiControl : XuiElement : XuiObject
 
     DeleteText
     GetCaretPosition
@@ -328,7 +394,7 @@ void userdata:ShowNotification( string message, DWORD type );
     SetTextLimit
     SetTopLine
 
-### XuiList : XuiControl : XuiElement : XuiObject
+#### XuiList : XuiControl : XuiElement : XuiObject
 
     DeleteItems
     GetCurSel
@@ -351,14 +417,14 @@ void userdata:ShowNotification( string message, DWORD type );
     SetText
     SetTopItem
 
-### XuiProgressBar : XuiControl : XuiElement : XuiObject
+#### XuiProgressBar : XuiControl : XuiElement : XuiObject
 
     GetRange
     GetValue
     SetRange
     SetValue
 
-### XuiSlider : XuiControl : XuiElement : XuiObject
+#### XuiSlider : XuiControl : XuiElement : XuiObject
 
     GetAccel
     GetRange
@@ -369,16 +435,16 @@ void userdata:ShowNotification( string message, DWORD type );
     SetStep
     SetValue
 
-### XuiCheckbox : XuiControl : XuiElement : XuiObject
+#### XuiCheckbox : XuiControl : XuiElement : XuiObject
 
     IsChecked
     SetCheck
 
-### XuiScene : XuiControl : XuiElement : XuiObject
+#### XuiScene : XuiControl : XuiElement : XuiObject
 
     (none)
 
-### XuiTabScene : XuiScene : XuiControl : XuiElement : XuiObject
+#### XuiTabScene : XuiScene : XuiControl : XuiElement : XuiObject
 
     CanUserTab
     EnableTabbing
