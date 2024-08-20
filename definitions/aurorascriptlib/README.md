@@ -13,11 +13,30 @@ Note that these annotations are a work in progress; contributions through pull r
 ## Table of Contents
 
 - [Library Modules](#library-modules)
+  - [IniFile](#inifile-module)
   - [Sql](#sql-module)*
   - [Thread](#thread-module)
   - [ZipFile](#zipfile-module)
 
 ## Library Modules
+
+### IniFile module
+
+Provides an interface for reading and writing INI files. See [IniFile.lua](definitions/aurorascriptlib/library/IniFile.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+IniFile.LoadFile(filePath: string): userdata|nil
+IniFile.LoadString(fileData: string): userdata|nil
+
+-- userdata methods
+IniFileUserData:ReadValue(section: string, key: string, default: string): string
+IniFileUserData:WriteValue(section: string, key: string, value: string): boolean
+IniFileUserData:GetAllSections(): table|nil
+IniFileUserData:GetAllKeys(section: string): table|nil
+IniFileUserData:GetSection(section: string): table|nil
+```
+
 
 ### Sql module
 
@@ -31,7 +50,7 @@ Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 
 ### Thread module
 
-Someone fell asleep at the keyboard and accidentally wrote this module. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
+I mean, what else do you want me to say? It's just a method. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods

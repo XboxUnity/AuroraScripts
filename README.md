@@ -214,18 +214,16 @@ table Http.PostEx( string url, table postvars, function progressRoutine, [string
 ##### IniFile
 
 ```lua
-userdata IniFile.LoadFile( string relativeFilePath );
-userdata IniFile.LoadString( string fileData );
-```
+-- class methods
+IniFile.LoadFile(filePath: string): userdata|nil
+IniFile.LoadString(fileData: string): userdata|nil
 
-**Userdata Methods:**
-
-```lua
-string userdata:ReadValue( string section, string key, string default );
-bool userdata:WriteValue( string section, string key, string value );
-table userdata:GetAllSections( void );
-table userdata:GetAllKeys( string section );
-table userdata:GetSection( string section );
+-- userdata methods
+IniFileUserData:ReadValue(section: string, key: string, default: string): string
+IniFileUserData:WriteValue(section: string, key: string, value: string): boolean
+IniFileUserData:GetAllSections(): table|nil
+IniFileUserData:GetAllKeys(section: string): table|nil
+IniFileUserData:GetSection(section: string): table|nil
 ```
 
 ##### Kernel
