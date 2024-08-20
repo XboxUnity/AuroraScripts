@@ -67,22 +67,22 @@ Note that these annotations are a work in progress; contributions through pull r
 
 ### Library Documentation
 
-- [Global Functions](#global-functions) ~ [(view annotations)](definitions/aurorascriptlib/Globals.lua)
-- [Library Modules](#library-modules) ~ [(view annotations)](definitions/aurorascriptlib/library/)
-  - [Script](#script) ~ [(view annotations)](definitions/aurorascriptlib/library/Script.lua)
-  - [Aurora](#aurora) ~ [(view annotations)](definitions/aurorascriptlib/library/Aurora.lua)
-  - [Content](#content)* ~ [(view annotations)](definitions/aurorascriptlib/library/Content.lua)
-  - [Dvd](#dvd) ~ [(view annotations)](definitions/aurorascriptlib/library/Dvd.lua)
-  - [FileSystem](#filesystem)* ~ [(view annotations)](definitions/aurorascriptlib/library/FileSystem.lua)
-  - [Http](#http)* ~ [(view annotations)](definitions/aurorascriptlib/library/Http.lua)
-  - [IniFile](#inifile) ~ [(view annotations)](definitions/aurorascriptlib/library/IniFile.lua)
-  - [Kernel](#kernel)* ~ [(view annotations)](definitions/aurorascriptlib/library/Kernel.lua)
-  - [Profile](#profile) ~ [(view annotations)](definitions/aurorascriptlib/library/Profile.lua)
-  - [Settings](#settings)* ~ [(view annotations)](definitions/aurorascriptlib/library/Settings.lua)
-  - [Sql](#sql)* ~ [(view annotations)](definitions/aurorascriptlib/library/Sql.lua)
-  - [Thread](#thread) ~ [(view annotations)](definitions/aurorascriptlib/library/Thread.lua)
-  - [ZipFile](#zipfile) ~ [(view annotations)](definitions/aurorascriptlib/library/ZipFile.lua)
-  - [GizmoUI](#gizmoui) ~ [(view annotations)](definitions/aurorascriptlib/library/GizmoUI.lua)
+- [Global Functions](#global-functions) • [module definitions](definitions/aurorascriptlib/Globals.lua)
+- [Library Modules](#library-modules)
+  - [Script](#script) • [module definitions](definitions/aurorascriptlib/library/Script.lua)
+  - [Aurora](#aurora) • [module definitions](definitions/aurorascriptlib/library/Aurora.lua)
+  - [Content](#content) • [module definitions](definitions/aurorascriptlib/library/Content.lua)*
+  - [Dvd](#dvd) • [module definitions](definitions/aurorascriptlib/library/Dvd.lua)
+  - [FileSystem](#filesystem) • [module definitions](definitions/aurorascriptlib/library/FileSystem.lua)*
+  - [Http](#http) • [module definitions](definitions/aurorascriptlib/library/Http.lua)*
+  - [IniFile](#inifile) • [module definitions](definitions/aurorascriptlib/library/IniFile.lua)
+  - [Kernel](#kernel) • [module definitions](definitions/aurorascriptlib/library/Kernel.lua)*
+  - [Profile](#profile) • [module definitions](definitions/aurorascriptlib/library/Profile.lua)
+  - [Settings](#settings) • [module definitions](definitions/aurorascriptlib/library/Settings.lua)*
+  - [Sql](#sql) • [module definitions](definitions/aurorascriptlib/library/Sql.lua)*
+  - [Thread](#thread) • [module definitions](definitions/aurorascriptlib/library/Thread.lua)
+  - [ZipFile](#zipfile) • [module definitions](definitions/aurorascriptlib/library/ZipFile.lua)
+  - [GizmoUI](#gizmoui) • [module definitions](definitions/aurorascriptlib/library/GizmoUI.lua)
 
 *Requires script permissions.
 
@@ -290,8 +290,13 @@ table Sql.ExecuteFetchRows( string query );
 
 ##### Thread
 
+This whole module is just a placeholder for a single method.
+
+[View module definitions](definitions/aurorascriptlib/library/Thread.lua)
+
 ```lua
-void Thread.Sleep( unsigned );
+-- class methods
+Thread.Sleep(ms: unsigned)
 ```
 
 ##### ZipFile
