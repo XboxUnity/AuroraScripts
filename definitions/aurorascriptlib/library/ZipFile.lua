@@ -1,27 +1,24 @@
 ---@meta
 
---[[
-	```lua
-	-- Methods added in 0.6b
-	userdata ZipFile.OpenFile( string filePath, [bool create] );
-	```
+---Provides an interface for opening and extracting the contents of a ZIP archive using 7-Zip.
+---@class ZipFile
+ZipFile = {}
 
-	**Userdata Methods:**
+---Opens a ZIP file from the specified path.
+---@param filePath string The path to the ZIP file, relative to the script base path.
+---@param createIfNotExist? boolean Optional. If true, creates a new ZIP file if it doesn't exist. Defaults to true.
+---@return ZipFileUserData|nil # A `userdata` object representing the opened ZIP file, or nil if the file could not be opened.
+---@since 0.6b
+function ZipFile.OpenFile(filePath, createIfNotExist) end
 
-	```lua
-	-- Methods added in 0.6b
-	bool userdata:Extract( string destDir );
-	```
+---Represents the `userdata` object returned by ZipFile methods.
+---@class ZipFileUserData
+local ZipFileUserData = {}
 
+---Extracts the contents of the ZIP file to the specified directory.
+---@param destDir string The path to the directory where the contents will be extracted, relative to the script base path.
+---@return boolean # True if the extraction was successful, false otherwise.
+---@since 0.6b
+function ZipFileUserData:Extract(destDir) end
 
-	static const luaL_Reg g_zipMethods[] = {
-		// Methods added in 0.6b
-		{"Extract", l_zipExtract}, // bool ZipFile.Extract( userdata zipFile, std::string destDir );
-		{nullptr,   nullptr}
-	};
-	static const luaL_Reg g_zipLibrary[] = {
-		// Methods added in 0.6b
-		{"OpenFile", l_zipOpenFile}, // userdata ZipFile.OpenFile( std::string filePath, [bool create] );
-		{nullptr,    nullptr}
-	};
-]]
+return ZipFile

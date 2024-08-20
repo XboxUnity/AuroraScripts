@@ -301,14 +301,14 @@ Thread.Sleep(ms: unsigned)
 
 ##### ZipFile
 
-```lua
-userdata ZipFile.OpenFile( string filePath, [bool create] );
-```
-
-**Userdata Methods:**
+[View module definitions](definitions/aurorascriptlib/library/ZipFile.lua)
 
 ```lua
-bool userdata:Extract( string destDir );
+-- class methods
+ZipFile.OpenFile(filePath: string, [createIfNotExist: boolean]): userdata|nil
+
+-- userdata methods
+userdata:Extract(destDir: string): boolean
 ```
 
 ##### GizmoUI

@@ -26,3 +26,15 @@ This whole module is just a placeholder for a single method. See [Thread.lua](de
 Thread.Sleep(ms: unsigned)
 ```
 
+### ZipFile module
+
+Provides an interface for opening and extracting the contents of a ZIP archive using 7-Zip. See [ZipFile.lua](definitions/aurorascriptlib/library/ZipFile.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+ZipFile.OpenFile(filePath: string, [createIfNotExist: boolean]): userdata|nil
+
+-- userdata methods
+userdata:Extract(destDir: string): boolean
+```
+

@@ -43,7 +43,6 @@
 		"Profile",
 		"Settings",
 		"Sql",
-		"ZipFile",
 		"GizmoUI",
 	],
 	"Lua.diagnostics.disable": [
