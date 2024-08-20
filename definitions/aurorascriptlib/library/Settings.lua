@@ -10,6 +10,12 @@
 	table Settings.GetSystemOptions( string name );
 	table Settings.GetUserOptions( string name );
 	table Settings.GetOptions( string name, unsigned settingType );
+	-- Methods added in 0.7b
+	table Settings.GetRSSFeeds( [bool enabledOnly] );
+	table Settings.GetRSSFeedById( unsigned feedId );
+	unsigned Settings.AddRSSFeed( string url, [bool enabled] );
+	bool Settings.DeleteRSSFeed( unsigned feedId );
+	bool Settings.UpdateRSSFeed( unsigned feedId, string url, bool enabled );
 	```
 
 

@@ -7,6 +7,11 @@
 	string Profile.GetGamerTag( unsigned playerIndex );
 	unsigned Profile.GetGamerScore( unsigned playerIndex );
 	table Profile.GetTitleAchievement( unsigned playerIndex, unsigned titleId );
+	-- Methods added in 0.7b
+	table Profile.EnumerateProfiles( void );
+	bool Profile.GetProfilePicture( std::string xuid );
+	bool Profile.Login( unsigned playerIndex, std::string xuid );
+	bool Profile.Logout( unsigned playerIndex );
 	```
 
 

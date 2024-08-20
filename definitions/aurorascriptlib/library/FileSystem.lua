@@ -20,6 +20,11 @@
 	table FileSystem.GetFiles( string path );
 	table FileSystem.GetDirectories( string path );
 	bool FileSystem.Rename( string original, string new );
+	bool FileSystem.InstallTitleFromDisc( string virtualTargetPath, bool createContentDirs, [function progressRoutine] );
+	-- Methods added in 0.7b
+	number FileSystem.GetPartitionSize( string driveName );
+	number FileSystem.GetPartitionUsedSpace( string driveName );
+	number FileSystem.GetPartitionFreeSpace( string driveName );
 	```
 
 	static const luaL_Reg l_filesystemMethods[] = {

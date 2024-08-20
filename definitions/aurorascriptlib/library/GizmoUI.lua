@@ -20,10 +20,12 @@
 	bool userdata:SetTimer( unsigned timerId, unsigned timerInterval );
 	bool userdata:KillTimer( unsigned timerId );
 	bool userdata:PlayTimeline( string startFrame, string initialFrame, string endFrame, bool recurse, bool loop );
-	void userdata:ShowNotification( string message, DWORD type );
-	table userdata:ShowMessageBox( unsigned identifier, string title, string prompt, string button1text, [string ...]);
+	void userdata:Notify( string message, DWORD notifyType );
+	table userdata:ShowMessagebox( unsigned identifier, string title, string prompt, string button1text, [string ...]);
 	table userdata:ShowPasscode( unsigned identifier, string title, string prompt, DWORD permissionFlag );
 	table userdata:ShowKeyboard( unsigned identifier, string title, string prompt, string default, DWORD flags );
+	-- Methods added in 0.7b
+	bool userdata:SetXLScene( bool enable );
 	```
 
 	static const luaL_Reg l_gizmoMethods[] = {

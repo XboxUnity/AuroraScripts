@@ -72,6 +72,7 @@ Note that these annotations are a work in progress; contributions through pull r
   - [Script](#script) ~ [(view annotations)](definitions/aurorascriptlib/library/Script.lua)
   - [Aurora](#aurora) ~ [(view annotations)](definitions/aurorascriptlib/library/Aurora.lua)
   - [Content](#content)* ~ [(view annotations)](definitions/aurorascriptlib/library/Content.lua)
+  - [Dvd](#dvd) ~ [(view annotations)](definitions/aurorascriptlib/library/Dvd.lua)
   - [FileSystem](#filesystem)* ~ [(view annotations)](definitions/aurorascriptlib/library/FileSystem.lua)
   - [Http](#http)* ~ [(view annotations)](definitions/aurorascriptlib/library/Http.lua)
   - [IniFile](#inifile) ~ [(view annotations)](definitions/aurorascriptlib/library/IniFile.lua)
@@ -88,9 +89,10 @@ Note that these annotations are a work in progress; contributions through pull r
 #### Global Functions
 
 ```lua
--- Methods added in 0.6b
 void print( string val );
 void tprint( table val );
+int trace( string val );
+int stackdump( void );
 table enum( array val );
 void wait( unsigned val );
 unsigned tounsigned( int val );
@@ -101,9 +103,8 @@ unsigned tounsigned( int val );
 ##### Script
 
 ```lua
--- Methods added in 0.6b
 string Script.GetBasePath( void );
-void Script.FileExists( string relativePath );
+bool Script.FileExists( string relativePath );
 void Script.CreateDirectory( string relativePath );
 bool Script.IsCanceled( void );
 unsigned Script.GetProgress( void );
@@ -111,7 +112,7 @@ string Script.GetStatus( void );
 void Script.SetProgress( unsigned val );
 void Script.SetStatus( string text );
 void Script.SetRefreshListOnExit( bool refreshList );
-void Script.ShowNotification( string message, DWORD type );
+void Script.ShowNotification( string message, DWORD notifyType );
 table Script.ShowMessageBox( string title, string prompt, string button1text, [string ...]);
 table Script.ShowPasscode( string title, string prompt, DWORD permissionFlag );
 table Script.ShowKeyboard( string title, string prompt, string default, [DWORD flags] );
@@ -122,10 +123,10 @@ table Script.ShowFilebrowser( string basePath, string selectedItem, [DWORD flags
 ##### Aurora
 
 ```lua
--- Methods added in 0.6b
 table Aurora.GetDashVersion( void );
 table Aurora.GetSkinVersion( void );
 table Aurora.GetFSPluginVersion( void );
+--table Aurora.GetNovaVersion( void ); ---@deprecated 0.7b
 bool Aurora.HasInternetConnection( void );
 string Aurora.GetIPAddress( void );
 string Aurora.GetMACAddress( void );
@@ -152,7 +153,6 @@ string Aurora.Crc32HashFile( string filePath );
 ##### Content
 
 ```lua
--- Methods added in 0.6b
 table Content.GetInfo( DWORD contentId );
 bool Content.SetTitle( DWORD contentId, string title );
 bool Content.SetDescription( DWORD contentId, string description );
@@ -161,12 +161,22 @@ bool Content.SetPublisher( DWORD contentId, string publisher );
 bool Content.SetReleaseDate( DWORD contentId, string releaseDate );
 bool Content.SetAsset( string imagePath, enum assetType, [DWORD screenshotIndex]);
 table Content.FindContent( DWORD titleId, [string searchText]);
+bool Content.StartScan( void );
+bool Content.IsScanning( void );
+```
+
+##### Dvd
+
+```lua
+unsigned Dvd.GetTrayState( void ); ---@since 0.7b
+unsigned Dvd.GetMediaType( void ); ---@since 0.7b
+bool Dvd.OpenTray( void ); ---@since 0.7b
+bool Dvd.CloseTray( void ); ---@since 0.7b
 ```
 
 ##### FileSystem
 
 ```lua
--- Methods added in 0.6b
 bool FileSystem.CopyDirectory( string srcDir, string dstDir, bool overwrite, [function progressRoutine] );
 bool FileSystem.MoveDirectory( string srcDir, string dstDir, bool overwrite, [function progressRoutine] );
 bool FileSystem.DeleteDirectory( string directory );
@@ -184,22 +194,26 @@ table FileSystem.GetFilesAndDirectories( string path );
 table FileSystem.GetFiles( string path );
 table FileSystem.GetDirectories( string path );
 bool FileSystem.Rename( string original, string new );
+bool FileSystem.InstallTitleFromDisc( string virtualTargetPath, bool createContentDirs, [function progressRoutine] );
+number FileSystem.GetPartitionSize( string driveName ); ---@since 0.7b
+number FileSystem.GetPartitionUsedSpace( string driveName ); ---@since 0.7b
+number FileSystem.GetPartitionFreeSpace( string driveName ); ---@since 0.7b
 ```
 
 ##### Http
 
 ```lua
--- Methods added in 0.6b
 table Http.Get( string url, [string relativeFilePath] );
 table Http.Post( string url, table postvars, [string relativeFilePath] );
 string Http.UrlEncode( string input );
 string Http.UrlDecode( string input );
+table Http.GetEx( string url, function progressRoutine, [string relativeFilePath] ); ---@since 0.7b
+table Http.PostEx( string url, table postvars, function progressRoutine, [string relativeFilePath] ); ---@since 0.7b
 ```
 
 ##### IniFile
 
 ```lua
--- Methods added in 0.6b
 userdata IniFile.LoadFile( string relativeFilePath );
 userdata IniFile.LoadString( string fileData );
 ```
@@ -207,7 +221,6 @@ userdata IniFile.LoadString( string fileData );
 **Userdata Methods:**
 
 ```lua
--- Methods added in 0.6b
 string userdata:ReadValue( string section, string key, string default );
 bool userdata:WriteValue( string section, string key, string value );
 table userdata:GetAllSections( void );
@@ -218,7 +231,6 @@ table userdata:GetSection( string section );
 ##### Kernel
 
 ```lua
--- Methods added in 0.6b
 table Kernel.GetVersion( void );
 unsigned Kernel.GetConsoleTiltState( void );
 string Kernel.GetCPUKey( void );
@@ -242,17 +254,19 @@ bool Kernel.SetTime(unsigned hour, [unsigned minute, unsigned second, unsigned m
 ##### Profile
 
 ```lua
--- Methods added in 0.6b
 string Profile.GetXUID( unsigned playerIndex );
 string Profile.GetGamerTag( unsigned playerIndex );
 unsigned Profile.GetGamerScore( unsigned playerIndex );
 table Profile.GetTitleAchievement( unsigned playerIndex, unsigned titleId );
+table Profile.EnumerateProfiles( void ); ---@since 0.7b
+bool Profile.GetProfilePicture( string xuid ); ---@since 0.7b
+bool Profile.Login( unsigned playerIndex, string xuid ); ---@since 0.7b
+bool Profile.Logout( unsigned playerIndex ); ---@since 0.7b
 ```
 
 ##### Settings
 
 ```lua
--- Methods added in 0.6b
 table Settings.GetSystem( [string, ...] );
 table Settings.GetUser( [string, ...] );
 table Settings.SetSystem( string name, string value, [ string, string ...] );
@@ -260,60 +274,60 @@ table Settings.SetUser( string name, string value, [ string, string ...] );
 table Settings.GetSystemOptions( string name );
 table Settings.GetUserOptions( string name );
 table Settings.GetOptions( string name, unsigned settingType );
+table Settings.GetRSSFeeds( [bool enabledOnly] ); ---@since 0.7b
+table Settings.GetRSSFeedById( unsigned feedId ); ---@since 0.7b
+unsigned Settings.AddRSSFeed( string url, [bool enabled] ); ---@since 0.7b
+bool Settings.DeleteRSSFeed( unsigned feedId ); ---@since 0.7b
+bool Settings.UpdateRSSFeed( unsigned feedId, string url, bool enabled ); ---@since 0.7b
 ```
 
 ##### Sql
 
 ```lua
--- Methods added in 0.6b
 bool Sql.Execute( string query );
-bool Sql.ExecuteFetchRows( string query );
+table Sql.ExecuteFetchRows( string query );
 ```
 
 ##### Thread
 
 ```lua
--- Methods added in 0.6b
 void Thread.Sleep( unsigned );
 ```
 
 ##### ZipFile
 
 ```lua
--- Methods added in 0.6b
-userdata ZipFile.OpenFile( string relativeFilePath );
+userdata ZipFile.OpenFile( string filePath, [bool create] );
 ```
 
 **Userdata Methods:**
 
 ```lua
--- Methods added in 0.6b
-bool userdata:Extract( string relativeDestDir );
+bool userdata:Extract( string destDir );
 ```
 
 ##### GizmoUI
 
 ```lua
--- Methods added in 0.6b
 userdata GizmoUI.CreateInstance( void );
 ```
 
 **Userdata Methods:**
 
 ```lua
--- Methods added in 0.6b
 userdata userdata:RegisterControl( unsigned objectType, string objectName );
 bool userdata:RegisterCallback( unsigned messageType, function fnCallback );
 bool userdata:RegisterAnimationCallback( string namedFrame, function fnCallback );
 object userdata:InvokeUI( string basePath, string title, string sceneFile, [string skinFile], [table initData] );
 void userdata:Dismiss( object key );
+bool userdata:SetXLScene( bool enable ); ---@since 0.7b
 bool userdata:SetCommandText( unsigned commandId, string text );
 bool userdata:SetCommandEnabled( unsigned commandId, bool state );
 bool userdata:SetTimer( unsigned timerId, unsigned timerInterval );
 bool userdata:KillTimer( unsigned timerId );
 bool userdata:PlayTimeline( string startFrame, string initialFrame, string endFrame, bool recurse, bool loop );
-void userdata:ShowNotification( string message, DWORD type );
-table userdata:ShowMessageBox( unsigned identifier, string title, string prompt, string button1text, [string ...]);
+void userdata:Notify( string message, DWORD notifyType );
+table userdata:ShowMessagebox( unsigned identifier, string title, string prompt, string button1text, [string ...]);
 table userdata:ShowPasscode( unsigned identifier, string title, string prompt, DWORD permissionFlag );
 table userdata:ShowKeyboard( unsigned identifier, string title, string prompt, string default, DWORD flags );
 ```

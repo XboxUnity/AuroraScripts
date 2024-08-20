@@ -11,6 +11,8 @@
 	bool Content.SetReleaseDate( DWORD contentId, string releaseDate );
 	bool Content.SetAsset( string imagePath, enum assetType, [DWORD screenshotIndex]);
 	table Content.FindContent( DWORD titleId, [string searchText]);
+	bool Content.StartScan( void );
+	bool Content.IsScanning( void );
 	```
 
 

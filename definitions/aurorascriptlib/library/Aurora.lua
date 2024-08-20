@@ -6,7 +6,7 @@
     table Aurora.GetDashVersion( void );
     table Aurora.GetSkinVersion( void );
     table Aurora.GetFSPluginVersion( void );
-    --table Aurora.GetNovaVersion( void );
+    --table Aurora.GetNovaVersion( void ); ---@deprecated 0.7b
     bool Aurora.HasInternetConnection( void );
     string Aurora.GetIPAddress( void );
     string Aurora.GetMACAddress( void );
@@ -36,7 +36,7 @@
         {"GetDashVersion",        l_auroraGetDashVersion},        // table Aurora.GetDashVersion( void );
         {"GetSkinVersion",        l_auroraGetSkinVersion},        // table Aurora.GetSkinVersion( void );
         {"GetFSPluginVersion",    l_auroraGetFSPluginVersion},    // table Aurora.GetFSPluginVersion( void );
-    //	{"GetNovaVersion",        l_auroraGetNovaVersion},        // table Aurora.GetFSPluginVersion( void );
+    //	{"GetNovaVersion",        l_auroraGetNovaVersion},        // table Aurora.GetFSPluginVersion( void ); ---@deprecated 0.7b
         {"HasInternetConnection", l_auroraHasInternetConnection}, // bool Aurora.HasInternetConnection( void );
         {"GetIPAddress",          l_auroraGetIPAddress},          // std::string Aurora.GetIPAddress( void );
         {"GetMACAddress",         l_auroraGetMACAddress},         // std::string Aurora.GetMACAddress( void );

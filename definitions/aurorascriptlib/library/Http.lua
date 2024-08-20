@@ -3,10 +3,13 @@
 --[[
 	```lua
 	-- Methods added in 0.6b
-	table Http.Get( string url, [string relativeFilePath] );
-	table Http.Post( string url, table postvars, [string relativeFilePath] );
+	table Http.Get( string url, [string outputPath] );
+	table Http.Post( string url, table postvars, [string outputPath] );
 	string Http.UrlEncode( string input );
 	string Http.UrlDecode( string input );
+	-- Methods added in 0.7b
+	table Http.GetEx( string url, function progressRoutine, [string outputPath] );
+	table Http.PostEx( string url, table postvars, function progressRoutine, [string outputPath] );
 	```
 
 

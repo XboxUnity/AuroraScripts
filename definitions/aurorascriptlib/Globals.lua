@@ -5,6 +5,8 @@
 	-- Methods added in 0.6b
 	void print( string val );
 	void tprint( table val );
+	int trace( string val );
+	int stackdump( void );
 	table enum( array val );
 	void wait( unsigned val );
 	unsigned tounsigned( int val );

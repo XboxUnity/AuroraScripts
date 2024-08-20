@@ -25,6 +25,8 @@
 		// global functions
 		"print",
 		"tprint",
+		"trace",
+		"stackdump",
 		"enum",
 		"wait",
 		"tounsigned",
@@ -33,6 +35,7 @@
 		"Script",
 		"Aurora",
 		"Content",
+		"Dvd",
 		"FileSystem",
 		"Http",
 		"IniFile",

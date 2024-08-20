@@ -4,7 +4,7 @@
 	```lua
 	-- Methods added in 0.6b
 	string Script.GetBasePath( void );
-	void Script.FileExists( string relativePath );
+	bool Script.FileExists( string relativePath );
 	void Script.CreateDirectory( string relativePath );
 	bool Script.IsCanceled( void );
 	unsigned Script.GetProgress( void );
@@ -12,7 +12,7 @@
 	void Script.SetProgress( unsigned val );
 	void Script.SetStatus( string text );
 	void Script.SetRefreshListOnExit( bool refreshList );
-	void Script.ShowNotification( string message, DWORD type );
+	void Script.ShowNotification( string message, DWORD notifyType );
 	table Script.ShowMessageBox( string title, string prompt, string button1text, [string ...]);
 	table Script.ShowPasscode( string title, string prompt, DWORD permissionFlag );
 	table Script.ShowKeyboard( string title, string prompt, string default, [DWORD flags] );
@@ -32,7 +32,7 @@
 	lua_pushcfunction(lua, ScriptRunner_SetStatus); lua_setfield(lua, -2, "SetStatus");
 	lua_pushcfunction(lua, ScriptRunner_SetCanCancel); lua_setfield(lua, -2, "SetCancelEnable");
 	lua_pushcfunction(lua, ScriptRunner_SetRefreshListOnExit); lua_setfield(lua, -2, "RefreshListOnExit"); // void Script.SetRefreshListOnExit( bool refreshList );
-	lua_pushcfunction(lua, l_scriptShowNotification); lua_setfield(lua, -2, "ShowNotification");           // void Script.ShowNotification( string message, [DWORD type] );
+	lua_pushcfunction(lua, l_scriptShowNotification); lua_setfield(lua, -2, "ShowNotification");           // void Script.ShowNotification( string message, [DWORD notifyType] );
 	lua_pushcfunction(lua, l_scriptShowMessageBox); lua_setfield(lua, -2, "ShowMessageBox");               // table Script.ShowMessageBox( string title, string prompt, string button1text, [string ...]);
 	lua_pushcfunction(lua, l_scriptShowPasscode); lua_setfield(lua, -2, "ShowPasscode");                   // table Script.ShowPasscode( string title, string prompt, DWORD permissionFlag );
 	lua_pushcfunction(lua, l_scriptShowPasscodeEx); lua_setfield(lua, -2, "ShowPasscodeEx");               // table Script.ShowPasscodeEx( string title, string prompt );
