@@ -1,17 +1,21 @@
 ---@meta
 
---[[
-	```lua
-	-- Methods added in 0.6b
-	bool Sql.Execute( string query );
-	table Sql.ExecuteFetchRows( string query );
-	```
+---Provides an interface for interacting with an SQLite database instance.
+---@class Sql
+Sql = {}
 
+---Executes an SQL query.
+---@param query string The SQL query to execute.
+---@return boolean # True if the query was successfully executed, false otherwise.
+---@since 0.6b
+function Sql.Execute(query) end
 
-	static const luaL_Reg g_sqlLibrary[] = {
-		// Methods added in 0.6b
-		{"Execute",          l_sqlExecute},          // boolean Sql.Execute( std::string query );
-		{"ExecuteFetchRows", l_sqlExecuteFetchRows}, // table Sql.ExecuteFetchRows( std::string query );
-		{nullptr,            nullptr}
-	};
-]]
+---@alias SqlResultSet table<integer, table<string, any>> A table where each entry represents a row in the result set, and each row is a table of column name-value pairs
+
+---Executes an SQL query and returns the result set as a table of rows.
+---@param query string The SQL query to execute.
+---@return SqlResultSet|nil # A table representing the result set, or nil if the query failed.
+---@since 0.6b
+function Sql.ExecuteFetchRows(query) end
+
+return Sql

@@ -284,15 +284,12 @@ bool Settings.UpdateRSSFeed( unsigned feedId, string url, bool enabled ); ---@si
 ##### Sql
 
 ```lua
-bool Sql.Execute( string query );
-table Sql.ExecuteFetchRows( string query );
+-- class methods
+Sql.Execute(query: string): boolean
+Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 ```
 
 ##### Thread
-
-This whole module is just a placeholder for a single method.
-
-[View module definitions](definitions/aurorascriptlib/library/Thread.lua)
 
 ```lua
 -- class methods
@@ -300,8 +297,6 @@ Thread.Sleep(ms: unsigned)
 ```
 
 ##### ZipFile
-
-[View module definitions](definitions/aurorascriptlib/library/ZipFile.lua)
 
 ```lua
 -- class methods

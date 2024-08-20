@@ -42,7 +42,6 @@
 		"Kernel",
 		"Profile",
 		"Settings",
-		"Sql",
 		"GizmoUI",
 	],
 	"Lua.diagnostics.disable": [

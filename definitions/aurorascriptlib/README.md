@@ -13,13 +13,25 @@ Note that these annotations are a work in progress; contributions through pull r
 ## Table of Contents
 
 - [Library Modules](#library-modules)
+  - [Sql](#sql-module)*
   - [Thread](#thread-module)
+  - [ZipFile](#zipfile-module)
 
 ## Library Modules
 
+### Sql module
+
+Provides an interface for interacting with an SQLite database instance. See [Sql.lua](definitions/aurorascriptlib/library/Sql.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+Sql.Execute(query: string): boolean
+Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
+```
+
 ### Thread module
 
-This whole module is just a placeholder for a single method. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
+Someone fell asleep at the keyboard and accidentally wrote this module. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
