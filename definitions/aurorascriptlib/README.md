@@ -12,6 +12,7 @@ Note that these annotations are a work in progress; contributions through pull r
 
 ## Table of Contents
 
+- [Globals](#globals)
 - [Library Modules](#library-modules)
   - [Aurora](#aurora-module)
   - [IniFile](#inifile-module)
@@ -20,6 +21,28 @@ Note that these annotations are a work in progress; contributions through pull r
   - [Sql](#sql-module)*
   - [Thread](#thread-module)
   - [ZipFile](#zipfile-module)
+
+*Requires script permissions.
+
+## Globals
+
+Global functions and objects that are available to all scripts. Global objects are used primarily by Content Scripts (Filters, Sorts, Subtitles). See [Globals.lua](definitions/aurorascriptlib/library/Globals.lua) for detailed documentation and annotations.
+
+```lua
+-- global functions
+function print(message: string)
+function tprint(table: table)
+function trace(message: any)
+function stackdump(): integer
+function enum(enumTable: EnumTable): EnumTable
+function wait(milliseconds: unsigned)
+function tounsigned(value: integer): unsigned
+
+-- global objects
+GameListFilterCategories
+GameListSorters
+GameListSubtitles
+```
 
 ## Library Modules
 
@@ -66,11 +89,11 @@ IniFile.LoadFile(filePath: string): userdata|nil
 IniFile.LoadString(fileData: string): userdata|nil
 
 -- userdata methods
-IniFileUserData:ReadValue(section: string, key: string, default: string): string
-IniFileUserData:WriteValue(section: string, key: string, value: string): boolean
-IniFileUserData:GetAllSections(): table|nil
-IniFileUserData:GetAllKeys(section: string): table|nil
-IniFileUserData:GetSection(section: string): table|nil
+userdata:ReadValue(section: string, key: string, default: string): string
+userdata:WriteValue(section: string, key: string, value: string): boolean
+userdata:GetAllSections(): table|nil
+userdata:GetAllKeys(section: string): table|nil
+userdata:GetSection(section: string): table|nil
 ```
 
 ### Kernel module
@@ -127,11 +150,11 @@ Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 
 ### Thread module
 
-This module is a single method for sleeping with threads. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
+A module for the most advanced thread sleeping technology in existence today. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
-Thread.Sleep(ms: unsigned)
+Thread.Sleep(milliseconds: unsigned)
 ```
 
 ### ZipFile module

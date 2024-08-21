@@ -89,13 +89,19 @@ Note that these annotations are a work in progress; contributions through pull r
 #### Global Functions
 
 ```lua
-void print( string val );
-void tprint( table val );
-int trace( string val );
-int stackdump( void );
-table enum( array val );
-void wait( unsigned val );
-unsigned tounsigned( int val );
+-- global functions
+function print(message: string)
+function tprint(table: table)
+function trace(message: any)
+function stackdump(): integer
+function enum(enumTable: EnumTable): EnumTable
+function wait(milliseconds: unsigned)
+function tounsigned(value: integer): unsigned
+
+-- global objects
+GameListFilterCategories
+GameListSorters
+GameListSubtitles
 ```
 
 #### Library Modules
@@ -220,11 +226,11 @@ IniFile.LoadFile(filePath: string): userdata|nil
 IniFile.LoadString(fileData: string): userdata|nil
 
 -- userdata methods
-IniFileUserData:ReadValue(section: string, key: string, default: string): string
-IniFileUserData:WriteValue(section: string, key: string, value: string): boolean
-IniFileUserData:GetAllSections(): table|nil
-IniFileUserData:GetAllKeys(section: string): table|nil
-IniFileUserData:GetSection(section: string): table|nil
+userdata:ReadValue(section: string, key: string, default: string): string
+userdata:WriteValue(section: string, key: string, value: string): boolean
+userdata:GetAllSections(): table|nil
+userdata:GetAllKeys(section: string): table|nil
+userdata:GetSection(section: string): table|nil
 ```
 
 ##### Kernel

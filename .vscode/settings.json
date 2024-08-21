@@ -17,20 +17,6 @@
 		"scriptIcon",
 		"scriptPermissions",
 
-		// globals
-		"GameListFilterCategories",
-		"GameListSorters",
-		"GameListSubtitles",
-
-		// global functions
-		"print",
-		"tprint",
-		"trace",
-		"stackdump",
-		"enum",
-		"wait",
-		"tounsigned",
-
 		// library modules
 		"Script",
 		"Content",

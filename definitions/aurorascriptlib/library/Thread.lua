@@ -5,8 +5,8 @@
 Thread = {}
 
 ---Sleeps the current thread for the specified number of milliseconds.
----@param ms unsigned The number of milliseconds to sleep.
+---@param milliseconds unsigned The number of milliseconds to sleep.
 ---@since 0.6b
-function Thread.Sleep(ms) end
+function Thread.Sleep(milliseconds) end
 
 return Thread
