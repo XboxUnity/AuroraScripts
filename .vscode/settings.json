@@ -39,7 +39,6 @@
 		"FileSystem",
 		"Http",
 		"Kernel",
-		"Profile",
 		"Settings",
 		"GizmoUI",
 	],

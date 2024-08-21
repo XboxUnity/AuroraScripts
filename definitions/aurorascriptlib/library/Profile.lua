@@ -1,31 +1,61 @@
 ---@meta
 
---[[
-	```lua
-	-- Methods added in 0.6b
-	string Profile.GetXUID( unsigned playerIndex );
-	string Profile.GetGamerTag( unsigned playerIndex );
-	unsigned Profile.GetGamerScore( unsigned playerIndex );
-	table Profile.GetTitleAchievement( unsigned playerIndex, unsigned titleId );
-	-- Methods added in 0.7b
-	table Profile.EnumerateProfiles( void );
-	bool Profile.GetProfilePicture( std::string xuid );
-	bool Profile.Login( unsigned playerIndex, std::string xuid );
-	bool Profile.Logout( unsigned playerIndex );
-	```
+---Provides an interface for interacting with user profiles, such as retrieving XUIDs, GamerTags, achievements, and more.
+---@class Profile
+Profile = {}
 
+---Gets the XUID of the specified player.
+---@param playerIndex integer The index of the player (1 to 4).
+---@return string # The XUID as a hexadecimal string.
+---@since 0.6b
+function Profile.GetXUID(playerIndex) end
 
-	static const luaL_Reg g_profileLibrary[] = {
-		// Methods added in 0.6b
-		{"GetXUID",             l_profileGetXUID},             // std::string Profile.GetXUID( unsigned playerIndex );
-		{"GetGamerTag",         l_profileGetGamerTag},         // std::string Profile.GetGamerTag( unsigned playerIndex );
-		{"GetGamerScore",       l_profileGetGamerScore},       // unsigned Profile.GetGamerScore( unsigned playerIndex );
-		{"GetTitleAchievement", l_profileGetTitleAchievement}, // table Profile.GetTitleAchievement( unsigned playerIndex, unsigned titleId );
-		// Methods added in 0.7b
-		{"EnumerateProfiles",   l_profileEnumerateProfiles},   // table Profile.EnumerateProfiles( void );
-		{"GetProfilePicture",   l_profileGetProfilePicture},   // bool Profile.GetProfilePicture( std::string xuid );
-		{"Login",               l_profileLogin},               // bool Profile.Login( unsigned playerIndex, std::string xuid );
-		{"Logout",              l_profileLogout},              // bool Profile.Logout( unsigned playerIndex );
-		{nullptr,					nullptr}
-	};
-]]
+---Gets the GamerTag of the specified player.
+---@param playerIndex integer The index of the player (1 to 4).
+---@return string # The GamerTag of the player.
+---@since 0.6b
+function Profile.GetGamerTag(playerIndex) end
+
+---Gets the gamer score of the specified player.
+---@param playerIndex integer The index of the player (1 to 4).
+---@return integer # The gamer score of the player.
+---@since 0.6b
+function Profile.GetGamerScore(playerIndex) end
+
+---@alias AchievementInfo { EarnedCount: unsigned, MaxCount: unsigned, EarnedScore: unsigned, MaxScore: unsigned }
+
+---Gets the achievement information for the specified title and player.
+---@param playerIndex integer The index of the player (1 to 4).
+---@param titleId integer The title ID of the game.
+---@return AchievementInfo|0|-1 # Returns a table containing the achievement information, 0 if no achievements were found, or -1 if the player is not signed in.
+---@since 0.6b
+function Profile.GetTitleAchievement(playerIndex, titleId) end
+
+---@alias ProfileInfo { DeviceID: unsigned, XUID: string, GamerTag: string }
+
+---Enumerates the profiles on the system.
+---@return ProfileInfo[] # A table with an array of entries containing the XUID, DeviceID, and GamerTag, or an empty table if no profiles were found.
+---@since 0.7b
+function Profile.EnumerateProfiles() end
+
+---Gets the profile picture for the specified XUID.
+---@param xuid string The XUID of the user.
+---@param path string The path where the profile picture will be saved.
+---@return boolean # True if the profile picture was successfully retrieved, false otherwise.
+---@since 0.7b
+function Profile.GetProfilePicture(xuid, path) end
+
+---Logs in a player using the specified XUID.
+---@param playerIndex integer The index of the player (1 to 4).
+---@param xuid string The XUID of the user in hexadecimal string format.
+---@return boolean # True if the login was successful, false otherwise.
+---@since 0.7b
+function Profile.Login(playerIndex, xuid) end
+
+---Logs out the specified player.
+---@param playerIndex integer The index of the player (1 to 4).
+---@return boolean # True if the logout was successful, false otherwise.
+---@since 0.7b
+function Profile.Logout(playerIndex) end
+
+return Profile

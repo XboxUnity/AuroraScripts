@@ -252,14 +252,15 @@ bool Kernel.SetTime(unsigned hour, [unsigned minute, unsigned second, unsigned m
 ##### Profile
 
 ```lua
-string Profile.GetXUID( unsigned playerIndex );
-string Profile.GetGamerTag( unsigned playerIndex );
-unsigned Profile.GetGamerScore( unsigned playerIndex );
-table Profile.GetTitleAchievement( unsigned playerIndex, unsigned titleId );
-table Profile.EnumerateProfiles( void ); ---@since 0.7b
-bool Profile.GetProfilePicture( string xuid ); ---@since 0.7b
-bool Profile.Login( unsigned playerIndex, string xuid ); ---@since 0.7b
-bool Profile.Logout( unsigned playerIndex ); ---@since 0.7b
+-- class methods
+Profile.GetXUID(playerIndex: integer): string
+Profile.GetGamerTag(playerIndex: integer): string
+Profile.GetGamerScore(playerIndex: integer): integer
+Profile.GetTitleAchievement(playerIndex: integer, titleId: integer): AchievementInfo|0|-1
+Profile.EnumerateProfiles(): ProfileInfo[] ---@since 0.7b
+Profile.GetProfilePicture(xuid: string, path: string): boolean ---@since 0.7b
+Profile.Login(playerIndex: integer, xuid: string): boolean ---@since 0.7b
+Profile.Logout(playerIndex: integer): boolean ---@since 0.7b
 ```
 
 ##### Settings

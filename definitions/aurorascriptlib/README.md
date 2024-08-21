@@ -14,6 +14,7 @@ Note that these annotations are a work in progress; contributions through pull r
 
 - [Library Modules](#library-modules)
   - [IniFile](#inifile-module)
+  - [Profile](#profile-module)
   - [Sql](#sql-module)*
   - [Thread](#thread-module)
   - [ZipFile](#zipfile-module)
@@ -37,6 +38,21 @@ IniFileUserData:GetAllKeys(section: string): table|nil
 IniFileUserData:GetSection(section: string): table|nil
 ```
 
+### Profile module
+
+Provides an interface for interacting with user profiles, such as retrieving XUIDs, GamerTags, achievements, and more. See [Profile.lua](definitions/aurorascriptlib/library/Profile.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+Profile.GetXUID(playerIndex: integer): string
+Profile.GetGamerTag(playerIndex: integer): string
+Profile.GetGamerScore(playerIndex: integer): integer
+Profile.GetTitleAchievement(playerIndex: integer, titleId: integer): AchievementInfo|0|-1
+Profile.EnumerateProfiles(): ProfileInfo[] ---@since 0.7b
+Profile.GetProfilePicture(xuid: string, path: string): boolean ---@since 0.7b
+Profile.Login(playerIndex: integer, xuid: string): boolean ---@since 0.7b
+Profile.Logout(playerIndex: integer): boolean ---@since 0.7b
+```
 
 ### Sql module
 
@@ -50,7 +66,7 @@ Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 
 ### Thread module
 
-I mean, what else do you want me to say? It's just a method. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
+This module is so small, it doesn't even need a description? It's just a method. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
