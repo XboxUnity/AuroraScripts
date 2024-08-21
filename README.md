@@ -123,31 +123,32 @@ table Script.ShowFilebrowser( string basePath, string selectedItem, [DWORD flags
 ##### Aurora
 
 ```lua
-table Aurora.GetDashVersion( void );
-table Aurora.GetSkinVersion( void );
-table Aurora.GetFSPluginVersion( void );
---table Aurora.GetNovaVersion( void ); ---@deprecated 0.7b
-bool Aurora.HasInternetConnection( void );
-string Aurora.GetIPAddress( void );
-string Aurora.GetMACAddress( void );
-table Aurora.GetTime( void );
-table Aurora.GetDate( void );
-table Aurora.GetTemperatures( void );
-table Aurora.GetMemoryInfo( void );
-table Aurora.GetCurrentSkin( void );
-table Aurora.GetCurrentLanguage( void );
-unsigned Aurora.GetDVDTrayState( void );
-void Aurora.OpenDVDTray( void );
-void Aurora.CloseDVDTray( void );
-void Aurora.Restart( void );
-void Aurora.Reboot( void );
-void Aurora.Shutdown( void );
-string Aurora.Sha1Hash( string input );
-string Aurora.Md5Hash( string input );
-string Aurora.Crc32Hash( string input );
-string Aurora.Sha1HashFile( string filePath );
-string Aurora.Md5HashFile( string filePath );
-string Aurora.Crc32HashFile( string filePath );
+-- class methods
+Aurora.GetDashVersion(): VersionData
+Aurora.GetSkinVersion(): VersionData
+Aurora.GetFSPluginVersion(): VersionData
+Aurora.GetNovaVersion(): VersionData ---@deprecated 0.7b
+Aurora.HasInternetConnection(): boolean
+Aurora.GetIPAddress(): string
+Aurora.GetMACAddress(): string
+Aurora.GetTime(): TimeInfo
+Aurora.GetDate(): DateInfo
+Aurora.GetTemperatures(): TemperatureInfo
+Aurora.GetMemoryInfo(): MemoryInfo
+Aurora.GetCurrentSkin(): SkinInfo
+Aurora.GetCurrentLanguage(): LanguagePackInfo
+Aurora.GetDVDTrayState(): SMCTrayState
+Aurora.OpenDVDTray()
+Aurora.CloseDVDTray()
+Aurora.Restart()
+Aurora.Reboot()
+Aurora.Shutdown()
+Aurora.Sha1Hash(input: string): string
+Aurora.Md5Hash(input: string): string
+Aurora.Crc32Hash(input: string): string
+Aurora.Sha1HashFile(filePath: string): string|nil
+Aurora.Md5HashFile(filePath: string): string|nil
+Aurora.Crc32HashFile(filePath: string): string|nil
 ```
 
 ##### Content

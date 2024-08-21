@@ -13,6 +13,7 @@ Note that these annotations are a work in progress; contributions through pull r
 ## Table of Contents
 
 - [Library Modules](#library-modules)
+  - [Aurora](#aurora-module)
   - [IniFile](#inifile-module)
   - [Kernel](#kernel-module)*
   - [Profile](#profile-module)
@@ -21,6 +22,39 @@ Note that these annotations are a work in progress; contributions through pull r
   - [ZipFile](#zipfile-module)
 
 ## Library Modules
+
+### Aurora module
+
+Provides an interface for common tasks such as retrieving Aurora version info, hashing, querying HAL/system status, performing basic SMC operations, and more. See [Aurora.lua](definitions/aurorascriptlib/library/Aurora.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+Aurora.GetDashVersion(): VersionData
+Aurora.GetSkinVersion(): VersionData
+Aurora.GetFSPluginVersion(): VersionData
+Aurora.GetNovaVersion(): VersionData ---@deprecated 0.7b
+Aurora.HasInternetConnection(): boolean
+Aurora.GetIPAddress(): string
+Aurora.GetMACAddress(): string
+Aurora.GetTime(): TimeInfo
+Aurora.GetDate(): DateInfo
+Aurora.GetTemperatures(): TemperatureInfo
+Aurora.GetMemoryInfo(): MemoryInfo
+Aurora.GetCurrentSkin(): SkinInfo
+Aurora.GetCurrentLanguage(): LanguagePackInfo
+Aurora.GetDVDTrayState(): SMCTrayState
+Aurora.OpenDVDTray()
+Aurora.CloseDVDTray()
+Aurora.Restart()
+Aurora.Reboot()
+Aurora.Shutdown()
+Aurora.Sha1Hash(input: string): string
+Aurora.Md5Hash(input: string): string
+Aurora.Crc32Hash(input: string): string
+Aurora.Sha1HashFile(filePath: string): string|nil
+Aurora.Md5HashFile(filePath: string): string|nil
+Aurora.Crc32HashFile(filePath: string): string|nil
+```
 
 ### IniFile module
 
@@ -93,7 +127,7 @@ Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 
 ### Thread module
 
-This module is so small, it doesn't even need a description. It's just a method. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
+This module is a single method for sleeping with threads. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
