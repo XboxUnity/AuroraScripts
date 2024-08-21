@@ -14,6 +14,7 @@ Note that these annotations are a work in progress; contributions through pull r
 
 - [Library Modules](#library-modules)
   - [IniFile](#inifile-module)
+  - [Kernel](#kernel-module)*
   - [Profile](#profile-module)
   - [Sql](#sql-module)*
   - [Thread](#thread-module)
@@ -36,6 +37,32 @@ IniFileUserData:WriteValue(section: string, key: string, value: string): boolean
 IniFileUserData:GetAllSections(): table|nil
 IniFileUserData:GetAllKeys(section: string): table|nil
 IniFileUserData:GetSection(section: string): table|nil
+```
+
+### Kernel module
+
+Provides an interface for interacting with system-level kernel operations such as querying system information, managing hardware settings, and controlling console behavior. See [Kernel.lua](definitions/aurorascriptlib/library/Kernel.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+Kernel.GetVersion()
+Kernel.GetConsoleTiltState(): TiltState
+Kernel.GetCPUKey(): string|nil
+Kernel.GetDVDKey(): string|nil
+Kernel.GetMotherboardType(): MoboType
+Kernel.GetConsoleType(): ConsoleType
+Kernel.GetConsoleId(): string
+Kernel.GetSerialNumber(): string
+Kernel.GetCPUTempThreshold(): unsigned|nil
+Kernel.GetGPUTempThreshold(): unsigned|nil
+Kernel.GetEDRAMTempThreshold(): unsigned|nil
+Kernel.SetCPUTempThreshold(threshold: unsigned): boolean
+Kernel.SetGPUTempThreshold(threshold: unsigned): boolean
+Kernel.SetEDRAMTempThreshold(threshold: unsigned): boolean
+Kernel.SetFanSpeed(fanSpeed: unsigned): boolean
+Kernel.SetDate(year: unsigned, month: unsigned, day: unsigned): boolean
+Kernel.SetTime(hour: unsigned, [minute: unsigned], [second: unsigned], [millisecond: unsigned]): boolean
+Kernel.RebootSMCRoutine()
 ```
 
 ### Profile module
@@ -66,7 +93,7 @@ Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 
 ### Thread module
 
-This module is so small, it doesn't even need a description? It's just a method. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
+This module is so small, it doesn't even need a description. It's just a method. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods

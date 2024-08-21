@@ -229,24 +229,25 @@ IniFileUserData:GetSection(section: string): table|nil
 ##### Kernel
 
 ```lua
-table Kernel.GetVersion( void );
-unsigned Kernel.GetConsoleTiltState( void );
-string Kernel.GetCPUKey( void );
-string Kernel.GetDVDKey( void );
-string Kernel.GetMotherboardType( void );
-string Kernel.GetConsoleType( void );
-string Kernel.GetConsoleId( void );
-string Kernel.GetSerialNumber( void );
-unsigned Kernel.GetCPUTempThreshold( void );
-unsigned Kernel.GetGPUTempThreshold( void );
-unsigned Kernel.GetEDRAMTempThreshold( void );
-bool Kernel.SetCPUTempThreshold( unsigned threshold );
-bool Kernel.SetGPUTempThreshold( unsigned threshold );
-bool Kernel.SetEDRAMTempThreshold( unsigned threshold );
-bool Kernel.SetFanSpeed( unsigned fanSpeed );
-void Kernel.RebootSMCRoutine( void );
-bool Kernel.SetDate(unsigned year, unsigned month, unsigned day);
-bool Kernel.SetTime(unsigned hour, [unsigned minute, unsigned second, unsigned millisecond]);
+-- class methods
+Kernel.GetVersion()
+Kernel.GetConsoleTiltState(): TiltState
+Kernel.GetCPUKey(): string|nil
+Kernel.GetDVDKey(): string|nil
+Kernel.GetMotherboardType(): MoboType
+Kernel.GetConsoleType(): ConsoleType
+Kernel.GetConsoleId(): string
+Kernel.GetSerialNumber(): string
+Kernel.GetCPUTempThreshold(): unsigned|nil
+Kernel.GetGPUTempThreshold(): unsigned|nil
+Kernel.GetEDRAMTempThreshold(): unsigned|nil
+Kernel.SetCPUTempThreshold(threshold: unsigned): boolean
+Kernel.SetGPUTempThreshold(threshold: unsigned): boolean
+Kernel.SetEDRAMTempThreshold(threshold: unsigned): boolean
+Kernel.SetFanSpeed(fanSpeed: unsigned): boolean
+Kernel.SetDate(year: unsigned, month: unsigned, day: unsigned): boolean
+Kernel.SetTime(hour: unsigned, [minute: unsigned], [second: unsigned], [millisecond: unsigned]): boolean
+Kernel.RebootSMCRoutine()
 ```
 
 ##### Profile

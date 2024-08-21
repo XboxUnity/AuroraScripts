@@ -1,49 +1,126 @@
 ---@meta
 
---[[
-	```lua
-	-- Methods added in 0.6b
-	table Kernel.GetVersion( void );
-	unsigned Kernel.GetConsoleTiltState( void );
-	string Kernel.GetCPUKey( void );
-	string Kernel.GetDVDKey( void );
-	string Kernel.GetMotherboardType( void );
-	string Kernel.GetConsoleType( void );
-	string Kernel.GetConsoleId( void );
-	string Kernel.GetSerialNumber( void );
-	unsigned Kernel.GetCPUTempThreshold( void );
-	unsigned Kernel.GetGPUTempThreshold( void );
-	unsigned Kernel.GetEDRAMTempThreshold( void );
-	bool Kernel.SetFanSpeed( unsigned fanSpeed );
-	bool Kernel.SetCPUTempThreshold( unsigned threshold );
-	bool Kernel.SetGPUTempThreshold( unsigned threshold );
-	bool Kernel.SetEDRAMTempThreshold( unsigned threshold );
-	void Kernel.RebootSMCRoutine( void );
-	bool Kernel.SetDate(unsigned year, unsigned month, unsigned day);
-	bool Kernel.SetTime(unsigned hour, [unsigned minute, unsigned second, unsigned millisecond]);
-	```
+---Provides an interface for interacting with system-level kernel operations such as querying
+---system information, managing hardware settings, and controlling console behavior.
+---@class Kernel
+Kernel = {}
 
+---Represents `struct XBOX_KRNL_VERSION` defined in xkelib.
+---@class KernelVersion
+---@field Major unsigned The major version number, usually 2 for Xbox 360.
+---@field Minor unsigned The minor version number, usually 0.
+---@field Build unsigned The current build number, e.g., 17559.
+---@field Qfe unsigned The QFE (Quick Fix Engineering) number, usually 0.
 
-	static const luaL_Reg g_kernelLibrary[] = {
-		// Methods added in 0.6b
-		{"GetVersion",				l_kernelGetVersion},			// table Kernel.GetVersion( void );
-		{"GetConsoleTiltState",		l_kernelGetConsoleTiltState},	// unsigned Kernel.GetConsoleTiltState( void );
-		{"GetCPUKey",				l_kernelGetCPUKey},				// std::string Kernel.GetCPUKey( void );
-		{"GetDVDKey",				l_kernelGetDVDKey},				// std::string Kernel.GetDVDKey( void );
-		{"GetMotherboardType",		l_kernelGetMotherboardType},	// std::string Kernel.GetMotherboardType( void );
-		{"GetConsoleType",			l_kernelGetConsoleType},		// std::string Kernel.GetConsoleType( void );
-		{"GetConsoleId",			l_kernelGetConsoleId},			// std::string Kernel.GetConsoleId( void );
-		{"GetSerialNumber",			l_kernelGetSerialNumber},		// std::string Kernel.GetSerialNumber( void );
-		{"GetCPUTempThreshold",		l_kernelGetCPUTempThreshold},	// unsigned Kernel.GetCPUTempThreshold( void );
-		{"GetGPUTempThreshold",		l_kernelGetGPUTempThreshold},	// unsigned Kernel.GetGPUTempThreshold( void );
-		{"GetEDRAMTempThreshold",	l_kernelGetEDRAMTempThreshold},	// unsigned Kernel.GetEDRAMTempThreshold( void );
-		{"SetFanSpeed",				l_kernelSetFanSpeed},			// bool Kernel.SetFanSpeed( unsigned fanSpeed );
-		{"SetCPUTempThreshold",		l_kernelSetCPUTempThreshold},	// bool Kernel.SetCPUTempThreshold( unsigned threshold );
-		{"SetGPUTempThreshold",		l_kernelSetGPUTempThreshold},	// bool Kernel.SetGPUTempThreshold( unsigned threshold );
-		{"SetEDRAMTempThreshold",	l_kernelSetEDRAMTempThreshold},	// bool Kernel.SetEDRAMTempThreshold( unsigned threshold );
-		{"RebootSMCRoutine",		l_kernelRebootSMCRoutine},		// void Kernel.RebootSMCRoutine( void );
-		{"SetDate",					l_kernelSetDate},				// bool Kernel.SetDate(unsigned year, unsigned month, unsigned day);
-		{"SetTime",					l_kernelSetTime},				// bool Kernel.SetTime(unsigned hour, [unsigned minute, unsigned second, unsigned millisecond]);
-		{nullptr,					nullptr}
-	};
-]]
+---Gets the Xbox kernel version.
+---@return KernelVersion # A table containing the 4 kernel version parts (e.g., 2.0.17559.0)
+---@since 0.6b
+function Kernel.GetVersion() end
+
+---@enum TiltState
+TiltState = {
+	Vertical = 0,
+	Horizontal = 1
+}
+
+---Gets the console tilt state.
+---@return TiltState # The console's tilt state.
+---@since 0.6b
+function Kernel.GetConsoleTiltState() end
+
+---Gets the CPU key of the console.
+---@return string|nil # The CPU key as a hexadecimal string, or nil if the key is not found.
+---@since 0.6b
+function Kernel.GetCPUKey() end
+
+---Gets the DVD key of the console.
+---@return string|nil # The DVD key as a hexadecimal string, or nil if the key is not found.
+---@since 0.6b
+function Kernel.GetDVDKey() end
+
+---@alias MoboType "Xenon"|"Zephyr"|"Falcon"|"Jasper"|"Trinity"|"Corona"|"Winchester"|"Unknown"
+
+---Gets the type of the motherboard.
+---@return MoboType # The motherboard type as a string.
+---@since 0.6b
+function Kernel.GetMotherboardType() end
+
+---@alias ConsoleType "Devkit"|"Retail"
+
+---Gets the console type.
+---@return ConsoleType # The console type as a string.
+---@since 0.6b
+function Kernel.GetConsoleType() end
+
+---Gets the console ID.
+---@return string # The console ID as a string.
+---@since 0.6b
+function Kernel.GetConsoleId() end
+
+---Gets the console serial number.
+---@return string # The console serial number as a string.
+---@since 0.6b
+function Kernel.GetSerialNumber() end
+
+---Gets the CPU temperature threshold.
+---@return unsigned|nil # The CPU temperature threshold, or nil if the value cannot be retrieved.
+---@since 0.6b
+function Kernel.GetCPUTempThreshold() end
+
+---Gets the GPU temperature threshold.
+---@return unsigned|nil # The GPU temperature threshold, or nil if the value cannot be retrieved.
+---@since 0.6b
+function Kernel.GetGPUTempThreshold() end
+
+---Gets the EDRAM temperature threshold.
+---@return unsigned|nil # The EDRAM temperature threshold, or nil if the value cannot be retrieved.
+---@since 0.6b
+function Kernel.GetEDRAMTempThreshold() end
+
+---Sets the CPU temperature threshold.
+---@param threshold unsigned The new CPU temperature threshold.
+---@return boolean # True if the threshold was successfully set, false otherwise.
+---@since 0.6b
+function Kernel.SetCPUTempThreshold(threshold) end
+
+---Sets the GPU temperature threshold.
+---@param threshold unsigned The new GPU temperature threshold.
+---@return boolean # True if the threshold was successfully set, false otherwise.
+---@since 0.6b
+function Kernel.SetGPUTempThreshold(threshold) end
+
+---Sets the EDRAM temperature threshold.
+---@param threshold unsigned The new EDRAM temperature threshold.
+---@return boolean # True if the threshold was successfully set, false otherwise.
+---@since 0.6b
+function Kernel.SetEDRAMTempThreshold(threshold) end
+
+---Sets the fan speed.
+---@param fanSpeed unsigned The fan speed as a percentage (25-100). Values below 25 set the fan to AUTO mode.
+---@return boolean # True if the fan speed was successfully set, false otherwise.
+---@since 0.6b
+function Kernel.SetFanSpeed(fanSpeed) end
+
+---Sets the console date.
+---@param year unsigned The year (2005-2025).
+---@param month unsigned The month (1-12).
+---@param day unsigned The day (varies by month and year).
+---@return boolean # True if the date was successfully set, false otherwise.
+---@since 0.6b
+function Kernel.SetDate(year, month, day) end
+
+---Sets the console time.
+---@param hour unsigned The hour (0-23).
+---@param minute? unsigned Optional. The minute (0-59). Defaults to 0.
+---@param second? unsigned Optional. The second (0-59). Defaults to 0.
+---@param millisecond? unsigned Optional. The millisecond (0-999). Defaults to 0.
+---@return boolean # True if the time was successfully set, false otherwise.
+---@since 0.6b
+function Kernel.SetTime(hour, minute, second, millisecond) end
+
+---Reboots the console with power down mode of `FIRMWARE_REENTRY.HalResetSMCRoutine`.
+---Internally, calls `HalReturnToFirmware(0x4)`.
+---@since 0.6b
+function Kernel.RebootSMCRoutine() end
+
+return Kernel
