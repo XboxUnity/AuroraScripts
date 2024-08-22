@@ -109,21 +109,25 @@ GameListSubtitles
 ##### Script
 
 ```lua
-string Script.GetBasePath( void );
-bool Script.FileExists( string relativePath );
-void Script.CreateDirectory( string relativePath );
-bool Script.IsCanceled( void );
-unsigned Script.GetProgress( void );
-string Script.GetStatus( void );
-void Script.SetProgress( unsigned val );
-void Script.SetStatus( string text );
-void Script.SetRefreshListOnExit( bool refreshList );
-void Script.ShowNotification( string message, DWORD notifyType );
-table Script.ShowMessageBox( string title, string prompt, string button1text, [string ...]);
-table Script.ShowPasscode( string title, string prompt, DWORD permissionFlag );
-table Script.ShowKeyboard( string title, string prompt, string default, [DWORD flags] );
-table Script.ShowPopupList( string title, string emptyList, table listContent );
-table Script.ShowFilebrowser( string basePath, string selectedItem, [DWORD flags] );
+Script.GetBasePath(): string
+Script.FileExists(relativePath: string): boolean
+Script.CreateDirectory(relativePath)
+Script.IsCanceled(): boolean
+Script.IsCancelEnabled(): boolean
+Script.SetCancelEnable(enabled: boolean)
+Script.RefreshListOnExit(refreshList: boolean)
+Script.GetProgress(): unsigned
+Script.SetProgress(progress: unsigned, [total: unsigned])
+Script.GetStatus(): string
+Script.SetStatus(status: string)
+Script.ShowNotification(message: string, [notifyType: NotifyType])
+Script.ShowMessageBox(title: string, prompt: string, button1text: string, ...): MessageBoxResult
+Script.ShowKeyboard(title: string, prompt: string, default: string, flags: KeyboardFlags): KeyboardResult
+Script.ShowPasscode(title: string, prompt: string, permissionFlag: unsigned): PasscodeResult
+Script.ShowPasscodeEx(title: string, prompt: string): PasscodeExResult
+Script.ShowPopupList(title: string, emptyList: string, listContent: table<integer|string, string>): PopupResultDefault
+Script.ShowPopupList(title: string, emptyList: string, popupType: PopupType): PopupResult
+Script.ShowFilebrowser(basePath: string, selectedItem: string, flags: unsigned): FilebrowserResult
 ```
 
 ##### Aurora

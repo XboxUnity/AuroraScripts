@@ -14,6 +14,7 @@ Note that these annotations are a work in progress; contributions through pull r
 
 - [Globals](#globals)
 - [Library Modules](#library-modules)
+  - [Script](#script-module)
   - [Aurora](#aurora-module)
   - [IniFile](#inifile-module)
   - [Kernel](#kernel-module)*
@@ -45,6 +46,32 @@ GameListSubtitles
 ```
 
 ## Library Modules
+
+### Script module
+
+Provides an interface for interacting with the script environment, including file I/O, XUI controls, and script states. See [Script.lua](definitions/aurorascriptlib/library/Script.lua) for detailed documentation and annotations
+
+```lua
+Script.GetBasePath(): string
+Script.FileExists(relativePath: string): boolean
+Script.CreateDirectory(relativePath)
+Script.IsCanceled(): boolean
+Script.IsCancelEnabled(): boolean
+Script.SetCancelEnable(enabled: boolean)
+Script.RefreshListOnExit(refreshList: boolean)
+Script.GetProgress(): unsigned
+Script.SetProgress(progress: unsigned, [total: unsigned])
+Script.GetStatus(): string
+Script.SetStatus(status: string)
+Script.ShowNotification(message: string, [notifyType: NotifyType])
+Script.ShowMessageBox(title: string, prompt: string, button1text: string, ...): MessageBoxResult
+Script.ShowKeyboard(title: string, prompt: string, default: string, flags: KeyboardFlags): KeyboardResult
+Script.ShowPasscode(title: string, prompt: string, permissionFlag: unsigned): PasscodeResult
+Script.ShowPasscodeEx(title: string, prompt: string): PasscodeExResult
+Script.ShowPopupList(title: string, emptyList: string, listContent: table<integer|string, string>): PopupResultDefault
+Script.ShowPopupList(title: string, emptyList: string, popupType: PopupType): PopupResult
+Script.ShowFilebrowser(basePath: string, selectedItem: string, flags: unsigned): FilebrowserResult
+```
 
 ### Aurora module
 
@@ -150,7 +177,7 @@ Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 
 ### Thread module
 
-A module for the most advanced thread sleeping technology in existence today. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
+It took me longer to write this description than it did to write the module. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
