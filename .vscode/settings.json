@@ -12,7 +12,6 @@
 		// library modules
 		"Content",
 		"FileSystem",
-		"Http",
 		"GizmoUI",
 	],
 	"Lua.diagnostics.disable": [

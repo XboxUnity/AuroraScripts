@@ -17,6 +17,7 @@ The included modules are available for use in all Content and Utility Scripts, a
   - [Script](#script-module)
   - [Aurora](#aurora-module)
   - [Dvd](#dvd-module)
+  - [Http](#http-module)*
   - [IniFile](#inifile-module)
   - [Kernel](#kernel-module)*
   - [Profile](#profile-module)
@@ -25,7 +26,7 @@ The included modules are available for use in all Content and Utility Scripts, a
   - [Thread](#thread-module)
   - [ZipFile](#zipfile-module)
 
-*Requires script permissions.
+*Denotes a privileged module that require script permissions to access.
 
 ### Globals
 
@@ -118,6 +119,23 @@ Dvd.GetTrayState(): DvdTrayState ---@since 0.7b
 Dvd.GetMediaType(): DvdMediaTypes ---@since 0.7b
 Dvd.OpenTray(): boolean ---@since 0.7b
 Dvd.CloseTray(): boolean ---@since 0.7b
+```
+
+#### Http module
+
+Provides an interface for performing basic HTTP requests, handling response data, and URL encoding/decoding. See [Http.lua](library/Http.lua) for detailed documentation and annotations
+
+```lua
+-- callback function types
+fun(totalFileSize: unsigned, totalBytesTransferred: unsigned, dwReason: HttpCallbackReason): unsigned
+
+-- class methods
+Http.Get(string url, [string outputPath]): HttpResponse
+Http.GetEx(string url, HttpProgressRoutine progressRoutine, [string outputPath]): HttpResponse ---@since 0.7b
+Http.Post(string url, table postvars, [string outputPath]): HttpResponse
+Http.PostEx(string url, table postvars, HttpProgressRoutine progressRoutine, [string outputPath]): HttpResponse ---@since 0.7b
+Http.UrlEncode(string input): string
+Http.UrlDecode(string input): string
 ```
 
 #### IniFile module

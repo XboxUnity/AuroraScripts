@@ -215,12 +215,16 @@ number FileSystem.GetPartitionFreeSpace( string driveName ); ---@since 0.7b
 ##### Http
 
 ```lua
-table Http.Get( string url, [string relativeFilePath] );
-table Http.Post( string url, table postvars, [string relativeFilePath] );
-string Http.UrlEncode( string input );
-string Http.UrlDecode( string input );
-table Http.GetEx( string url, function progressRoutine, [string relativeFilePath] ); ---@since 0.7b
-table Http.PostEx( string url, table postvars, function progressRoutine, [string relativeFilePath] ); ---@since 0.7b
+-- callback function types
+fun(totalFileSize: unsigned, totalBytesTransferred: unsigned, dwReason: HttpCallbackReason): unsigned
+
+-- class methods
+Http.Get(string url, [string outputPath]): HttpResponse
+Http.GetEx(string url, HttpProgressRoutine progressRoutine, [string outputPath]): HttpResponse ---@since 0.7b
+Http.Post(string url, table postvars, [string outputPath]): HttpResponse
+Http.PostEx(string url, table postvars, HttpProgressRoutine progressRoutine, [string outputPath]): HttpResponse ---@since 0.7b
+Http.UrlEncode(string input): string
+Http.UrlDecode(string input): string
 ```
 
 ##### IniFile
