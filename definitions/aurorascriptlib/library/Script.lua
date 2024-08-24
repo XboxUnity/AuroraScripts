@@ -26,14 +26,14 @@ function Script.CreateDirectory(relativePath) end
 function Script.IsCanceled() end
 
 -- NOTE: Inconsistent naming: `IsCancelEnabled` -> `GetCancelEnabled`/`GetCancelationEnabled`
----Gets whether script cancellation is enabled.
+---Gets whether script cancelation is enabled.
 ---@return boolean # True if the script can be canceled, false otherwise.
 ---@since 0.6b
 function Script.IsCancelEnabled() end
 
 -- NOTE: Inconsistent naming: `SetCancelEnable` -> `SetCancelEnabled`/`SetCancelationEnabled`
 ---Enables or disables the ability to cancel the script.
----@param enabled boolean True to enable script cancellation, false to disable.
+---@param enabled boolean True to enable script cancelation, false to disable.
 ---@since 0.6b
 function Script.SetCancelEnable(enabled) end
 
@@ -66,6 +66,7 @@ function Script.SetStatus(status) end
 
 -- TODO: Include max streng lengths for notifications, messagebox titles/prompts/button strings, etc. in annotations
 
+-- NOTE: NotifyType also used in GizmoUI.lua
 ---@enum NotifyType
 NotifyType = {
     Info    = 0,
@@ -213,28 +214,17 @@ function Script.ShowPopupList(title, emptyList, listContent) end
 ---@field Canceled boolean
 ---@field Selected PopupReturnValueBackground|PopupReturnValueSkin|PopupReturnValueCoverLayout|PopupReturnValueLanguage|PopupReturnValueProfileSelect|PopupReturnValueDeviceSelect|nil
 
----Represents a specific `PopupResult` for a `PopupType.Background` popup list selection.
----@alias PopupResultBackground { Canceled: boolean, Selected: PopupReturnValueBackground? }
-
----Represents a specific `PopupResult` for a `PopupType.Skin` popup list selection.
----@alias PopupResultSkin { Canceled: boolean, Selected: PopupReturnValueSkin? }
-
----Represents a specific `PopupResult` for a `PopupType.CoverLayout` popup list selection.
----@alias PopupResultCoverLayout { Canceled: boolean, Selected: PopupReturnValueCoverLayout? }
-
----Represents a specific `PopupResult` for a `PopupType.Language` popup list selection.
----@alias PopupResultLanguage { Canceled: boolean, Selected: PopupReturnValueLanguage? }
-
----Represents a specific `PopupResult` for a `PopupType.ProfileSelect` popup list selection.
----@alias PopupResultProfileSelect { Canceled: boolean, Selected: PopupReturnValueProfileSelect? }
-
----Represents a specific `PopupResult` for a `PopupType.DeviceSelect` popup list selection.
----@alias PopupResultDeviceSelect { Canceled: boolean, Selected: PopupReturnValueDeviceSelect? }
+---@alias PopupResultBackground { Canceled: boolean, Selected: PopupReturnValueBackground? } Represents a specific `PopupResult` for a `PopupType.Background` popup list selection.
+---@alias PopupResultSkin { Canceled: boolean, Selected: PopupReturnValueSkin? } Represents a specific `PopupResult` for a `PopupType.Skin` popup list selection.
+---@alias PopupResultCoverLayout { Canceled: boolean, Selected: PopupReturnValueCoverLayout? } Represents a specific `PopupResult` for a `PopupType.CoverLayout` popup list selection.
+---@alias PopupResultLanguage { Canceled: boolean, Selected: PopupReturnValueLanguage? } Represents a specific `PopupResult` for a `PopupType.Language` popup list selection.
+---@alias PopupResultProfileSelect { Canceled: boolean, Selected: PopupReturnValueProfileSelect? } Represents a specific `PopupResult` for a `PopupType.ProfileSelect` popup list selection.
+---@alias PopupResultDeviceSelect { Canceled: boolean, Selected: PopupReturnValueDeviceSelect? } Represents a specific `PopupResult` for a `PopupType.DeviceSelect` popup list selection.
 
 ---Displays a popup list selection UI of the specified popup type.
 ---
----Narrow the intellisense type checking and hinting features to fields for the specified `PopupType` by marking the return value with either
----the [`---@type`](https://luals.github.io/wiki/annotations/#cast) or [`---@cast`](https://luals.github.io/wiki/annotations/#cast) annotation:
+---Narrow the intellisense type checking and hinting features to fields for the specified `PopupType` by marking the return value with a
+---[`@type`](https://luals.github.io/wiki/annotations/#type) or [`@cast`](https://luals.github.io/wiki/annotations/#cast) annotation:
 --- 1. `---@type PopupResultXXX` (on same line or line above the result variable declaration)
 --- 2. `---@cast resultVar PopupResultXXX` (on same line or anywhere following the result variable declaration)
 ---

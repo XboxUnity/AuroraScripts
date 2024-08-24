@@ -1,6 +1,18 @@
 ---@meta
 
 ---Provides an interface for accessing and modifying system and user settings, as well as managing RSS feeds.
+---
+---
+---This module requires the `settings` permission to be enabled in the calling script's global `ScriptInfo` table.
+---
+---### Example
+---
+---```lua
+---ScriptInfo = {
+---  -- ...(other fields),
+---  Permissions = { "settings" }
+---}
+---```
 ---@class Settings
 Settings = {}
 
@@ -12,7 +24,7 @@ SettingType = {
     User          = 2,
 }
 
----Represents the System Settings used in Aurora.
+---Represents the System Settings names.
 ---@alias SystemSettingKey
 ---| '"SMBServerEnabled"'
 ---| '"SMBHostname"'
@@ -119,7 +131,7 @@ SettingType = {
 ---| '"PCPasscode"'
 ---| '"PCPermissions"'
 
----Represents the User Settings used in Aurora.
+---Represents the User Settings names.
 ---@alias UserSettingKey
 ---| '"FunctionSort"'
 ---| '"FunctionSubtitle"'

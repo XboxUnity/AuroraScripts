@@ -24,9 +24,9 @@ function Aurora.GetFSPluginVersion() end
 
 ---Retrieves the Nova Plugin version.
 ---@return VersionData # A table containing Major, Minor, Revision, and Type.
----@deprecated 0.6b
----**Deprecated**: Use [Aurora.GetFSPluginVersion](lua://Aurora.GetFSPluginVersion) instead.
 ---@since 0.6b
+---@deprecated 0.7b
+---**Deprecated**: Use [Aurora.GetFSPluginVersion](lua://Aurora.GetFSPluginVersion) instead.
 function Aurora.GetNovaVersion() end
 
 ---Checks if the console has an internet connection.

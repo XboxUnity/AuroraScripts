@@ -1,6 +1,17 @@
 ---@meta
 
 ---Provides an interface for interacting with an SQLite database instance.
+---
+---This module requires the `sql` permission to be enabled in the calling script's global `ScriptInfo` table.
+---
+---### Example
+---
+---```lua
+---ScriptInfo = {
+---  -- ...(other fields),
+---  Permissions = { "sql" }
+---}
+---```
 ---@class Sql
 Sql = {}
 

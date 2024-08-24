@@ -1,26 +1,36 @@
 # Aurora Scripts
 
-Aurora's Lua scripting API can be used to extend the functionality of Aurora through custom community-contributed Content (Filter, Sort, and Subtitle) and Utility scripts.
+Aurora's Lua scripting API can be used to extend the functionality of Aurora through custom community-contributed Content (Filter, Sort, and Subtitle) and Utility scripts. These scripts are a community effort that help enhance the functionality and versatility of Aurora for all users, and comprise two main categories:
 
 **Content Scripts** - These scripts provide custom filters, sorters, or subtitle generators for game content. They are executed automatically when Aurora loads.
-- **Filters** - Modify the list of games displayed in Aurora based on custom criteria.
-- **Sorters** - Change the order in which games are displayed in Aurora.
-- **Subtitles** - Generate custom subtitles for games displayed in Aurora.
+- [**Filters**](Filters/) - Modify the list of games displayed in Aurora based on custom criteria.
+- [**Sorters**](Sorts/) - Change the order in which games are displayed in Aurora.
+- [**Subtitles**](Subtitles/) - Generate custom subtitles for games displayed in Aurora.
 
-**Utility Scripts** - These scripts provide additional functionality for Aurora, and are downloaded from the Aurora Repo Browser. They are run on-demand by the user with their own UI.
+[**Utility Scripts**](UtilityScripts/) - These scripts provide additional functionality within Aurora, and run in their own UI when loaded through Aurora.
 
-## Contributing
+All scripts included in this repository can be downloaded (and auto updated) directly from Aurora using the Aurora Repo Browser.
 
-Aurora Scripts are a community effort that help enhance the functionality and versatility of Aurora for all users. To ensure a smooth integration of your script into Aurora's ecosystem, review the script requirements below.
+## Script Development
 
-### Script Metadata
+Aurora's scripting library API exposes several [global objects and functions](definitions/aurorascriptlib/library/Globals.lua), and includes numerous feature-rich [modules](definitions/aurorascriptlib/library/) designed to extend the functionality of custom Aurora scripts by interfacing with Aurora's script execution environment and UI, as well as the Xbox 360 internals.
+
+Refer to the [module definitions README](definitions/aurorascriptlib/README.md) for a quick reference function list or to review the documentation and annotations.
+
+For custom script development, we recommend using [Visual Studio Code](https://code.visualstudio.com/) with the [Lua Language Server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) extension.
+
+After forking this repository and cloning it to your local machine, open the project directory in VS Code. You will be prompted to install the recommended extensions for the project, which include the Lua Language Server for intellisense support.
+
+If this is your first time writing a writing a script for Aurora, a good place to start is by reviewing the [Weather Script](UtilityScripts/Weather), written by Aurora developers and specifically designed to serve as a fully functional example "how-to" sample script. The script is heavily commented, follows idiomatic and best coding practices, and serves as a well-rounded example of how to structure your script and interact with Aurora's Lua API. The code demonstrates proper error handling, making external API requests using the `Http` module, parsing response data using a third party JSON module, persistent storage of user config settings using `IniFile` module, and more.
+
+### ScriptInfo Metadata
 
 Each script must include the following metadata at the beginning of the main script file, defined as global variables.
 
 **Content Scripts:**
 
 ```lua
-ContentScriptMeta = {
+ContentScriptInfo = {
     Title       = "Cool Factor Filter",
     Author      = "Stelio Kontos",
     Description = "Filters games based on their cool factor",
@@ -35,12 +45,12 @@ scriptAuthor = "Stelio Kontos"
 scriptVersion = 1
 scriptDescription = "Randomly plays the Stelio Kontos theme song when Aurora starts"
 scriptIcon = "icon\\icon.xur" -- or .png
-scriptPermissions = { "http", "filesystem" } -- if using modules requiring permissions
+scriptPermissions = { "http", "filesystem" } -- if using modules with restricted permissions
 ```
 
 ### Script Permissions
 
-Some modules must be explicitly enabled in the script's `scriptPermissions` metadata in order to be loaded at runtime and be called by the script. Modules requiring permissions are:
+Some modules must be explicitly enabled by including them in the script's `scriptPermissions` metadata in order to be loaded and executed from the calling script at runtime. Modules requiring permissions are:
 
 - Content
 - FileSystem
@@ -52,37 +62,27 @@ Some modules must be explicitly enabled in the script's `scriptPermissions` meta
 Example:
 
 ```lua
-scriptPermissions = { "http", "filesystem" } -- case-insensitive
+scriptPermissions = { "filesystem", "http" } -- case-insensitive
 ```
 
-## API Reference
+## Library Documentation
 
-Aurora's scripting library API exposes several [global objects and functions](definitions/aurorascriptlib/library/Globals.lua), and includes numerous feature-rich modules designed to extend the functionality of custom scripts by interfacing with Aurora's UI, filesystem, and system internals.
-
-The included modules are available for use in all Content and Utility Scripts, and are preloaded into the Lua execution environment at runtime, eliminating the need to `require` them in your script.
-
-Library documentation is provided as [LuaDoc](https://luals.github.io/wiki/annotations/) annotations, allowing for intellisense support and type checking when used in conjunction with the VS Code extension [Lua Language Server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) by sumneko.
-
-Note that these annotations are a work in progress; contributions through pull requests are welcome.
-
-### Library Documentation
-
-- [Global Functions](#global-functions) • [module definitions](definitions/aurorascriptlib/Globals.lua)
-- [Library Modules](#library-modules)
-  - [Script](#script) • [module definitions](definitions/aurorascriptlib/library/Script.lua)
-  - [Aurora](#aurora) • [module definitions](definitions/aurorascriptlib/library/Aurora.lua)
-  - [Content](#content) • [module definitions](definitions/aurorascriptlib/library/Content.lua)*
-  - [Dvd](#dvd) • [module definitions](definitions/aurorascriptlib/library/Dvd.lua)
-  - [FileSystem](#filesystem) • [module definitions](definitions/aurorascriptlib/library/FileSystem.lua)*
-  - [Http](#http) • [module definitions](definitions/aurorascriptlib/library/Http.lua)*
-  - [IniFile](#inifile) • [module definitions](definitions/aurorascriptlib/library/IniFile.lua)
-  - [Kernel](#kernel) • [module definitions](definitions/aurorascriptlib/library/Kernel.lua)*
-  - [Profile](#profile) • [module definitions](definitions/aurorascriptlib/library/Profile.lua)
-  - [Settings](#settings) • [module definitions](definitions/aurorascriptlib/library/Settings.lua)*
-  - [Sql](#sql) • [module definitions](definitions/aurorascriptlib/library/Sql.lua)*
-  - [Thread](#thread) • [module definitions](definitions/aurorascriptlib/library/Thread.lua)
-  - [ZipFile](#zipfile) • [module definitions](definitions/aurorascriptlib/library/ZipFile.lua)
-  - [GizmoUI](#gizmoui) • [module definitions](definitions/aurorascriptlib/library/GizmoUI.lua)
+- [Globals](definitions/aurorascriptlib/Globals.lua)
+- [Library Modules](definitions/aurorascriptlib)
+  - [Script](definitions/aurorascriptlib/library/Script.lua)
+  - [Aurora](definitions/aurorascriptlib/library/Aurora.lua)
+  - [Content](definitions/aurorascriptlib/library/Content.lua)*
+  - [Dvd](definitions/aurorascriptlib/library/Dvd.lua)
+  - [FileSystem](definitions/aurorascriptlib/library/FileSystem.lua)*
+  - [Http](definitions/aurorascriptlib/library/Http.lua)*
+  - [IniFile](definitions/aurorascriptlib/library/IniFile.lua)
+  - [Kernel](definitions/aurorascriptlib/library/Kernel.lua)*
+  - [Profile](definitions/aurorascriptlib/library/Profile.lua)
+  - [Settings](definitions/aurorascriptlib/library/Settings.lua)*
+  - [Sql](definitions/aurorascriptlib/library/Sql.lua)*
+  - [Thread](definitions/aurorascriptlib/library/Thread.lua)
+  - [ZipFile](definitions/aurorascriptlib/library/ZipFile.lua)
+  - [GizmoUI](definitions/aurorascriptlib/library/GizmoUI.lua)
 
 *Requires script permissions.
 

@@ -2,6 +2,17 @@
 
 ---Provides an interface for interacting with system-level kernel operations such as querying
 ---system information, managing hardware settings, and controlling console behavior.
+---
+---This module requires the `kernel` permission to be enabled in the calling script's global `ScriptInfo` table.
+---
+---### Example
+---
+---```lua
+---ScriptInfo = {
+---  -- ...(other fields),
+---  Permissions = { "kernel" }
+---}
+---```
 ---@class Kernel
 Kernel = {}
 

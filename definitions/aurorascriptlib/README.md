@@ -1,16 +1,16 @@
 # Aurora Scripting Library - Module Definitions
 
-Aurora's scripting library API exposes several [global objects and functions](definitions/aurorascriptlib/library/Globals.lua), and includes numerous feature-rich modules designed to extend the functionality of custom scripts by interfacing with Aurora's UI, filesystem, and system internals.
+Aurora's scripting library API exposes several [global objects and functions](library/Globals.lua), and includes numerous feature-rich modules designed to extend the functionality of custom scripts by interfacing with Aurora's UI, filesystem, and system internals.
 
-## API Reference
+## Library Usage
 
 The included modules are available for use in all Content and Utility Scripts, and are preloaded into the Lua execution environment at runtime, eliminating the need to `require` them in your script.
 
-Library documentation is provided as [LuaDoc](https://luals.github.io/wiki/annotations/) annotations, allowing for intellisense support and type checking when used in conjunction with the VS Code extension [Lua Language Server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) by sumneko.
+[LuaCATS](https://luals.github.io/wiki/annotations/) annotations for each module serve as a manual documentation reference, and provide intellisense support and type hinting when used in conjunction with the [Lua Language Server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) VS Code extension by sumneko.
 
-Note that these annotations are a work in progress; contributions through pull requests are welcome.
+*Note that these annotations are a work in progress; contributions through pull requests are welcome.*
 
-## Table of Contents
+## API Reference
 
 - [Globals](#globals)
 - [Library Modules](#library-modules)
@@ -19,15 +19,16 @@ Note that these annotations are a work in progress; contributions through pull r
   - [IniFile](#inifile-module)
   - [Kernel](#kernel-module)*
   - [Profile](#profile-module)
+  - [Settings](#settings-module)*
   - [Sql](#sql-module)*
   - [Thread](#thread-module)
   - [ZipFile](#zipfile-module)
 
 *Requires script permissions.
 
-## Globals
+### Globals
 
-Global functions and objects that are available to all scripts. Global objects are used primarily by Content Scripts (Filters, Sorts, Subtitles). See [Globals.lua](definitions/aurorascriptlib/library/Globals.lua) for detailed documentation and annotations.
+Global functions and objects that are available to all scripts. Global objects are used primarily by Content Scripts (Filters, Sorts, Subtitles). See [Globals.lua](library/Globals.lua) for detailed documentation and annotations.
 
 ```lua
 -- global functions
@@ -45,11 +46,11 @@ GameListSorters
 GameListSubtitles
 ```
 
-## Library Modules
+### Library Modules
 
-### Script module
+#### Script module
 
-Provides an interface for interacting with the script environment, including file I/O, XUI controls, and script states. See [Script.lua](definitions/aurorascriptlib/library/Script.lua) for detailed documentation and annotations
+Provides an interface for interacting with the script environment, including file I/O, XUI controls, and script states. See [Script.lua](library/Script.lua) for detailed documentation and annotations
 
 ```lua
 Script.GetBasePath(): string
@@ -73,9 +74,9 @@ Script.ShowPopupList(title: string, emptyList: string, popupType: PopupType): Po
 Script.ShowFilebrowser(basePath: string, selectedItem: string, flags: unsigned): FilebrowserResult
 ```
 
-### Aurora module
+#### Aurora module
 
-Provides an interface for common tasks such as retrieving Aurora version info, hashing, querying HAL/system status, performing basic SMC operations, and more. See [Aurora.lua](definitions/aurorascriptlib/library/Aurora.lua) for detailed documentation and annotations
+Provides an interface for common tasks such as retrieving Aurora version info, hashing, querying HAL/system status, performing basic SMC operations, and more. See [Aurora.lua](library/Aurora.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
@@ -106,9 +107,9 @@ Aurora.Md5HashFile(filePath: string): string|nil
 Aurora.Crc32HashFile(filePath: string): string|nil
 ```
 
-### IniFile module
+#### IniFile module
 
-Provides an interface for reading and writing INI files. See [IniFile.lua](definitions/aurorascriptlib/library/IniFile.lua) for detailed documentation and annotations
+Provides an interface for reading and writing INI files. See [IniFile.lua](library/IniFile.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
@@ -123,9 +124,9 @@ userdata:GetAllKeys(section: string): table|nil
 userdata:GetSection(section: string): table|nil
 ```
 
-### Kernel module
+#### Kernel module
 
-Provides an interface for interacting with system-level kernel operations such as querying system information, managing hardware settings, and controlling console behavior. See [Kernel.lua](definitions/aurorascriptlib/library/Kernel.lua) for detailed documentation and annotations
+Provides an interface for interacting with system-level kernel operations such as querying system information, managing hardware settings, and controlling console behavior. See [Kernel.lua](library/Kernel.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
@@ -149,9 +150,9 @@ Kernel.SetTime(hour: unsigned, [minute: unsigned], [second: unsigned], [millisec
 Kernel.RebootSMCRoutine()
 ```
 
-### Profile module
+#### Profile module
 
-Provides an interface for interacting with user profiles, such as retrieving XUIDs, GamerTags, achievements, and more. See [Profile.lua](definitions/aurorascriptlib/library/Profile.lua) for detailed documentation and annotations
+Provides an interface for interacting with user profiles, such as retrieving XUIDs, GamerTags, achievements, and more. See [Profile.lua](library/Profile.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
@@ -165,7 +166,7 @@ Profile.Login(playerIndex: integer, xuid: string): boolean ---@since 0.7b
 Profile.Logout(playerIndex: integer): boolean ---@since 0.7b
 ```
 
-### Settings module
+#### Settings module
 
 Provides an interface for accessing and modifying system and user settings, as well as managing RSS feeds. See [Settings.lua](library/Settings.lua) for detailed documentation and annotations
 
@@ -185,9 +186,9 @@ Settings.DeleteRSSFeed(feedId: unsigned): boolean ---@since 0.7b
 Settings.UpdateRSSFeed(feedId: unsigned, url: string, enabled: boolean): boolean ---@since 0.7b
 ```
 
-### Sql module
+#### Sql module
 
-Provides an interface for interacting with an SQLite database instance. See [Sql.lua](definitions/aurorascriptlib/library/Sql.lua) for detailed documentation and annotations
+Provides an interface for interacting with an SQLite database instance. See [Sql.lua](library/Sql.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
@@ -195,7 +196,7 @@ Sql.Execute(query: string): boolean
 Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 ```
 
-### Thread module
+#### Thread module
 
 It's just a single method. That's it. See [Thread.lua](library/Thread.lua) for detailed documentation and annotations
 
@@ -204,9 +205,9 @@ It's just a single method. That's it. See [Thread.lua](library/Thread.lua) for d
 Thread.Sleep(milliseconds: unsigned)
 ```
 
-### ZipFile module
+#### ZipFile module
 
-Provides an interface for opening and extracting the contents of a ZIP archive using 7-Zip. See [ZipFile.lua](definitions/aurorascriptlib/library/ZipFile.lua) for detailed documentation and annotations
+Provides an interface for opening and extracting the contents of a ZIP archive using 7-Zip. See [ZipFile.lua](library/ZipFile.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods
