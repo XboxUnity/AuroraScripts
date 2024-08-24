@@ -25,21 +25,23 @@ Http = {}
 ---@field OutputData string|nil The response data as a string, if not saved to a file.
 ---@field Canceled boolean Indicates if the request was canceled.
 
----Enum representing the different callback reasons used in the HTTP progress routine.
+---Represents the different callback reasons used in the HTTP progress routine.
 ---@enum HttpCallbackReason
 HttpCallbackReason = {
-    RequestOpened    = 1, ---The HTTP request has been opened.
-    ChunkFinished    = 2, ---A chunk of data has been successfully transferred.
-    RequestCompleted = 3, ---The HTTP request has been completed.
-    RequestCanceled  = 4, ---The HTTP request has been canceled.
-    RequestClosed    = 5, ---The HTTP request has been closed.
+    RequestOpened    = 1, --- The HTTP request has been opened.
+    ChunkFinished    = 2, --- A chunk of data has been successfully transferred.
+    RequestCompleted = 3, --- The HTTP request has been completed.
+    RequestCanceled  = 4, --- The HTTP request has been canceled.
+    RequestClosed    = 5, --- The HTTP request has been closed.
 }
+
+---@alias HttpProgressReturnCode ProgressCallbackReturnCode
 
 ---Callback function type used to track the progress of an HTTP download operation.
 ---The function receives the total size of the file being downloaded, the number of bytes transferred so far,
----and a reason code indicating the current state or phase of the download process. The callback function
----should return a Win32 error code (such as `PROGRESS_CONTINUE`, `PROGRESS_CANCEL`, or `PROGRESS_QUIET`) to control the continuation of the download.
----@alias HttpProgressRoutine fun(totalFileSize: unsigned, totalBytesTransferred: unsigned, dwReason: HttpCallbackReason): unsigned
+---and a reason code indicating the current state or phase of the download process.
+---The function should return an `HttpProgressReturnCode` to control the continuation of the operation.
+---@alias HttpProgressRoutine fun(totalFileSize: unsigned, totalBytesTransferred: unsigned, dwReason: HttpCallbackReason): HttpProgressReturnCode
 
 ---Sends a GET request to the specified URL, optionally saving the response data to a file.
 ---@param url string The URL to send the GET request to.

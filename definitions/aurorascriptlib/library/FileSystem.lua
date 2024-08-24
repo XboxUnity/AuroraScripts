@@ -1,56 +1,202 @@
 ---@meta
 
---[[
-	```lua
-	-- Methods added in 0.6b
-	bool FileSystem.CopyDirectory( string srcDir, string dstDir, bool overwrite, [function progressRoutine] );
-	bool FileSystem.MoveDirectory( string srcDir, string dstDir, bool overwrite, [function progressRoutine] );
-	bool FileSystem.DeleteDirectory( string directory );
-	bool FileSystem.CreateDirectory( string directory );
-	bool FileSystem.CopyFile( string srcFile, string dstFile, bool overwrite, [function progressRoutine] );
-	bool FileSystem.MoveFile( string srcFile, string dstFile, bool overwrite, [function progressRoutine] );
-	bool FileSystem.DeleteFile( string srcFile );
-	string Filesystem.ReadFile( string srcFile );
-	bool FileSystem.WriteFile( string srcFile, string buffer );
-	bool FileSystem.FileExists( string path );
-	unsigned FileSystem.GetFileSize( string path );
-	unsigned FileSystem.GetAttributes( string path );
-	table FileSystem.GetDrives( [bool contentDrivesOnly] )
-	table FileSystem.GetFilesAndDirectories( string path );
-	table FileSystem.GetFiles( string path );
-	table FileSystem.GetDirectories( string path );
-	bool FileSystem.Rename( string original, string new );
-	bool FileSystem.InstallTitleFromDisc( string virtualTargetPath, bool createContentDirs, [function progressRoutine] );
-	-- Methods added in 0.7b
-	number FileSystem.GetPartitionSize( string driveName );
-	number FileSystem.GetPartitionUsedSpace( string driveName );
-	number FileSystem.GetPartitionFreeSpace( string driveName );
-	```
+---Provides an interface for performing file system operations, including file and directory manipulation, partition management, and installation routines.
+---
+---This module requires the `filesystem` permission to be enabled in the calling script's global `ScriptInfo` table.
+---
+---### Example
+---
+---```lua
+---ScriptInfo = {
+---  -- ...(other fields),
+---  Permissions = { "filesystem" }
+---}
+---```
+---@class FileSystem
+FileSystem = {}
 
-	static const luaL_Reg l_filesystemMethods[] = {
-		// Methods added in 0.6b
-		{"CopyDirectory",          l_filesystemCopyDirectory },          // bool FileSystem.CopyDirectory( std::string srcDir, std::string dstDir, bool overwrite, [function progressRoutine] );
-		{"MoveDirectory",          l_filesystemMoveDirectory },          // bool FileSystem.MoveDirectory( std::string srcDir, std::string dstDir, bool overwrite, [function progressRoutine] );
-		{"DeleteDirectory",        l_filesystemDeleteDirectory },        // bool FileSystem.DeleteDirectory( std::string directory );
-		{"CreateDirectory",        l_filesystemCreateDirectory },        // bool FileSystem.CreateDirectory( std::string directory );
-		{"CopyFile",               l_filesystemCopyFile },               // bool FileSystem.CopyFile( std::string srcFile, std::string dstFile, bool overwrite, [function progressRoutine] );
-		{"MoveFile",               l_filesystemMoveFile },               // bool FileSystem.MoveFile( std::string srcFile, std::string dstFile, bool overwrite, [function progressRoutine] );
-		{"DeleteFile",             l_filesystemDeleteFile },             // bool FileSystem.DeleteFile( std::string srcFile );
-		{"ReadFile",               l_filesystemReadFile },               // std::string Filesystem.ReadFile( std::string srcFile );
-		{"WriteFile",              l_filesystemWriteFile },              // bool FileSystem.WriteFile( std::string srcFile, std::string buffer );
-		{"FileExists",             l_filesystemExists },                 // bool FileSystem.FileExists( std::string path );
-		{"GetFileSize",            l_filesystemGetFileSize },            // unsigned FileSystem.GetFileSize( std::string path );
-		{"GetAttributes",          l_filesystemGetAttributes },          // unsigned FileSystem.GetAttributes( std::string path );
-		{"GetDrives",              l_filesystemGetDrives },              // table FileSystem.GetDrives( [bool contentDrivesOnly] )
-		{"GetFilesAndDirectories", l_filesystemGetFilesAndDirectories }, // table FileSystem.GetFilesAndDirectories( std::string path );
-		{"GetFiles",               l_filesystemGetFiles},                // table FileSystem.GetFiles( std::string path );
-		{"GetDirectories",         l_filesystemGetDirectories},          // table FileSystem.GetDirectories( std::string path );
-		{"Rename",                 l_filesystemRename },                 // bool FileSystem.Rename( std::string original, std::string new );
-		{"InstallTitleFromDisc",   l_filesystemInstallTitleFromDisc},    // bool FileSystem.InstallTitleFromDisc( std::string virtualTargetPath, bool createContentDirs, [function progressRoutine] );
-		// Methods added in 0.7b
-		{"GetPartitionSize",       l_filesystemGetPartitionSize},        // number FileSystem.GetPartitionSize( std::string driveName );
-		{"GetPartitionUsedSpace",  l_filesystemGetPartitionUsedSpace},   // number FileSystem.GetPartitionUsedSpace( std::string driveName );
-		{"GetPartitionFreeSpace",  l_filesystemGetPartitionFreeSpace},   // number FileSystem.GetPartitionFreeSpace( std::string driveName );
-		{nullptr,		nullptr}
-	};
-]]
+---Represents the state change reasons used in progress callback routines.
+---Equivalent to the CopyFileEx `CALLBACK_X` state change values defined in `winbase.h`.
+---@enum FileSystemCallbackReason
+FileSystemCallbackReason = {
+    ChunkFinished = 0x00000000, --- A chunk of data has been successfully transferred.
+    StreamSwitch  = 0x00000001, --- The stream is switching to a new source.
+}
+
+---@alias FileSystemProgressReturnCode FileSystemProgressReturnCode
+
+---Callback function type used to track the progress of a file copy or move operation.
+---The function receives the total size of the file being processed and the number of bytes transferred so far.
+---The function should return a `FileSystemProgressReturnCode` to control the continuation of the operation.
+---@alias FileSystemProgressRoutine fun(totalFileSize: number, totalBytesTransferred: number): FileSystemProgressReturnCode
+
+---Callback function type used to track the progress of an SVOD installation operation.
+---The function receives the total size of the installation, bytes transferred, chunk information, and a callback reason.
+---The function should return a `FileSystemProgressReturnCode` to control the continuation of the operation.
+---@alias FileSystemSvodProgressRoutine fun(totalFileSize: number, totalBytesTransferred: number, chunkFileSize: number, chunkBytesTransferred: number, chunkNumber: unsigned, chunkTotal: unsigned, callbackReason: FileSystemCallbackReason): FileSystemProgressReturnCode
+
+---Installs a title from disc to the specified virtual target path, optionally creating content directories and providing progress updates.
+---@param virtualTargetPath string The virtual target path where the title should be installed.
+---@param createContentDirs boolean Whether to create content directories.
+---@param progressRoutine? FileSystemSvodProgressRoutine Optional. A callback function that receives progress updates.
+---@return boolean # True if the installation was successful, false otherwise.
+---@since 0.6b
+function FileSystem.InstallTitleFromDisc(virtualTargetPath, createContentDirs, progressRoutine) end
+
+---Copies a directory from source to destination, optionally overwriting existing files and providing progress updates.
+---If the destination directory does not exist, it will be created.
+---@param srcDirPath string The source directory path.
+---@param destDirPath string The destination directory path.
+---@param overwrite boolean Whether to overwrite existing files in the destination directory.
+---@param progressRoutine? FileSystemProgressRoutine Optional. A callback function that receives progress updates.
+---@return boolean # True if the directory copy was successful, false otherwise.
+---@since 0.6b
+function FileSystem.CopyDirectory(srcDirPath, destDirPath, overwrite, progressRoutine) end
+
+---Moves a directory from source to destination, optionally overwriting existing files and providing progress updates.
+---If the destination directory does not exist, it will be created.
+---@param srcDirPath string The source directory path.
+---@param destDirPath string The destination directory path.
+---@param overwrite boolean Whether to overwrite existing files in the destination directory.
+---@param progressRoutine? FileSystemProgressRoutine Optional. A callback function that receives progress updates.
+---@return boolean # True if the directory move was successful, false otherwise.
+---@since 0.6b
+function FileSystem.MoveDirectory(srcDirPath, destDirPath, overwrite, progressRoutine) end
+
+---Copies a file from source to destination, optionally overwriting the destination file and providing progress updates.
+---@param srcFilePath string The source file path.
+---@param destFilePath string The destination file path.
+---@param overwrite boolean Whether to overwrite the existing file in the destination path.
+---@param progressRoutine? FileSystemProgressRoutine Optional. A callback function that receives progress updates.
+---@return boolean # True if the file copy was successful, false otherwise.
+---@since 0.6b
+function FileSystem.CopyFile(srcFilePath, destFilePath, overwrite, progressRoutine) end
+
+---Moves a file from source to destination, optionally overwriting the destination file and providing progress updates.
+---@param srcFilePath string The source file path.
+---@param destFilePath string The destination file path.
+---@param overwrite boolean Whether to overwrite the existing file in the destination path.
+---@param progressRoutine? FileSystemProgressRoutine Optional. A callback function that receives progress updates.
+---@return boolean # True if the file move was successful, false otherwise.
+---@since 0.6b
+function FileSystem.MoveFile(srcFilePath, destFilePath, overwrite, progressRoutine) end
+
+---Deletes a directory and all its contents recursively.
+---@param dirPath string The directory path to delete.
+---@return boolean # True if the directory was successfully deleted, false otherwise.
+---@since 0.6b
+function FileSystem.DeleteDirectory(dirPath) end
+
+---Creates a new directory, including any necessary parent directories.
+---@param dirPath string The directory path to create.
+---@return boolean # True if the directory was successfully created, false otherwise.
+---@since 0.6b
+function FileSystem.CreateDirectory(dirPath) end
+
+---Deletes a file.
+---@param filePath string The file path to delete.
+---@return boolean # True if the file was successfully deleted, false otherwise.
+---@since 0.6b
+function FileSystem.DeleteFile(filePath) end
+
+---Writes a string to a file.
+---@param filePath string The file path to write.
+---@param data string The data to write to the file.
+---@return boolean # True if the data was successfully written to the file, false otherwise.
+---@since 0.6b
+function FileSystem.WriteFile(filePath, data) end
+
+---Reads the entire contents of a file into a string.
+---@param filePath string The file path to read.
+---@return string|nil # The contents of the file, or nil if the file does not exist or could not be read.
+---@since 0.6b
+function FileSystem.ReadFile(filePath) end
+
+---Renames a file or directory.
+---@param curName string The current name of the file or directory.
+---@param newName string The new name for the file or directory.
+---@return boolean # True if the rename was successful, false otherwise.
+---@since 0.6b
+function FileSystem.Rename(curName, newName) end
+
+---TODO: Better named `Exists`, ambiguous since it checks files and directories.
+---
+---Checks if a file or directory exists at the specified path.
+---@param path string The file or directory path to check.
+---@return boolean # True if the file or directory exists, false otherwise.
+---@since 0.6b
+function FileSystem.FileExists(path) end
+
+---Gets the attributes of a file or directory.
+---@param path string The file or directory path.
+---@return FileAttributes|unsigned # The attributes of the file or directory.
+---@since 0.6b
+function FileSystem.GetAttributes(path) end
+
+---Gets the size of a file.
+---@param filePath string The file path.
+---@return unsigned # The size of the file in bytes, or 0 if the file does not exist.
+---@since 0.6b
+function FileSystem.GetFileSize(filePath) end
+
+---Represents a file system entry, such as a file or directory.
+---Based on the `WIN32_FIND_DATA` structure defined in `winbase.h`.
+---@class FileInfo
+---@field Name string The name of the file or directory.
+---@field Attributes FileAttributes|unsigned The file attributes.
+---@field CreationTime integer The creation time of the file or directory.
+---@field LastAccessTime integer The last access time of the file or directory.
+---@field LastWriteTime integer The last write time of the file or directory.
+---@field Size unsigned The size of the file, in bytes, or 0 for directories.
+
+---Gets a list of files and directories at the specified path.
+---@param path string The directory path to query.
+---@return FileInfo[] # A table with an array of `FileInfo` entries containing information about each file or directory, or an empty table if no entries were found.
+---@since 0.6b
+function FileSystem.GetFilesAndDirectories(path) end
+
+---Gets a list of files at the specified path.
+---@param path string The directory path to query.
+---@return FileInfo[] # A table with an array of `FileInfo` entries containing information about each file, or an empty table if no files were found.
+---@since 0.6b
+function FileSystem.GetFiles(path) end
+
+---Gets a list of directories at the specified path.
+---@param path string The directory path to query.
+---@return FileInfo[] # A table with an array of `FileInfo` entries containing information about each directory, or an empty table if no directories were found.
+---@since 0.6b
+function FileSystem.GetDirectories(path) end
+
+---Represents a mounted drive entry.
+---@class DriveInfo
+---@field Name string The name of the drive.
+---@field MountPoint string The mount point of the drive.
+---@field SystemPath string The system path of the drive.
+---@field VirtualRoot string The virtual root of the drive.
+---@field Serial string The serial number of the drive.
+
+---Retrieves a list of mounted drives, optionally filtering for content drives only.
+---@param contentDrivesOnly? boolean Optional. Whether to include only content drives. Default is false.
+---@return DriveInfo[] # A table with an array of `DriveInfo` entries containing information about each drive, or an empty table if no drives were found.
+---@since 0.6b
+function FileSystem.GetDrives(contentDrivesOnly) end
+
+---Gets the total size of a partition.
+---@param driveName string The name of the drive.
+---@return number|nil # The total size of the partition in bytes, or nil if it the drive is not mounted.
+---@since 0.7b
+function FileSystem.GetPartitionSize(driveName) end
+
+---Gets the used space of a partition.
+---@param driveName string The name of the drive.
+---@return number|nil # The used space of the partition in bytes, or nil if it the drive is not mounted.
+---@since 0.7b
+function FileSystem.GetPartitionUsedSpace(driveName) end
+
+---Gets the free space of a partition.
+---@param driveName string The name of the drive.
+---@return number|nil # The free space of the partition in bytes, or nil if it the drive is not mounted.
+---@since 0.7b
+function FileSystem.GetPartitionFreeSpace(driveName) end
+
+return FileSystem

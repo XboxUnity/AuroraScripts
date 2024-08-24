@@ -189,42 +189,47 @@ Dvd.CloseTray(): boolean ---@since 0.7b
 ##### FileSystem
 
 ```lua
-bool FileSystem.CopyDirectory( string srcDir, string dstDir, bool overwrite, [function progressRoutine] );
-bool FileSystem.MoveDirectory( string srcDir, string dstDir, bool overwrite, [function progressRoutine] );
-bool FileSystem.DeleteDirectory( string directory );
-bool FileSystem.CreateDirectory( string directory );
-bool FileSystem.CopyFile( string srcFile, string dstFile, bool overwrite, [function progressRoutine] );
-bool FileSystem.MoveFile( string srcFile, string dstFile, bool overwrite, [function progressRoutine] );
-bool FileSystem.DeleteFile( string srcFile );
-string Filesystem.ReadFile( string srcFile );
-bool FileSystem.WriteFile( string srcFile, string buffer );
-bool FileSystem.FileExists( string path );
-unsigned FileSystem.GetFileSize( string path );
-unsigned FileSystem.GetAttributes( string path );
-table FileSystem.GetDrives( [bool contentDrivesOnly] )
-table FileSystem.GetFilesAndDirectories( string path );
-table FileSystem.GetFiles( string path );
-table FileSystem.GetDirectories( string path );
-bool FileSystem.Rename( string original, string new );
-bool FileSystem.InstallTitleFromDisc( string virtualTargetPath, bool createContentDirs, [function progressRoutine] );
-number FileSystem.GetPartitionSize( string driveName ); ---@since 0.7b
-number FileSystem.GetPartitionUsedSpace( string driveName ); ---@since 0.7b
-number FileSystem.GetPartitionFreeSpace( string driveName ); ---@since 0.7b
+-- callback function types
+FileSystemProgressRoutine = fun(totalFileSize: number, totalBytesTransferred: number): FileSystemProgressReturnCode
+FileSystemSvodProgressRoutine = fun(totalFileSize: number, totalBytesTransferred: number, chunkFileSize: number, chunkBytesTransferred: number, chunkNumber: unsigned, chunkTotal: unsigned, callbackReason: FileSystemCallbackReason): FileSystemProgressReturnCode
+
+-- class methods
+FileSystem.InstallTitleFromDisc(virtualTargetPath: string, createContentDirs: boolean, [progressRoutine: FileSystemSvodProgressRoutine]): boolean
+FileSystem.CopyDirectory(srcDirPath: string, destDirPath: string, overwrite: boolean, [progressRoutine: FileSystemProgressRoutine]): boolean
+FileSystem.MoveDirectory(srcDirPath: string, destDirPath: string, overwrite: boolean, [progressRoutine: FileSystemProgressRoutine]): boolean
+FileSystem.CopyFile(srcFilePath: string, destFilePath: string, overwrite: boolean, [progressRoutine: FileSystemProgressRoutine]): boolean
+FileSystem.MoveFile(srcFilePath: string, destFilePath: string, overwrite: boolean, [progressRoutine: FileSystemProgressRoutine]): boolean
+FileSystem.DeleteDirectory(dirPath: string): boolean
+FileSystem.CreateDirectory(dirPath: string): boolean
+FileSystem.DeleteFile(filePath: string): boolean
+FileSystem.WriteFile(filePath: string, data: string): boolean
+FileSystem.ReadFile(filePath: string): string|nil
+FileSystem.Rename(curName: string, newName: string): boolean
+FileSystem.FileExists(path: string): boolean
+FileSystem.GetAttributes(path: string): FileAttributes|unsigned
+FileSystem.GetFileSize(filePath: string): unsigned
+FileSystem.GetFilesAndDirectories(path: string): FileInfo[]
+FileSystem.GetFiles(path: string): FileInfo[]
+FileSystem.GetDirectories(path: string): FileInfo[]
+FileSystem.GetDrives([contentDrivesOnly: boolean]): DriveInfo[]
+FileSystem.GetPartitionSize(driveName: string): number|nil ---@since 0.7b
+FileSystem.GetPartitionUsedSpace(driveName: string): number|nil ---@since 0.7b
+FileSystem.GetPartitionFreeSpace(driveName: string): number|nil ---@since 0.7b
 ```
 
 ##### Http
 
 ```lua
 -- callback function types
-fun(totalFileSize: unsigned, totalBytesTransferred: unsigned, dwReason: HttpCallbackReason): unsigned
+HttpProgressRoutine = fun(totalFileSize: unsigned, totalBytesTransferred: unsigned, dwReason: HttpCallbackReason): unsigned ---@since 0.7b
 
 -- class methods
-Http.Get(string url, [string outputPath]): HttpResponse
-Http.GetEx(string url, HttpProgressRoutine progressRoutine, [string outputPath]): HttpResponse ---@since 0.7b
-Http.Post(string url, table postvars, [string outputPath]): HttpResponse
-Http.PostEx(string url, table postvars, HttpProgressRoutine progressRoutine, [string outputPath]): HttpResponse ---@since 0.7b
-Http.UrlEncode(string input): string
-Http.UrlDecode(string input): string
+Http.Get(url: string, [outputPath: string]): HttpResponse
+Http.GetEx(url: string, progressRoutine: HttpProgressRoutine, [outputPath: string]): HttpResponse ---@since 0.7b
+Http.Post(url: string, postvars: table, [outputPath: string]): HttpResponse
+Http.PostEx(url: string, postvars: table, progressRoutine: HttpProgressRoutine, [outputPath: string]): HttpResponse ---@since 0.7b
+Http.UrlEncode(input: string): string
+Http.UrlDecode(input: string): string
 ```
 
 ##### IniFile

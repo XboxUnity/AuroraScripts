@@ -17,6 +17,7 @@ The included modules are available for use in all Content and Utility Scripts, a
   - [Script](#script-module)
   - [Aurora](#aurora-module)
   - [Dvd](#dvd-module)
+  - [FileSystem](#filesystem-module)*
   - [Http](#http-module)*
   - [IniFile](#inifile-module)
   - [Kernel](#kernel-module)*
@@ -121,21 +122,54 @@ Dvd.OpenTray(): boolean ---@since 0.7b
 Dvd.CloseTray(): boolean ---@since 0.7b
 ```
 
+#### FileSystem module
+
+Provides an interface for performing file system operations, including file and directory manipulation, partition management, and installation routines. See [FileSystem.lua](library/FileSystem.lua) for detailed documentation and annotations
+
+```lua
+-- callback function types
+FileSystemProgressRoutine = fun(totalFileSize: number, totalBytesTransferred: number): FileSystemProgressReturnCode
+FileSystemSvodProgressRoutine = fun(totalFileSize: number, totalBytesTransferred: number, chunkFileSize: number, chunkBytesTransferred: number, chunkNumber: unsigned, chunkTotal: unsigned, callbackReason: FileSystemCallbackReason): FileSystemProgressReturnCode
+
+-- class methods
+FileSystem.InstallTitleFromDisc(virtualTargetPath: string, createContentDirs: boolean, [progressRoutine: FileSystemSvodProgressRoutine]): boolean
+FileSystem.CopyDirectory(srcDirPath: string, destDirPath: string, overwrite: boolean, [progressRoutine: FileSystemProgressRoutine]): boolean
+FileSystem.MoveDirectory(srcDirPath: string, destDirPath: string, overwrite: boolean, [progressRoutine: FileSystemProgressRoutine]): boolean
+FileSystem.CopyFile(srcFilePath: string, destFilePath: string, overwrite: boolean, [progressRoutine: FileSystemProgressRoutine]): boolean
+FileSystem.MoveFile(srcFilePath: string, destFilePath: string, overwrite: boolean, [progressRoutine: FileSystemProgressRoutine]): boolean
+FileSystem.DeleteDirectory(dirPath: string): boolean
+FileSystem.CreateDirectory(dirPath: string): boolean
+FileSystem.DeleteFile(filePath: string): boolean
+FileSystem.WriteFile(filePath: string, data: string): boolean
+FileSystem.ReadFile(filePath: string): string|nil
+FileSystem.Rename(curName: string, newName: string): boolean
+FileSystem.FileExists(path: string): boolean
+FileSystem.GetAttributes(path: string): FileAttributes|unsigned
+FileSystem.GetFileSize(filePath: string): unsigned
+FileSystem.GetFilesAndDirectories(path: string): FileInfo[]
+FileSystem.GetFiles(path: string): FileInfo[]
+FileSystem.GetDirectories(path: string): FileInfo[]
+FileSystem.GetDrives([contentDrivesOnly: boolean]): DriveInfo[]
+FileSystem.GetPartitionSize(driveName: string): number|nil ---@since 0.7b
+FileSystem.GetPartitionUsedSpace(driveName: string): number|nil ---@since 0.7b
+FileSystem.GetPartitionFreeSpace(driveName: string): number|nil ---@since 0.7b
+```
+
 #### Http module
 
 Provides an interface for performing basic HTTP requests, handling response data, and URL encoding/decoding. See [Http.lua](library/Http.lua) for detailed documentation and annotations
 
 ```lua
 -- callback function types
-fun(totalFileSize: unsigned, totalBytesTransferred: unsigned, dwReason: HttpCallbackReason): unsigned
+HttpProgressRoutine = fun(totalFileSize: unsigned, totalBytesTransferred: unsigned, dwReason: HttpCallbackReason): unsigned ---@since 0.7b
 
 -- class methods
-Http.Get(string url, [string outputPath]): HttpResponse
-Http.GetEx(string url, HttpProgressRoutine progressRoutine, [string outputPath]): HttpResponse ---@since 0.7b
-Http.Post(string url, table postvars, [string outputPath]): HttpResponse
-Http.PostEx(string url, table postvars, HttpProgressRoutine progressRoutine, [string outputPath]): HttpResponse ---@since 0.7b
-Http.UrlEncode(string input): string
-Http.UrlDecode(string input): string
+Http.Get(url: string, [outputPath: string]): HttpResponse
+Http.GetEx(url: string, progressRoutine: HttpProgressRoutine, [outputPath: string]): HttpResponse ---@since 0.7b
+Http.Post(url: string, postvars: table, [outputPath: string]): HttpResponse
+Http.PostEx(url: string, postvars: table, progressRoutine: HttpProgressRoutine, [outputPath: string]): HttpResponse ---@since 0.7b
+Http.UrlEncode(input: string): string
+Http.UrlDecode(input: string): string
 ```
 
 #### IniFile module

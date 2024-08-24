@@ -86,16 +86,16 @@ function Aurora.GetCurrentSkin() end
 ---@since 0.6b
 function Aurora.GetCurrentLanguage() end
 
----Represents `enum SMC_TRAY_STATE` defined xkelib, with values adjusted for Lua (0-6).
+---Represents `enum SMC_TRAY_STATE` defined in xkelib, with values adjusted for Lua (0-6).
 ---@enum SMCTrayState
 SMCTrayState = {
-    Open        = 0, --SMC_TRAY_OPEN-0x60
-    OpenRequest = 1, --SMC_TRAY_OPEN_REQUEST-0x60
-    Close       = 2, --SMC_TRAY_CLOSE-0x60
-    Opening     = 3, --SMC_TRAY_OPENING-0x60
-    Closing     = 4, --SMC_TRAY_CLOSING-0x60
-    Unknown     = 5, --SMC_TRAY_UNKNOWN-0x60
-    SpinUp      = 6, --SMC_TRAY_SPINUP-0x60
+    Open        = 0, --- SMC_TRAY_OPEN - 0x60
+    OpenRequest = 1, --- SMC_TRAY_OPEN_REQUEST - 0x60
+    Close       = 2, --- SMC_TRAY_CLOSE - 0x60
+    Opening     = 3, --- SMC_TRAY_OPENING - 0x60
+    Closing     = 4, --- SMC_TRAY_CLOSING - 0x60
+    Unknown     = 5, --- SMC_TRAY_UNKNOWN - 0x60
+    SpinUp      = 6, --- SMC_TRAY_SPINUP - 0x60
 }
 
 ---Retrieves the DVD tray state.

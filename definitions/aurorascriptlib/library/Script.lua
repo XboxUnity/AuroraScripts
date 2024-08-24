@@ -276,6 +276,7 @@ FileExecType = {
     ELF     = 6, -- ELF executable.
 }
 
+---Represents a file object with information about the file.
 ---@class FileObject
 ---@field VirtualRoot string The virtual root of the file.
 ---@field SystemRoot string The system root of the file.
@@ -287,7 +288,7 @@ FileExecType = {
 ---@field Type FileTypeFlags The type of the file as a 32-bit flag.
 ---@field Size unsigned The size of the file in bytes.
 ---@field SizeStr string The size of the file as a formatted string.
----@field Attributes unsigned The file attributes associated with the file.
+---@field Attributes FileAttributes|unsigned The file attributes associated with the file.
 ---@field ExecType FileExecType The execution type associated with the file.
 
 ---@alias FilebrowserResult { Canceled: boolean, File: FileObject? }
