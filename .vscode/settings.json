@@ -9,14 +9,6 @@
 	"Lua.diagnostics.globals": [
 		"main",
 
-		// script metadata
-		"scriptTitle",
-		"scriptAuthor",
-		"scriptDescription",
-		"scriptVersion",
-		"scriptIcon",
-		"scriptPermissions",
-
 		// library modules
 		"Content",
 		"Dvd",

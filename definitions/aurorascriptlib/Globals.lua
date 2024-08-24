@@ -1,6 +1,19 @@
 ---@meta
 
 --
+-- Required Script Metadata for all Aurora Scripts
+--
+
+scriptTitle                = ""  ---@type string The title of the script.
+scriptAuthor               = ""  ---@type string The author of the script.
+scriptVersion              = 1   ---@type integer The version of the script as an integer. Note: Only integer values are allowed, no decimals.
+scriptDescription          = ""  ---@type string A brief description of what the script does.
+scriptIcon                 = ""  ---@type string? Optional. The path to the script icon file, relative to the script base path, using Windows-style escaped backslashes (e.g., "images\\icon.xur"). Valid file types are XUR and PNG.
+scriptPermissions          = {}  ---@type LibModulesPrivileged[]? Optional. A list of permissions required by the script if it uses modules with restricted permissions. Defaults to {}.
+scriptMinimumAuroraVersion = 0.6 ---@type number? Optional. The minimum version of Aurora that the script is compatible with. Defaults to 0.6.
+
+
+--
 -- Global functions and objects that are available to all scripts.
 --
 

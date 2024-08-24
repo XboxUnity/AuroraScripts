@@ -42,9 +42,9 @@ ContentScriptInfo = {
 ```lua
 scriptTitle = "Rick Roll"
 scriptAuthor = "Stelio Kontos"
-scriptVersion = 1
+scriptVersion = 1 -- integers only (no decimals)
 scriptDescription = "Randomly plays the Stelio Kontos theme song when Aurora starts"
-scriptIcon = "icon\\icon.xur" -- or .png
+scriptIcon = "icon\\icon.xur" -- valid filetypes are XUR and PNG
 scriptPermissions = { "http", "filesystem" } -- if using modules with restricted permissions
 ```
 
