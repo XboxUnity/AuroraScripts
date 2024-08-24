@@ -16,6 +16,7 @@ The included modules are available for use in all Content and Utility Scripts, a
 - [Library Modules](#library-modules)
   - [Script](#script-module)
   - [Aurora](#aurora-module)
+  - [Dvd](#dvd-module)
   - [IniFile](#inifile-module)
   - [Kernel](#kernel-module)*
   - [Profile](#profile-module)
@@ -105,6 +106,18 @@ Aurora.Crc32Hash(input: string): string
 Aurora.Sha1HashFile(filePath: string): string|nil
 Aurora.Md5HashFile(filePath: string): string|nil
 Aurora.Crc32HashFile(filePath: string): string|nil
+```
+
+#### Dvd module
+
+Provides an interface for interacting with the DVD drive on the console. See [Dvd.lua](library/Dvd.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+Dvd.GetTrayState(): DvdTrayState ---@since 0.7b
+Dvd.GetMediaType(): DvdMediaTypes ---@since 0.7b
+Dvd.OpenTray(): boolean ---@since 0.7b
+Dvd.CloseTray(): boolean ---@since 0.7b
 ```
 
 #### IniFile module

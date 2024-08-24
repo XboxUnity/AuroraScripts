@@ -179,10 +179,11 @@ bool Content.IsScanning( void );
 ##### Dvd
 
 ```lua
-unsigned Dvd.GetTrayState( void ); ---@since 0.7b
-unsigned Dvd.GetMediaType( void ); ---@since 0.7b
-bool Dvd.OpenTray( void ); ---@since 0.7b
-bool Dvd.CloseTray( void ); ---@since 0.7b
+-- class methods
+Dvd.GetTrayState(): DvdTrayState ---@since 0.7b
+Dvd.GetMediaType(): DvdMediaTypes ---@since 0.7b
+Dvd.OpenTray(): boolean ---@since 0.7b
+Dvd.CloseTray(): boolean ---@since 0.7b
 ```
 
 ##### FileSystem
