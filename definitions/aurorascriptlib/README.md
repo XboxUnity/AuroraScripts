@@ -165,6 +165,26 @@ Profile.Login(playerIndex: integer, xuid: string): boolean ---@since 0.7b
 Profile.Logout(playerIndex: integer): boolean ---@since 0.7b
 ```
 
+### Settings module
+
+Provides an interface for accessing and modifying system and user settings, as well as managing RSS feeds. See [Settings.lua](library/Settings.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+Settings.GetSystem(...: SystemSettingKey): SystemSettingsDictionary|nil
+Settings.GetUser(...: UserSettingKey): UserSettingsDictionary|nil
+Settings.SetSystem(name: SystemSettingKey, value: string, ...): UpdatedSystemSettingsDictionary|nil
+Settings.SetUser(name: UserSettingKey, value: string, ...): UpdatedUserSettingsDictionary|nil
+Settings.GetOptions(name: SystemSettingKey|UserSettingKey, settingType: SettingType): OptionsDictionary|nil
+Settings.GetSystemOptions(name: SystemSettingKey): OptionsDictionary|nil
+Settings.GetUserOptions(name: UserSettingKey): OptionsDictionary|nil
+Settings.GetRSSFeeds([enabledOnly: boolean]): RSSFeed[] ---@since 0.7b
+Settings.GetRSSFeedById(feedId: unsigned): RSSFeed|nil ---@since 0.7b
+Settings.AddRSSFeed(url: string, [enabled: boolean]): unsigned ---@since 0.7b
+Settings.DeleteRSSFeed(feedId: unsigned): boolean ---@since 0.7b
+Settings.UpdateRSSFeed(feedId: unsigned, url: string, enabled: boolean): boolean ---@since 0.7b
+```
+
 ### Sql module
 
 Provides an interface for interacting with an SQLite database instance. See [Sql.lua](definitions/aurorascriptlib/library/Sql.lua) for detailed documentation and annotations
@@ -177,7 +197,7 @@ Sql.ExecuteFetchRows(query: string): SqlResultSet|nil
 
 ### Thread module
 
-It took me longer to write this description than it did to write the module. See [Thread.lua](definitions/aurorascriptlib/library/Thread.lua) for detailed documentation and annotations
+It's just a single method. That's it. See [Thread.lua](library/Thread.lua) for detailed documentation and annotations
 
 ```lua
 -- class methods

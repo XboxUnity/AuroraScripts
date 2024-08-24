@@ -22,7 +22,6 @@
 		"Dvd",
 		"FileSystem",
 		"Http",
-		"Settings",
 		"GizmoUI",
 	],
 	"Lua.diagnostics.disable": [

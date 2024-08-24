@@ -278,18 +278,19 @@ Profile.Logout(playerIndex: integer): boolean ---@since 0.7b
 ##### Settings
 
 ```lua
-table Settings.GetSystem( [string, ...] );
-table Settings.GetUser( [string, ...] );
-table Settings.SetSystem( string name, string value, [ string, string ...] );
-table Settings.SetUser( string name, string value, [ string, string ...] );
-table Settings.GetSystemOptions( string name );
-table Settings.GetUserOptions( string name );
-table Settings.GetOptions( string name, unsigned settingType );
-table Settings.GetRSSFeeds( [bool enabledOnly] ); ---@since 0.7b
-table Settings.GetRSSFeedById( unsigned feedId ); ---@since 0.7b
-unsigned Settings.AddRSSFeed( string url, [bool enabled] ); ---@since 0.7b
-bool Settings.DeleteRSSFeed( unsigned feedId ); ---@since 0.7b
-bool Settings.UpdateRSSFeed( unsigned feedId, string url, bool enabled ); ---@since 0.7b
+-- class methods
+Settings.GetSystem(...: SystemSettingKey): SystemSettingsDictionary|nil
+Settings.GetUser(...: UserSettingKey): UserSettingsDictionary|nil
+Settings.SetSystem(name: SystemSettingKey, value: string, ...): UpdatedSystemSettingsDictionary|nil
+Settings.SetUser(name: UserSettingKey, value: string, ...): UpdatedUserSettingsDictionary|nil
+Settings.GetOptions(name: SystemSettingKey|UserSettingKey, settingType: SettingType): OptionsDictionary|nil
+Settings.GetSystemOptions(name: SystemSettingKey): OptionsDictionary|nil
+Settings.GetUserOptions(name: UserSettingKey): OptionsDictionary|nil
+Settings.GetRSSFeeds([enabledOnly: boolean]): RSSFeed[] ---@since 0.7b
+Settings.GetRSSFeedById(feedId: unsigned): RSSFeed|nil ---@since 0.7b
+Settings.AddRSSFeed(url: string, [enabled: boolean]): unsigned ---@since 0.7b
+Settings.DeleteRSSFeed(feedId: unsigned): boolean ---@since 0.7b
+Settings.UpdateRSSFeed(feedId: unsigned, url: string, enabled: boolean): boolean ---@since 0.7b
 ```
 
 ##### Sql
