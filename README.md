@@ -68,9 +68,10 @@ scriptPermissions = { "filesystem", "http" } -- case-insensitive
 ## Library Documentation
 
 - [Globals](definitions/aurorascriptlib/Globals.lua)
+- [Core Script Module](definitions/aurorascriptlib/Script.lua)
 - [Library Modules](definitions/aurorascriptlib)
-  - [Script](definitions/aurorascriptlib/library/Script.lua)
   - [Aurora](definitions/aurorascriptlib/library/Aurora.lua)
+  - [GizmoUI](definitions/aurorascriptlib/library/GizmoUI.lua)
   - [Content](definitions/aurorascriptlib/library/Content.lua)*
   - [Dvd](definitions/aurorascriptlib/library/Dvd.lua)
   - [FileSystem](definitions/aurorascriptlib/library/FileSystem.lua)*
@@ -82,7 +83,6 @@ scriptPermissions = { "filesystem", "http" } -- case-insensitive
   - [Sql](definitions/aurorascriptlib/library/Sql.lua)*
   - [Thread](definitions/aurorascriptlib/library/Thread.lua)
   - [ZipFile](definitions/aurorascriptlib/library/ZipFile.lua)
-  - [GizmoUI](definitions/aurorascriptlib/library/GizmoUI.lua)
 
 *Requires script permissions.
 
@@ -104,9 +104,7 @@ GameListSorters
 GameListSubtitles
 ```
 
-#### Library Modules
-
-##### Script
+#### Core Script Module
 
 ```lua
 Script.GetBasePath(): string
@@ -129,6 +127,8 @@ Script.ShowPopupList(title: string, emptyList: string, listContent: table<intege
 Script.ShowPopupList(title: string, emptyList: string, popupType: PopupType): PopupResult
 Script.ShowFilebrowser(basePath: string, selectedItem: string, flags: unsigned): FilebrowserResult
 ```
+
+#### Library Modules
 
 ##### Aurora
 
@@ -159,6 +159,32 @@ Aurora.Crc32Hash(input: string): string
 Aurora.Sha1HashFile(filePath: string): string|nil
 Aurora.Md5HashFile(filePath: string): string|nil
 Aurora.Crc32HashFile(filePath: string): string|nil
+```
+
+##### GizmoUI
+
+```lua
+userdata GizmoUI.CreateInstance( void );
+```
+
+**Userdata Methods:**
+
+```lua
+userdata userdata:RegisterControl( unsigned objectType, string objectName );
+bool userdata:RegisterCallback( unsigned messageType, function fnCallback );
+bool userdata:RegisterAnimationCallback( string namedFrame, function fnCallback );
+object userdata:InvokeUI( string basePath, string title, string sceneFile, [string skinFile], [table initData] );
+void userdata:Dismiss( object key );
+bool userdata:SetXLScene( bool enable ); ---@since 0.7b
+bool userdata:SetCommandText( unsigned commandId, string text );
+bool userdata:SetCommandEnabled( unsigned commandId, bool state );
+bool userdata:SetTimer( unsigned timerId, unsigned timerInterval );
+bool userdata:KillTimer( unsigned timerId );
+bool userdata:PlayTimeline( string startFrame, string initialFrame, string endFrame, bool recurse, bool loop );
+void userdata:Notify( string message, DWORD notifyType );
+table userdata:ShowMessagebox( unsigned identifier, string title, string prompt, string button1text, [string ...]);
+table userdata:ShowPasscode( unsigned identifier, string title, string prompt, DWORD permissionFlag );
+table userdata:ShowKeyboard( unsigned identifier, string title, string prompt, string default, DWORD flags );
 ```
 
 ##### Content
@@ -326,32 +352,6 @@ ZipFile.OpenFile(filePath: string, [createIfNotExist: boolean]): userdata|nil
 
 -- userdata methods
 userdata:Extract(destDir: string): boolean
-```
-
-##### GizmoUI
-
-```lua
-userdata GizmoUI.CreateInstance( void );
-```
-
-**Userdata Methods:**
-
-```lua
-userdata userdata:RegisterControl( unsigned objectType, string objectName );
-bool userdata:RegisterCallback( unsigned messageType, function fnCallback );
-bool userdata:RegisterAnimationCallback( string namedFrame, function fnCallback );
-object userdata:InvokeUI( string basePath, string title, string sceneFile, [string skinFile], [table initData] );
-void userdata:Dismiss( object key );
-bool userdata:SetXLScene( bool enable ); ---@since 0.7b
-bool userdata:SetCommandText( unsigned commandId, string text );
-bool userdata:SetCommandEnabled( unsigned commandId, bool state );
-bool userdata:SetTimer( unsigned timerId, unsigned timerInterval );
-bool userdata:KillTimer( unsigned timerId );
-bool userdata:PlayTimeline( string startFrame, string initialFrame, string endFrame, bool recurse, bool loop );
-void userdata:Notify( string message, DWORD notifyType );
-table userdata:ShowMessagebox( unsigned identifier, string title, string prompt, string button1text, [string ...]);
-table userdata:ShowPasscode( unsigned identifier, string title, string prompt, DWORD permissionFlag );
-table userdata:ShowKeyboard( unsigned identifier, string title, string prompt, string default, DWORD flags );
 ```
 
 ### XUI Object Tree

@@ -64,6 +64,7 @@ function FileSystem.CopyDirectory(srcDirPath, destDirPath, overwrite, progressRo
 function FileSystem.MoveDirectory(srcDirPath, destDirPath, overwrite, progressRoutine) end
 
 ---Copies a file from source to destination, optionally overwriting the destination file and providing progress updates.
+---If the destination path does not exist, it will be created.
 ---@param srcFilePath string The source file path.
 ---@param destFilePath string The destination file path.
 ---@param overwrite boolean Whether to overwrite the existing file in the destination path.
@@ -73,6 +74,7 @@ function FileSystem.MoveDirectory(srcDirPath, destDirPath, overwrite, progressRo
 function FileSystem.CopyFile(srcFilePath, destFilePath, overwrite, progressRoutine) end
 
 ---Moves a file from source to destination, optionally overwriting the destination file and providing progress updates.
+---If the destination path does not exist, it will be created.
 ---@param srcFilePath string The source file path.
 ---@param destFilePath string The destination file path.
 ---@param overwrite boolean Whether to overwrite the existing file in the destination path.

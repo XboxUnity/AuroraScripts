@@ -13,8 +13,8 @@ The included modules are available for use in all Content and Utility Scripts, a
 ## API Reference
 
 - [Globals](#globals)
+- [Core Script Module](#core-script-module)
 - [Library Modules](#library-modules)
-  - [Script](#script-module)
   - [Aurora](#aurora-module)
   - [Dvd](#dvd-module)
   - [FileSystem](#filesystem-module)*
@@ -49,11 +49,9 @@ GameListSorters
 GameListSubtitles
 ```
 
-### Library Modules
+### Core Script module
 
-#### Script module
-
-Provides an interface for interacting with the script environment, including file I/O, XUI controls, and script states. See [Script.lua](library/Script.lua) for detailed documentation and annotations
+Provides an interface for interacting with the script environment, including file I/O, XUI controls, and script states. See [Script.lua](Script.lua) for detailed documentation and annotations
 
 ```lua
 Script.GetBasePath(): string
@@ -76,6 +74,8 @@ Script.ShowPopupList(title: string, emptyList: string, listContent: table<intege
 Script.ShowPopupList(title: string, emptyList: string, popupType: PopupType): PopupResult
 Script.ShowFilebrowser(basePath: string, selectedItem: string, flags: unsigned): FilebrowserResult
 ```
+
+### Library Modules
 
 #### Aurora module
 
@@ -281,4 +281,3 @@ ZipFile.OpenFile(filePath: string, [createIfNotExist: boolean]): userdata|nil
 -- userdata methods
 userdata:Extract(destDir: string): boolean
 ```
-
