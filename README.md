@@ -191,7 +191,7 @@ table userdata:ShowKeyboard( unsigned identifier, string title, string prompt, s
 
 ```lua
 -- class methods
-function Content.FindContent([titleId: unsigned], [searchText: string]): ContentItem[]
+function Content.FindContent([titleId: unsigned], [regexPattern: string]): ContentItem[]
 function Content.GetInfo(contentId: unsigned): ContentItem|nil
 function Content.SetTitle(contentId: unsigned, name: string): boolean
 function Content.SetDescription(contentId: unsigned, description: string): boolean
