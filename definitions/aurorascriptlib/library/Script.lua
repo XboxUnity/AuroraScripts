@@ -93,6 +93,23 @@ function Script.ShowNotification(message, notifyType) end
 ---@since 0.6b
 function Script.ShowMessageBox(title, prompt, button1text, ...) end
 
+---@alias KeyboardFlags unsigned
+
+KeyboardFlags = enum {
+    Default      = 0,
+    Full         = 1,
+    Email        = 2,
+    Gamertag     = 4,
+    Phone        = 8,
+    IPAddress    = 16,
+    Numeric      = 32,
+    Alphabet     = 64,
+    Password     = 128,
+    Subscription = 256,
+    FocusDone    = 268435456,
+    Highlight    = 536870912,
+}
+
 ---@alias KeyboardResult { Canceled: boolean, Buffer: string? }
 
 ---Displays a keyboard input UI.
@@ -104,12 +121,25 @@ function Script.ShowMessageBox(title, prompt, button1text, ...) end
 ---@since 0.6b
 function Script.ShowKeyboard(title, prompt, default, flags) end
 
+---@alias PermissionFlags unsigned
+
+PermissionFlags = enum {
+    None          = 0,
+    FileManager   = 256,
+    View          = 512,
+    Settings      = 1024,
+    Details       = 2048,
+    QuickView     = 4096,
+    DeleteContent = 8192,
+    RenameGame    = 16384,
+}
+
 ---@alias PasscodeResult { Canceled: boolean, Authorized: boolean? }
 
 ---Displays a passcode input UI.
 ---@param title string The title of the passcode dialog.
 ---@param prompt string The prompt message to display.
----@param permissionFlag unsigned The permission flag required for the passcode.
+---@param permissionFlag PermissionFlags The permission flags required for the passcode.
 ---@return PasscodeResult # A table containing whether the operation was canceled, and whether the passcode was authorized if not canceled.
 ---@since 0.6b
 function Script.ShowPasscode(title, prompt, permissionFlag) end

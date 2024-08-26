@@ -37,9 +37,41 @@ function trace(message) end
 ---@since 0.6b
 function stackdump() end
 
----Creates an immutable table representing an enumeration.
----@param enumTable EnumTable The table to convert into an enum. Keys should be strings and values integers.
----@return EnumTable enumTable The created enum table with read-only properties.
+---@alias EnumTable table<string, integer>
+
+---Creates a table literal representing an enumeration.
+---
+---In order to enable intellisense features and type hinting for the created enum as a named enum type,
+---define an `integer` or `unsigned` (for enums used as bitflags) alias **with the same name** as the enum table.
+---This is especially useful when using annotations to specify param/return types.
+---
+---### Example:
+---```lua
+------@alias GizmoCommand integer
+---GizmoCommand = enum {
+---    A = 1,
+---    X = 2,
+---    Y = 3,
+---}
+---```
+---
+---#### Using the named enum type as a variable type:
+---```lua
+---local command ---@type GizmoCommand
+---command = GizmoCommand.A -- this assignment will trigger intellisense type hinting for the GizmoCommand enum
+---```
+---
+---#### Using the named enum type as a function param/return type:
+---```lua
+------Prints the given command to the script log.
+------@param cmd GizmoCommand
+---function printCommand(cmd) print("Command: " .. cmd) end
+---
+---printCommand(GizmoCommand.X) -- intellisense will suggest GizmoCommand.A, GizmoCommand.X, GizmoCommand.Y
+---```
+---@generic T
+---@param enumTable T A dictionary table literal with `integer` values to convert into an enum.
+---@return T enumTable The created enum table literal of type `T`.
 ---@since 0.6b
 function enum(enumTable) end
 

@@ -24,8 +24,6 @@
 ---| "Kernel"
 
 ---@alias unsigned integer
----@alias DWORD unsigned
----@alias EnumTable table<string, integer>
 
 ---Represents the return codes from a progress callback routine.
 ---Equivalent to the CopyFileEx `PROGRESS_X` return codes defined in `winbase.h`.
