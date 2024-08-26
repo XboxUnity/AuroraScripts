@@ -16,6 +16,7 @@ The included modules are available for use in all Content and Utility Scripts, a
 - [Core Script Module](#core-script-module)
 - [Library Modules](#library-modules)
   - [Aurora](#aurora-module)
+  - [Content](#content-module)*
   - [Dvd](#dvd-module)
   - [FileSystem](#filesystem-module)*
   - [Http](#http-module)*
@@ -108,6 +109,24 @@ Aurora.Crc32Hash(input: string): string
 Aurora.Sha1HashFile(filePath: string): string|nil
 Aurora.Md5HashFile(filePath: string): string|nil
 Aurora.Crc32HashFile(filePath: string): string|nil
+```
+
+#### Content module
+
+Provides an interface for scanning, retrieving, and managing game content information, such as content metadata, images, and assets. See [Content.lua](library/Content.lua) for detailed documentation and annotations
+
+```lua
+-- class methods
+function Content.FindContent([titleId: unsigned], [searchText: string]): ContentItem[]
+function Content.GetInfo(contentId: unsigned): ContentItem|nil
+function Content.SetTitle(contentId: unsigned, name: string): boolean
+function Content.SetDescription(contentId: unsigned, description: string): boolean
+function Content.SetDeveloper(contentId: unsigned, developer: string): boolean
+function Content.SetPublisher(contentId: unsigned, publisher: string): boolean
+function Content.SetReleaseDate(contentId: unsigned, releaseDate: string): boolean
+function Content.SetAsset(contentId: unsigned, imagePath: string, assetType: ContentAssetType, [screenshotIndex: unsigned]): boolean
+function Content.StartScan(): boolean
+function Content.IsScanning(): boolean
 ```
 
 #### Dvd module

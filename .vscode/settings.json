@@ -10,7 +10,6 @@
 		"main",
 
 		// library modules
-		"Content",
 		"GizmoUI",
 	],
 	"Lua.diagnostics.disable": [

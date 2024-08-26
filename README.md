@@ -190,16 +190,17 @@ table userdata:ShowKeyboard( unsigned identifier, string title, string prompt, s
 ##### Content
 
 ```lua
-table Content.GetInfo( DWORD contentId );
-bool Content.SetTitle( DWORD contentId, string title );
-bool Content.SetDescription( DWORD contentId, string description );
-bool Content.SetDeveloper( DWORD contentId, string developer );
-bool Content.SetPublisher( DWORD contentId, string publisher );
-bool Content.SetReleaseDate( DWORD contentId, string releaseDate );
-bool Content.SetAsset( string imagePath, enum assetType, [DWORD screenshotIndex]);
-table Content.FindContent( DWORD titleId, [string searchText]);
-bool Content.StartScan( void );
-bool Content.IsScanning( void );
+-- class methods
+function Content.FindContent([titleId: unsigned], [searchText: string]): ContentItem[]
+function Content.GetInfo(contentId: unsigned): ContentItem|nil
+function Content.SetTitle(contentId: unsigned, name: string): boolean
+function Content.SetDescription(contentId: unsigned, description: string): boolean
+function Content.SetDeveloper(contentId: unsigned, developer: string): boolean
+function Content.SetPublisher(contentId: unsigned, publisher: string): boolean
+function Content.SetReleaseDate(contentId: unsigned, releaseDate: string): boolean
+function Content.SetAsset(contentId: unsigned, imagePath: string, assetType: ContentAssetType, [screenshotIndex: unsigned]): boolean
+function Content.StartScan(): boolean
+function Content.IsScanning(): boolean
 ```
 
 ##### Dvd
