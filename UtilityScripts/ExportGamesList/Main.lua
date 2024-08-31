@@ -5,8 +5,6 @@ scriptDescription = "Exports a list of your games (name, titleID) to a text file
 scriptIcon = "icon.png"
 scriptPermissions = { "content", "filesystem" }
 
-ExitTriggered = false
-
 function main()
     local collection = Content.FindContent()
     local arrGamesDialog = {}
