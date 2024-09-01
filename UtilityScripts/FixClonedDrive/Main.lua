@@ -58,7 +58,7 @@ function main()
             local dialogTitleUpdates = {}
 
             -- Add all rows from Content.TitleUpdates with LiveDeviceId not matching newDeviceID to list
-            for i, row in pairs(Sql.ExecuteFetchRows("SELECT id, displayname, livedeviceid, version FROM titleupdates ORDER BY displayname ASC")) do
+            for i, row in pairs(Sql.ExecuteFetchRows("SELECT id, displayname, filename, livedeviceid, titleid, version FROM titleupdates ORDER BY displayname ASC")) do
                 if row["LiveDeviceId"] ~= newDeviceID then  
                     dbTitleUpdatesRows[i] = { row["Id"], row["DisplayName"], row["FileName"], row["LiveDeviceId"], row["TitleId"], row["Version"] }
                     dialogTitleUpdates[i] =  "(TU_" .. row["Version"] .. ") " .. row["DisplayName"]
