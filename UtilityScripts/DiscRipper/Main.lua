@@ -22,8 +22,13 @@ function main()
         -- Get installation path
         basePath = ret.File.MountPoint .. "\\" .. ret.File.RelativePath .. "\\" .. ret.File.Name .. "\\";
         Script.SetStatus("Copying files...");
-        FileSystem.CopyDirectory("dvd:\\", basePath, true, CopyProgressRoutine);
-        Script.ShowNotification("Rip complete!");
+        local result = FileSystem.CopyDirectory("dvd:\\", basePath, true, CopyProgressRoutine);
+        if result == true then
+            Script.ShowNotification("Copy complete!");
+        else
+            Script.ShowNotification("Copy failed or was aborted");
+            Script.ShowMessageBox("ERROR", "The disc copy failed or was aborted.\nReasons for this may include:\n- Operation was manually aborted.\n- Destination device was removed.\n- Destination path is too long\n- Disc has anti-copying protection via long file names or paths\n\nTry selecting a short named folder on the HDD root or ripping to a USB storage device.", "OK");
+        end
     end
 end
 
