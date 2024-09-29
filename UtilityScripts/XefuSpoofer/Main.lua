@@ -1,6 +1,6 @@
 scriptTitle = "Xefu Spoofer"
 scriptAuthor = "Derf"
-scriptVersion = 2
+scriptVersion = 3
 scriptDescription = "Forces original Xbox games to use your selected xefu version. Compatibility list: ConsoleMods.org/fusion"
 scriptIcon = "icon.png"
 scriptPermissions = { "filesystem" }
@@ -57,8 +57,21 @@ function xefu_files_all_present(path)
 		FileSystem.CopyFile( compatibility_folder .. "xefu2019.xex", xefubackup_folder .. "xefu2019.xex", false );
 	end
 
-	if FileSystem.FileExists( compatibility_folder .. "xefu2021.xex" ) and not FileSystem.FileExists( xefubackup_folder .. "xefu2021.xex" ) then
-		FileSystem.CopyFile( compatibility_folder .. "xefu2021.xex", xefubackup_folder .. "xefu2021.xex", false );
+	if FileSystem.FileExists( compatibility_folder .. "xefu2021a.xex" ) and not FileSystem.FileExists( xefubackup_folder .. "xefu2021a.xex" ) then
+		FileSystem.CopyFile( compatibility_folder .. "xefu2021a.xex", xefubackup_folder .. "xefu2021a.xex", false );
+	end
+
+	if FileSystem.FileExists( compatibility_folder .. "xefu2021b.xex" ) and not FileSystem.FileExists( xefubackup_folder .. "xefu2021b.xex" ) then
+		FileSystem.CopyFile( compatibility_folder .. "xefu2021b.xex", xefubackup_folder .. "xefu2021b.xex", false );
+	end
+
+	if FileSystem.FileExists( compatibility_folder .. "xefu2021c.xex" ) and not FileSystem.FileExists( xefubackup_folder .. "xefu2021c.xex" ) then
+		FileSystem.CopyFile( compatibility_folder .. "xefu2021c.xex", xefubackup_folder .. "xefu2021c.xex", false );
+	end
+
+	-- Permanently rename legacy name "xefu2021" to "xefu2021c"
+	if FileSystem.FileExists( compatibility_folder .. "xefu2021.xex" ) and not FileSystem.FileExists( xefubackup_folder .. "xefu2021c.xex" ) then
+		FileSystem.CopyFile( compatibility_folder .. "xefu2021.xex", xefubackup_folder .. "xefu2021c.xex", false );
 	end
 
 	-- Optional new xefutitle files
@@ -87,8 +100,16 @@ function copy_xefu_files(source_folder, target_folder)
 		FileSystem.CopyFile( source_folder .. "xefu2019.xex", target_folder .. "xefu2019.xex", false );
 	end
 
-	if FileSystem.FileExists( source_folder .. "xefu2021.xex" ) then
-		FileSystem.CopyFile( source_folder .. "xefu2021.xex", target_folder .. "xefu2021.xex", false );
+	if FileSystem.FileExists( source_folder .. "xefu2021a.xex" ) then
+		FileSystem.CopyFile( source_folder .. "xefu2021a.xex", target_folder .. "xefu2021a.xex", false );
+	end
+
+	if FileSystem.FileExists( source_folder .. "xefu2021b.xex" ) then
+		FileSystem.CopyFile( source_folder .. "xefu2021b.xex", target_folder .. "xefu2021b.xex", false );
+	end
+
+	if FileSystem.FileExists( source_folder .. "xefu2021c.xex" ) then
+		FileSystem.CopyFile( source_folder .. "xefu2021c.xex", target_folder .. "xefu2021c.xex", false );
 	end
 
 	FileSystem.CopyFile( source_folder .. "xefutitle5.xex", target_folder .. "xefutitle5.xex", false );
@@ -126,7 +147,7 @@ function spoof_xefu_files(xefu_name)
 		xefutitle_name = "xefutitle7b.xex";
 	elseif xefu_name == "xefu2019.xex" then
 		xefutitle_name = "xefutitle2019.xex";
-	elseif xefu_name == "xefu2021.xex" then
+	elseif xefu_name == "xefu2021a.xex" or xefu_name == "xefu2021b.xex" or xefu_name == "xefu2021c.xex" then
 		xefutitle_name = "xefutitle2021.xex";
 	end
 
@@ -153,6 +174,19 @@ function delete_xefu_files(target_folder)
 		FileSystem.DeleteFile( target_folder .. "xefu2019.xex" );
 	end
 
+	if FileSystem.FileExists( target_folder .. "xefu2021a.xex" ) then
+		FileSystem.DeleteFile( target_folder .. "xefu2021a.xex" );
+	end
+
+	if FileSystem.FileExists( target_folder .. "xefu2021b.xex" ) then
+		FileSystem.DeleteFile( target_folder .. "xefu2021b.xex" );
+	end
+
+	if FileSystem.FileExists( target_folder .. "xefu2021c.xex" ) then
+		FileSystem.DeleteFile( target_folder .. "xefu2021c.xex" );
+	end
+
+	-- Legacy name for xefu2021c.xex
 	if FileSystem.FileExists( target_folder .. "xefu2021.xex" ) then
 		FileSystem.DeleteFile( target_folder .. "xefu2021.xex" );
 	end
@@ -191,21 +225,16 @@ function init()
 	end
 
 	-- Look in Compatibility folder for XefuBackup
-	if FileSystem.FileExists(xefubackup_folder) then
-		if xefu_files_all_present(xefubackup_folder) then
-			-- All checks OK, proceed
-			return true;
-		else
-			-- Backup xefu files to XefuBackup folder
-			Script.SetStatus("Backing up Xefu files...");
-			Script.SetProgress(50);
-			copy_xefu_files(compatibility_folder, xefubackup_folder);
-			Script.SetProgress(100);
-			return true;
-		end
+	if not FileSystem.FileExists(xefubackup_folder) then
+		FileSystem.CreateDirectory(xefubackup_folder);
+	end
+	
+	-- Backup xefu files if needed
+	if xefu_files_all_present(xefubackup_folder) then
+		-- All checks OK, proceed
+		return true;
 	else
 		-- Backup xefu files to XefuBackup folder
-		FileSystem.CreateDirectory( xefubackup_folder );
 		Script.SetStatus("Backing up Xefu files...");
 		Script.SetProgress(50);
 		copy_xefu_files(compatibility_folder, xefubackup_folder);
@@ -228,8 +257,16 @@ function MakeMainMenu()
 	-- Populate menu
 	Menu.AddMainMenuItem(Menu.MakeMenuItem("<reset to default>", "RESET" ));
 
-	if FileSystem.FileExists( xefubackup_folder .. "xefu2021.xex" ) and FileSystem.FileExists( xefubackup_folder .. "xefutitle2021.xex" ) then
-		Menu.AddMainMenuItem(Menu.MakeMenuItem("xefu2021.xex", "xefu2021.xex"));
+	if FileSystem.FileExists( xefubackup_folder .. "xefu2021c.xex" ) and FileSystem.FileExists( xefubackup_folder .. "xefutitle2021.xex" ) then
+		Menu.AddMainMenuItem(Menu.MakeMenuItem("xefu2021c.xex", "xefu2021c.xex"));
+	end
+
+	if FileSystem.FileExists( xefubackup_folder .. "xefu2021b.xex" ) and FileSystem.FileExists( xefubackup_folder .. "xefutitle2021.xex" ) then
+		Menu.AddMainMenuItem(Menu.MakeMenuItem("xefu2021b.xex", "xefu2021b.xex"));
+	end
+
+	if FileSystem.FileExists( xefubackup_folder .. "xefu2021a.xex" ) and FileSystem.FileExists( xefubackup_folder .. "xefutitle2021.xex" ) then
+		Menu.AddMainMenuItem(Menu.MakeMenuItem("xefu2021a.xex", "xefu2021a.xex"));
 	end
 
 	if FileSystem.FileExists( xefubackup_folder .. "xefu2019.xex" ) and FileSystem.FileExists( xefubackup_folder .. "xefutitle2019.xex" ) then
