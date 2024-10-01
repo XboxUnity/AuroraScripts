@@ -1,6 +1,6 @@
 scriptTitle = "Homebrew Store"
 scriptAuthor = "Derf / Cheato"
-scriptVersion = 2.0
+scriptVersion = 3.0
 scriptDescription = "Download homebrew from ConsoleMods.org and other repos!"
 scriptIcon = "icon.png"
 scriptPermissions = { "http", "sql", "filesystem" }
@@ -9,14 +9,15 @@ require("MenuSystem");
 
 local reloadRequired = false;
 downloadsPath = "Downloads\\";
+gAbortedOperation = false;
 
 -- Main entry point to script
 function main()
 	if Aurora.HasInternetConnection() ~= true then
-		Script.ShowMessageBox("ERROR", "ERROR: This script requires an active internet connection to work...\n\nPlease make sure you have internet to your console before running the script", "OK");
+		Script.ShowMessageBox("ERROR", "This script requires an active internet connection to work...\n\nPlease make sure you have internet to your console before running the script", "OK");
 		return;
 	end
-	print("-- " .. scriptTitle .. " Started...");
+	print("-- " .. scriptTitle .. " started...");
 	
 	if init() == false then
 		goto scriptend;
@@ -25,7 +26,7 @@ function main()
 	MakeMainMenu();
 	DoShowMenu();
 
-	if reloadRequired then
+	if reloadRequired and not gAbortedOperation then
 		local ret = Script.ShowMessageBox("Aurora Reload Required", "A Reload is required for your changes to take effect\n\nDo you want to reload Aurora now?", "Yes", "No");
 		if ret.Button == 1 then
 			Aurora.Restart();
@@ -34,7 +35,7 @@ function main()
 	
 	::mainend::
 	FileSystem.DeleteDirectory(absoluteDownloadsPath);
-	print("-- " .. scriptTitle .. " Ended...");
+	print("-- " .. scriptTitle .. " ended...");
 	::scriptend::
 end
 
@@ -75,7 +76,6 @@ end
 function MakeMainMenu()
 	Menu.SetTitle(scriptTitle);
 	Menu.SetGoBackText("");
-
 	local repos = FileSystem.GetFiles( Script.GetBasePath() .. "Repos\\*" );
 	for i, repo in pairs(repos) do
 		remoteRepoIni = IniFile.LoadFile( "Repos\\" .. repo.Name);
@@ -95,6 +95,10 @@ function MakeMainMenu()
 end
 
 function DoShowMenu(menu)
+	if gAbortedOperation then
+		return;
+	end
+
 	local ret = {}
 	local canceled = false;
 	local menuItem = {}
@@ -186,7 +190,7 @@ function HandleSelection(selection, repo, menu)
 		info = info .. "Size: " .. selection.itemSize .. "\n";
 	end
 
-	local destinationPath = GetDestinationPath(selection, repo.type);
+	local destinationPath = GetDestinationPath(selection.path, repo.type);
 	if destinationPath ~= nil and destinationPath ~= "" then
 		info = info .. "Path: " .. destinationPath .. "\n";
 	else
@@ -235,14 +239,14 @@ function GetScanPath(type)
 	end
 end
 
-function GetDestinationPath(selection, type)
+function GetDestinationPath(path, type)
 	-- If ScanPaths not set in Aurora settings, then:
-	-- App       - Installs to /Apps/
-	-- Games     - Installs to /Games/
-	-- Emulator  - Installs to /Emulators/
-	-- Other     - Full path specified in .ini
-	-----------------------------------------------------
-	-- Official content - "Hdd1:\\Content\\0000000000000000\\";
+	-- App           - Installs to /Apps/
+	-- Games         - Installs to /Games/
+	-- Emulator      - Installs to /Emulators/
+	-- PublicProfile - Installs to /Content/0000000000000000/
+	-- Profile       - Installs to /Content/<profile ID>/ of signed-in user
+	-- Other         - Full path specified in .ini
 	
 	local applicationsDirectory = GetScanPath("App");
 	local homebrewDirectory = GetScanPath("Homebrew");
@@ -250,26 +254,45 @@ function GetDestinationPath(selection, type)
 
 	if type == "App" then
 		if applicationsDirectory ~= nil then
-			return applicationsDirectory .. selection.path;
+			return applicationsDirectory .. path;
 		else
-			return "Hdd1:\\Apps\\" .. selection.path;
+			return "Hdd1:\\Apps\\" .. path;
 		end
 	elseif type == "Game" then
-		return "Hdd1:\\Games\\" .. selection.path;
+		return "Hdd1:\\Games\\" .. path;
 	elseif type == "Emulator" then
 		if emulatorsDirectory ~= nil then
-			return emulatorsDirectory .. selection.path;
+			return emulatorsDirectory .. path;
 		else
-			return "Hdd1:\\Emulators\\" .. selection.path;
+			return "Hdd1:\\Emulators\\" .. path;
 		end
 	elseif type == "Homebrew" then
 		if homebrewDirectory ~= nil then
-			return homebrewDirectory .. selection.path;
+			return homebrewDirectory .. path;
 		else
-			return "Hdd1:\\Homebrew\\" .. selection.path;
+			return "Hdd1:\\Homebrew\\" .. path;
+		end
+	elseif type == "PublicProfile" then
+		return "Hdd1:\\Content\\0000000000000000\\" .. path;
+	elseif type == "Profile" then
+		profileID = Profile.GetXUID(1);
+		if profileID == "0" then
+			Script.ShowMessageBox("ERROR", "You need to sign into a profile to download from this category.", "OK");
+		else
+			if string.len(profileID) == 16 then
+				return "Hdd1:\\Content\\" .. Profile.GetXUID(1) .. "\\" .. path;
+			else
+				-- When signed into Xbox Live, profile XUID changes to a 13 character string
+				local profiles = Profile.EnumerateProfiles();
+				for i, profile in pairs(profiles) do
+					if profile.GamerTag == Profile.GetGamerTag(1) then
+						return "Hdd1:\\Content\\" .. profile.XUID .. "\\" .. path;
+					end
+				end
+			end
 		end
 	else 
-		return selection.path;
+		return path;
 	end
 end
 
@@ -281,83 +304,141 @@ function HandleInstallation(selection, destinationPath, type)
 		end
 	end
 
-	if string.match(selection.dataurl, ".7z") then
-		return HandleZipInstall(selection, destinationPath, type, true);
-	elseif selection.dataurl ~= nil then
-		return HandleFileInstall(selection, destinationPath, type, true);
-	end
-end
-
-function HandleFileInstall(selection, destinationPath, type, checkExists)
-	if checkExists == true then
-		local filename = selection.path;
-		if FileSystem.FileExists(destinationPath .. selection.path) then
-			if not HandleAlreadyExists(type, filename) then
-				return false; -- We're not going to continue trying this
-			end
+	local filename = selection.path;
+	if FileSystem.FileExists(destinationPath) then
+		if not HandleAlreadyExists(type, filename) then
+			return false; -- We're not going to continue trying this
 		end
 	end
-	Script.SetStatus("Downloading Content...");
-	Script.SetProgress(10);
-	local dlpath = downloadsPath .. "tmp.bin";
-	local http = Http.Get(selection.dataurl, dlpath);
-	Script.SetStatus("Moving Content...");
-	Script.SetProgress(50);
-	local successfulMove = FileSystem.MoveFile( absoluteDownloadsPath .. "tmp.bin", destinationPath .. selection.path, true);
-	Script.SetProgress(75);
-	FileSystem.DeleteDirectory(absoluteDownloadsPath);
-	Script.ShowNotification(selection.itemTitle .. " Installed");
-	return false;
-end
-
-function HandleZipInstall(selection, destinationPath, type, checkExists)
-	if checkExists == true then
-		local filename = selection.path;
-		if FileSystem.FileExists(destinationPath .. selection.path) then
-			if not HandleAlreadyExists(type, filename) then
-				return false; -- We're not going to continue trying this
-			end
-		end
-	end
-	FileSystem.CreateDirectory( destinationPath .. string.match(selection.path, "^.+[\\]") );
-	Script.SetStatus("Downloading Content...");
-	Script.SetProgress(10);
 	
+	FileSystem.CreateDirectory(destinationPath);
+	--Script.SetStatus("Downloading content...");
+	Script.SetProgress(10);
+
+	local destinationFullPath = "";
+	local partFileName = "";
 	local updatingIndex = 0;
 	local loadingProgress = 0;
 	local installSuccess = false;
+	gAbortedOperation = false;
 	
-	-- Must be <350MB parts, otherwise the Aurora zip extractor breaks
-	for key, dataurl in pairs(selection) do
-		if string.match(key, "dataurl") then
-			if updatingIndex < 8 then
-				loadingProgress = 10+(10*updatingIndex);
-				Script.SetProgress(loadingProgress);
-			end
-			updatingIndex = updatingIndex + 1;
-			
-			-- Download files
-			local dlpath = downloadsPath .. "tmp.7z";
-			local http = Http.Get(dataurl, dlpath);
-			if http.Success then
-				-- Unzip files
-				Script.SetProgress(loadingProgress+5);
-				local zip = ZipFile.OpenFile( dlpath );
-				if zip == nil then
-					Script.ShowMessageBox("ERROR", "Extraction failed!", "OK");
-					return false;
-				end
-				Script.SetStatus("Decompressing Content...");
-				local result = zip.Extract( zip, downloadsPath .. "tmp\\" );
-				if result == false then
-					Script.ShowMessageBox("ERROR", "Extraction failed!", "OK");
-				else
-					Script.SetProgress(loadingProgress+7);
-					Script.SetStatus("Installing Content...");
-					local successfulMove = FileSystem.MoveDirectory( absoluteDownloadsPath .. "tmp\\", string.match(destinationPath, "^.+[\\]"), true);
-					Script.SetProgress(loadingProgress+9);
+	-- 7z files must be <350MB, otherwise the Aurora zip extractor breaks
+	-- Other files can be seemingly unlimited size
 
-					if successfulMove == true then
+	-- Add dataurl to table first
+	local dataurls = {}
+	for key in pairs(selection) do
+		if string.match(key, "^dataurl$") then
+			table.insert(dataurls, key);
+			break;
+		end
+	end
+
+	-- Add dataurlparts to table sequentially
+	local total_parts = 1;
+	local dataurl_index = 1;
+	local match_found = true;
+	while match_found do
+		dataurl_index = dataurl_index + 1;
+		match_found = false;
+		for key in pairs(selection) do
+			if string.match(key, "^dataurlpart" .. dataurl_index .. "$") then
+				table.insert(dataurls, key);
+				match_found = true;
+				total_parts = total_parts + 1;
+				break;
+			end
+		end
+	end
+
+	local dataurl;
+	local current_part_index = 0;
+	for key, dataurl_name in ipairs(dataurls) do
+		current_part_index = current_part_index + 1;
+		dataurl = selection[dataurl_name];
+		-- If a file part, get part path
+		if string.match(dataurl_name, "part") then
+			local partname = string.sub(dataurl_name, 8, -1);
+			destinationFullPath = "";
+			for key2, partpath in pairs(selection) do
+				if string.match(key2, partname .. "path") then
+					destinationFullPath = GetDestinationPath(partpath, type);
+				end
+			end
+
+			if destinationFullPath == "" then
+				-- If no part path specified, default to path
+				destinationFullPath = string.match(destinationPath, "^.+[\\]");
+			end
+		else
+			-- This is dataurl and path
+			destinationFullPath = string.match(destinationPath, "^.+[\\]");
+		end
+		FileSystem.CreateDirectory(destinationFullPath);
+
+		if updatingIndex < 8 then
+			loadingProgress = 10+(10*updatingIndex);
+			Script.SetProgress(loadingProgress);
+		end
+		updatingIndex = updatingIndex + 1;
+		
+		-- Download files
+		local dlpath = "";
+		local successfulMove = false;
+		if string.match(dataurl, ".7z") then
+			dlpath = downloadsPath .. "tmp.7z";
+		else
+			dlpath = downloadsPath .. "tmp.bin";
+		end
+
+		Script.SetStatus("Downloading content (" .. current_part_index .. "/" .. total_parts .. ")...");
+		local http = Http.GetEx(dataurl, HttpProgressRoutine, dlpath);
+		if gAbortedOperation == true then 
+			installSuccess = false;
+			Script.ShowNotification("Download cancelled");
+			Script.SetStatus("Exiting script...");
+			FileSystem.DeleteDirectory(absoluteDownloadsPath);
+		else
+			if http.Success then
+				Script.SetProgress(loadingProgress+5);
+
+				if string.match(dataurl, ".7z") then
+					-- Unzip files
+					local zip = ZipFile.OpenFile( dlpath );
+					if zip == nil then
+						Script.ShowMessageBox("ERROR", "Could not open zip!", "OK");
+						return false;
+					end
+					Script.SetStatus("Decompressing content (" .. current_part_index .. "/" .. total_parts .. ")...");
+					local result = zip.Extract( zip, downloadsPath .. "tmp\\" );
+
+					if result == false then
+						Script.ShowMessageBox("ERROR", "Extraction failed!", "OK");
+						FileSystem.DeleteDirectory(absoluteDownloadsPath);
+						return false;
+					else
+						Script.SetProgress(loadingProgress+7);
+						Script.SetStatus("Installing content (" .. current_part_index .. "/" .. total_parts .. ")...");
+						successfulMove = FileSystem.MoveDirectory(absoluteDownloadsPath .. "tmp\\", string.match(destinationPath, "^.+[\\]"), true, CopyProgressRoutine);
+						Script.SetProgress(loadingProgress+9);
+					end
+				else
+					-- Copy single file to destination
+					Script.SetProgress(loadingProgress+7);
+					Script.SetStatus("Moving content (" .. current_part_index .. "/" .. total_parts .. ")...");
+					partFileName = string.match(dataurl, "^.*/([^/]+)$");
+					successfulMove = FileSystem.CopyFile(absoluteDownloadsPath .. "tmp.bin", destinationFullPath .. partFileName, true, CopyProgressRoutine);
+					Script.SetProgress(loadingProgress+9);
+				end
+
+				if gAbortedOperation == true then
+					Script.ShowNotification("Operation aborted!");
+					Script.SetStatus("Exiting script...");
+					FileSystem.DeleteDirectory(absoluteDownloadsPath);
+					return false;
+				else
+					Script.SetStatus("");
+					if successfulMove == true and gAbortedOperation == false then
 						installSuccess = true;
 					else
 						Script.ShowMessageBox("ERROR", "Installation failed!", "OK");
@@ -366,22 +447,22 @@ function HandleZipInstall(selection, destinationPath, type, checkExists)
 					end
 				end
 			else
+				installSuccess = false;
 				Script.ShowMessageBox("ERROR", "Download failed\n\nPlease try again later...", "OK");
 			end
 		end
 	end
 
 	if installSuccess == true then
-		Script.ShowNotification(selection.itemTitle .. " Installed");
+		Script.ShowNotification(selection.itemTitle .. " installed");
 	end
 
 	FileSystem.DeleteDirectory(absoluteDownloadsPath);
-	
 	return true;
 end
 
 function HandleAlreadyExists(type, name)
-	local msg = "There is a "..type.." already installed with the name:\n\n" .. name .. "\n\nDo you want to overwrite/replace it?";
+	local msg = "There is a folder that already installed with the name:\n\n" .. name .. "\n\nDo you want to overwrite/replace it?";
 	local ret = Script.ShowMessageBox("Item Already Exists", msg, "No", "Yes");
 	if ret.Canceled or ret.Button ~= 2 then
 		return false;
@@ -389,72 +470,26 @@ function HandleAlreadyExists(type, name)
 	return true;
 end
 
-function GetNewName(currentName, path, prompt, extension)
-	local extlen = 0;
-	if extension ~= nil then
-		extlen = 0 - string.len(extension);
-		if string.lower(string.sub(currentName, extlen)) == extension then
-			currentName = string.sub(currentName, 0, extlen - 1);
-		end
-	end
-	local ret = Script.ShowKeyboard(scriptTitle, prompt, currentName, 0);
-	if ret.Canceled == false then
-		if extension ~= nil then
-			if string.lower(string.sub(ret.Buffer, extlen)) ~= extension then
-				ret.Buffer = ret.Buffer..extension;
-			end
-		end
-		return path..ret.Buffer, ret.Buffer, ret.Canceled;
-	end
-	return path..currentName, currentName, ret.Canceled;
+function HttpProgressRoutine( dwTotalFileSize, dwTotalBytesTransferred, dwReason )
+	if Script.IsCanceled() then
+		gAbortedOperation = true;
+		Script.SetStatus("Cancelling after this download...");
+		Script.SetProgress(dwTotalBytesTransferred, dwTotalFileSize);
+        return Cancel;
+    end
+
+    Script.SetProgress(dwTotalBytesTransferred, dwTotalFileSize);
+	return 0;
 end
 
-function HandleZipInstallUpdate(selection, path, type, checkExists)
-	local installPath = path;
-	if checkExists == true then
-		installPath = installPath .. selection.path;
-		local filename = selection.path;
-		if FileSystem.FileExists(installPath) then
-			if  not HandleAlreadyExists(type, filename) then
-				while FileSystem.FileExists(installPath) do
-					installPath, filename, canceled = GetNewName(filename, path, "Select new folder name:");
-					if canceled then
-						return false; -- We're not going to continue trying this
-					end
-				end
-			end
-		end
-	end
-	Script.SetStatus("Downloading Script...");
-	Script.SetProgress(0);
-	local dlpath = downloadsPath.."tmp.7z";
-	local http = Http.Get(selection.dataurl, dlpath);
-	if http.Success then
-		Script.SetStatus("Extracting Script...");
-		Script.SetProgress(25);
-		local zip = ZipFile.OpenFile(dlpath);
-		if zip == nil then
-			Script.ShowMessageBox("ERROR", "Extraction failed!", "OK");
-			return false;
-		end
-		local result = zip.Extract(zip, downloadsPath.."tmp\\");
-		FileSystem.DeleteFile(http.OutputPath);
-		if result == false then
-			Script.ShowMessageBox("ERROR", "Extraction failed!", "OK");
-		else
-			Script.SetStatus("Installing Script...");
-			Script.SetProgress(75);
-			result = FileSystem.MoveDirectory(absoluteDownloadsPath.."tmp\\", installPath, true);
-			Script.SetStatus("Done! Returning to menu...");
-			Script.SetProgress(100);
-			if result == true then
-				return true;
-			else
-				Script.ShowMessageBox("ERROR", "Installation failed!", "OK");
-			end
-		end
-	else
-		Script.ShowMessageBox("ERROR", "Download failed\n\nPlease try again later...", "OK");
-	end
-	return false;
+function CopyProgressRoutine( dwTotalFileSize, dwTotalBytesTransferred )
+    if Script.IsCanceled() then
+        gAbortedOperation = true;
+		Script.SetStatus("Cancelling after this operation...");
+		Script.SetProgress(dwTotalBytesTransferred, dwTotalFileSize);
+		return Cancel;
+    end
+
+    Script.SetProgress(dwTotalBytesTransferred, dwTotalFileSize);
+	return 0;
 end
