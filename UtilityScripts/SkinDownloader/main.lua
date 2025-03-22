@@ -1,16 +1,19 @@
 scriptTitle = "Skin Downloader"
 scriptAuthor = "Dan Martí"
-scriptVersion = 2;
+scriptVersion = 3;
 scriptDescription =
-    "Download skins, backgrounds and coverflows for Aurora\nfb.com/Danotopia\nhttp://aurorascripts.lmhsoluciones.com/"
+    "Download skins, backgrounds and coverflows for Aurora\nfb.com/Danotopia\nhttps://tuxuser.github.io/AuroraSkins/"
 scriptIcon = "icon.png"
 scriptPermissions = {"http", "filesystem", "settings"}
 require("AuroraUI")
 require("MenuSystem")
+
 json = require("json")
 gizmo = require("Gizmo")
-local a = "http://aurorascripts.lmhsoluciones.com/"
+
+local base_url = "https://tuxuser.github.io/AuroraSkins/"
 local b;
+
 paths = {
     ['backgrounds'] = "Game:\\User\\Backgrounds\\",
     ['coverflows'] = "Game:\\Media\\Layouts\\",
@@ -77,7 +80,7 @@ function DoShowMenu(e)
     if not g then
         if f == "about" then
             Script.ShowMessageBox(scriptTitle .. " v" .. scriptVersion,
-                "This script was made by Dan Martí, hosted by FeArCxDxGx and supported by the entire Aurora's community for uploading the content.\nThe script is nothing without you guys.\nThank you so much!\n\nFor more information visit aurorascripts.lmhsoluciones.com",
+                "This script was made by Dan Martí, hosted by FeArCxDxGx and supported by the entire Aurora's community for uploading the content.\nThe script is nothing without you guys.\nThank you so much!\n\nFor more information visit " .. base_url,
                 "OK")
             DoShowMenu(e)
             return
@@ -119,7 +122,7 @@ function DoShowMenu(e)
     end
 end
 function httpJson(p)
-    local q = Http.Get(a .. p)
+    local q = Http.Get(base_url .. p)
     if q.Success then
         return json:decode(q.OutputData)
     else
@@ -143,7 +146,7 @@ function HandleSelection(v, w, e)
     if Script.FileExists(B) == false then
         Script.SetProgress(25)
         Script.SetStatus("Downloading screenshot...")
-        local C = Http.Get(a .. "/" .. w .. "/" .. x .. ".jpg", B)
+        local C = Http.Get(base_url .. "/" .. w .. "/" .. x .. ".jpg", B)
         if C.Success == true then
             print("image '" .. B .. "' download successfully")
         else
@@ -214,9 +217,9 @@ function HandleSelection(v, w, e)
         ::I::
         Script.CreateDirectory("Downloads")
         local J = "Downloads\\" .. z;
-        local K = Http.Get(a .. w .. "/" .. x .. extension[w], J)
+        local K = Http.Get(base_url .. w .. "/" .. x .. extension[w], J)
         if K == nil then
-            print("Error Downloading: H: " .. a .. "; Type: " .. F .. "; ID: " .. x)
+            print("Error Downloading: H: " .. base_url .. "; Type: " .. F .. "; ID: " .. x)
             Script.ShowMessageBox("Error", "There was an error trying to download the " .. F, "OK")
             return false
         end
@@ -320,7 +323,7 @@ function HandleZipInstall(v, i, R)
     return false
 end
 function CheckUpdate()
-    local p = a .. "Update.ini"
+    local p = base_url .. "Update.ini"
     Script.SetStatus("Downloading Update information...")
     Script.SetProgress(0)
     local q = Http.Get(p)
