@@ -263,7 +263,7 @@ function ShowQueryBuilder()
                 selectedSyntax = PromptSelectFromArr(Keyboard, "Query: " .. GetFittedCurrentBuilderQuery())
                 if selectedSyntax ~= -1 then
                     local toInsert = Keyboard[selectedSyntax]
-                    if toInsert == 'SPACE' then
+                    if toInsert == "SPACE" then
                         toInsert = " "
                     end
                     LastEntry = toInsert
