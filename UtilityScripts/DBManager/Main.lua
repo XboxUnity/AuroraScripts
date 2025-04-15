@@ -195,7 +195,7 @@ QueryBuilderMenu = {
     "Show SQL Syntax",
     "Show Keyboard",
     "Show Tables",
-    "Show Column By Table",
+    "Show Columns By Table",
     "Show Full Query",
     "Delete Last Entry",
     "Backspace",
@@ -278,7 +278,7 @@ function ShowQueryBuilder()
                 LastEntry = selectedTableName
                 CurrentBuilderQuery = CurrentBuilderQuery .. selectedTableName
             end
-        elseif selected == QueryBuilderMenu[4] then -- "Show Column By Table"
+        elseif selected == QueryBuilderMenu[4] then -- "Show Columns By Table"
             local selectedTableKey = PromptTableSelect()
             if selectedTableKey ~= -1 then
                 local selectedTableName = StripSubitemPadding(Tables[selectedTableKey][1][1])
