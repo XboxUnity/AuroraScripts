@@ -8,7 +8,7 @@ function main()
     local trayState = Aurora.GetDVDTrayState();
     if trayState == 0 then
         Aurora.CloseDVDTray();
-    elseif trayState ~= 0 then
+    else
         Aurora.OpenDVDTray();
     end
 end
