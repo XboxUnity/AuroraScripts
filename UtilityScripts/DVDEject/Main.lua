@@ -1,4 +1,4 @@
-scriptTitle = "A DVD Eject"
+scriptTitle = "_DVD Eject"
 scriptAuthor = "zzahkaboom24"
 scriptVersion = 1
 scriptDescription = "A script to eject or close the dvd drive, adding this crucial and missing functionality."
