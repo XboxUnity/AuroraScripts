@@ -1,6 +1,6 @@
 scriptTitle = "Xefu Spoofer"
 scriptAuthor = "Derf"
-scriptVersion = 3
+scriptVersion = "4"
 scriptDescription = "Forces original Xbox games to use your selected xefu version. Compatibility list: ConsoleMods.org/fusion"
 scriptIcon = "icon.png"
 scriptPermissions = { "filesystem" }
@@ -69,6 +69,10 @@ function xefu_files_all_present(path)
 		FileSystem.CopyFile( compatibility_folder .. "xefu2021c.xex", xefubackup_folder .. "xefu2021c.xex", false );
 	end
 
+	if FileSystem.FileExists( compatibility_folder .. "config_loader_xefu7.xex" ) and not FileSystem.FileExists( xefubackup_folder .. "config_loader_xefu7.xex" ) then
+		FileSystem.CopyFile( compatibility_folder .. "config_loader_xefu7.xex", xefubackup_folder .. "config_loader_xefu7.xex", false );
+	end
+
 	-- Permanently rename legacy name "xefu2021" to "xefu2021c"
 	if FileSystem.FileExists( compatibility_folder .. "xefu2021.xex" ) and not FileSystem.FileExists( xefubackup_folder .. "xefu2021c.xex" ) then
 		FileSystem.CopyFile( compatibility_folder .. "xefu2021.xex", xefubackup_folder .. "xefu2021c.xex", false );
@@ -112,6 +116,10 @@ function copy_xefu_files(source_folder, target_folder)
 		FileSystem.CopyFile( source_folder .. "xefu2021c.xex", target_folder .. "xefu2021c.xex", false );
 	end
 
+	if FileSystem.FileExists( source_folder .. "config_loader_xefu7.xex" ) then
+		FileSystem.CopyFile( source_folder .. "config_loader_xefu7.xex", target_folder .. "config_loader_xefu7.xex", false );
+	end
+
 	FileSystem.CopyFile( source_folder .. "xefutitle5.xex", target_folder .. "xefutitle5.xex", false );
 	FileSystem.CopyFile( source_folder .. "xefutitle6.xex", target_folder .. "xefutitle6.xex", false );
 	FileSystem.CopyFile( source_folder .. "xefutitle7.xex", target_folder .. "xefutitle7.xex", false );
@@ -141,7 +149,7 @@ function spoof_xefu_files(xefu_name)
 		xefutitle_name = "xefutitle5.xex";
 	elseif xefu_name == "xefu6.xex" then
 		xefutitle_name = "xefutitle6.xex";
-	elseif xefu_name == "xefu7.xex" then
+	elseif xefu_name == "xefu7.xex" or xefu_name == "config_loader_xefu7.xex" then
 		xefutitle_name = "xefutitle7.xex";
 	elseif xefu_name == "xefu7b.xex" then
 		xefutitle_name = "xefutitle7b.xex";
@@ -184,6 +192,10 @@ function delete_xefu_files(target_folder)
 
 	if FileSystem.FileExists( target_folder .. "xefu2021c.xex" ) then
 		FileSystem.DeleteFile( target_folder .. "xefu2021c.xex" );
+	end
+
+	if FileSystem.FileExists( target_folder .. "config_loader_xefu7.xex" ) then
+		FileSystem.DeleteFile( target_folder .. "config_loader_xefu7.xex" );
 	end
 
 	-- Legacy name for xefu2021c.xex
@@ -256,6 +268,10 @@ function MakeMainMenu()
 
 	-- Populate menu
 	Menu.AddMainMenuItem(Menu.MakeMenuItem("<reset to default>", "RESET" ));
+
+	if FileSystem.FileExists( xefubackup_folder .. "config_loader_xefu7.xex" ) and FileSystem.FileExists( xefubackup_folder .. "xefutitle7.xex" ) then
+		Menu.AddMainMenuItem(Menu.MakeMenuItem("xefu7.xex with Config Loader (recommended)", "config_loader_xefu7.xex"));
+	end
 
 	if FileSystem.FileExists( xefubackup_folder .. "xefu2021c.xex" ) and FileSystem.FileExists( xefubackup_folder .. "xefutitle2021.xex" ) then
 		Menu.AddMainMenuItem(Menu.MakeMenuItem("xefu2021c.xex", "xefu2021c.xex"));
