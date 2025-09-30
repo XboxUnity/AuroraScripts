@@ -1,6 +1,6 @@
 scriptTitle = "Homebrew Store"
 scriptAuthor = "Derf / Cheato"
-scriptVersion = 3.0
+scriptVersion = 4.0
 scriptDescription = "Download homebrew from ConsoleMods.org and other repos!"
 scriptIcon = "icon.png"
 scriptPermissions = { "http", "sql", "filesystem" }
@@ -44,6 +44,15 @@ function init()
 	absoluteDownloadsPath = Script.GetBasePath() .. downloadsPath;
 	FileSystem.DeleteDirectory(absoluteDownloadsPath);
 
+	-- Load last selected storage device
+	confPath = Script.GetBasePath() .. "homebrewstore.conf"
+	storageDeviceFromConf = FileSystem.ReadFile(confPath);
+	if (storageDeviceFromConf == nil) then
+		FileSystem.WriteFile(confPath, "hdd1:\\");
+		storageDeviceFromConf = FileSystem.ReadFile(confPath);
+	end
+	storageDevice = storageDeviceFromConf
+
 	-- Update saved repos
 	Script.SetStatus("Updating repos...");
 	Script.SetProgress(5);
@@ -74,7 +83,7 @@ function init()
 end
 
 function MakeMainMenu()
-	Menu.SetTitle(scriptTitle);
+	Menu.SetTitle(scriptTitle .. " (" .. storageDevice:gsub( "\\", "") .. ")");
 	Menu.SetGoBackText("");
 	local repos = FileSystem.GetFiles( Script.GetBasePath() .. "Repos\\*" );
 	for i, repo in pairs(repos) do
@@ -91,7 +100,8 @@ function MakeMainMenu()
 		end
 	end
 
-	Menu.AddMainMenuItem(Menu.MakeMenuItem("<enter URL>", { ["name"] = 'test',["iniurl"] = 'PROMPT',} ));
+	Menu.AddMainMenuItem(Menu.MakeMenuItem("Change Storage Device", { ["name"] = 'test2',["iniurl"] = 'CHANGE_STORAGE',} ));
+	Menu.AddMainMenuItem(Menu.MakeMenuItem("<enter URL>", { ["name"] = 'test',["iniurl"] = 'ENTER_URL',} ));
 end
 
 function DoShowMenu(menu)
@@ -115,7 +125,14 @@ function DoShowMenu(menu)
 			local http, iniurl;
 			Script.SetProgress(0);
 
-			if (ret.iniurl == "PROMPT") then
+			if (ret.iniurl == "CHANGE_STORAGE") then
+				-- Open menu to select storage device
+				Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem("hdd1:", "hdd1:\\"));
+				Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem("usb0:", "usb0:\\"));
+				Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem("usb1:", "usb1:\\"));
+				Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem("memunit0:", "memunit0:\\"));
+				Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem("memunit1:", "memunit1:\\"));
+			elseif (ret.iniurl == "ENTER_URL") then
 				-- Prompt user for URL to .ini file
 				local keyboardData = Script.ShowKeyboard( "Aurora Keyboard", "Enter the full URL to a valid .ini file", "https://", 0 );
 				if keyboardData.Canceled == false then 
@@ -138,28 +155,27 @@ function DoShowMenu(menu)
 			else
 				-- Load .ini from Repo .ini entry
 				http = Http.Get(ret.iniurl);
-			end
+				if http.Success then
+					Script.SetStatus("Processing listings...");
+					Script.SetProgress(50);
+					local ini = IniFile.LoadString(http.OutputData);
+					
+					for _, v in pairs(ini:GetAllSections()) do
+						local title =  ini:ReadValue(v, "itemTitle", "");
+						local ver =    ini:ReadValue(v, "itemVersion", "");
+						local author = ini:ReadValue(v, "itemAuthor", "");
 
-			if http.Success then
-				Script.SetStatus("Processing listings...");
-				Script.SetProgress(50);
-				local ini = IniFile.LoadString(http.OutputData);
-				
-				for _, v in pairs(ini:GetAllSections()) do
-					local title =  ini:ReadValue(v, "itemTitle", "");
-					local ver =    ini:ReadValue(v, "itemVersion", "");
-					local author = ini:ReadValue(v, "itemAuthor", "");
-
-					if (title ~= "" and ver ~= "" and author ~= "") then
-						Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title .. " (v" .. ver .. ")", ini:GetSection(v)));
-					elseif (title ~= "") then
-						Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title, ini:GetSection(v)));
+						if (title ~= "" and ver ~= "" and author ~= "") then
+							Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title .. " (v" .. ver .. ")", ini:GetSection(v)));
+						elseif (title ~= "") then
+							Menu.AddSubMenuItem(menuItem, Menu.MakeMenuItem(title, ini:GetSection(v)));
+						end
 					end
+				else
+					Script.ShowMessageBox("ERROR", "An error occurred while downloading store data...\n\nPlease try again later", "OK");
+					DoShowMenu(menu);
+					return;
 				end
-			else
-				Script.ShowMessageBox("ERROR", "An error occurred while downloading store data...\n\nPlease try again later", "OK");
-				DoShowMenu(menu);
-				return;
 			end
 		end
 
@@ -177,6 +193,20 @@ end
 
 function HandleSelection(selection, repo, menu)
 	local info = "";
+
+	if (selection.itemTitle == nil) then
+		-- Change active storage device, save out to config file
+		FileSystem.WriteFile(confPath, selection);
+		storageDevice = FileSystem.ReadFile(confPath);
+		Script.ShowNotification("Storage device set to " .. storageDevice:gsub( "\\", ""));
+		return
+	end
+
+	if not FileSystem.FileExists(storageDevice) then
+		Script.ShowMessageBox("ERROR","The selected storage device " .. storageDevice:gsub( "\\", "") .. " is not connected.","OK");
+		return nil;
+	end
+	
 	info = info .. "Name: " .. selection.itemTitle .. "\n";
 	if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
 		info = info .. "Version: " .. selection.itemVersion .. "\n";
@@ -242,13 +272,14 @@ end
 function GetDestinationPath(path, type)
 	-- If ScanPaths not set in Aurora settings, then:
 	-- App           - Installs to /Apps/
-	-- Games         - Installs to /Games/
+	-- Game          - Installs to /Games/
 	-- Emulator      - Installs to /Emulators/
 	-- PublicProfile - Installs to /Content/0000000000000000/
 	-- Profile       - Installs to /Content/<profile ID>/ of signed-in user
 	-- Other         - Full path specified in .ini
 	
 	local applicationsDirectory = GetScanPath("App");
+	local gamesDirectory = GetScanPath("Game");
 	local homebrewDirectory = GetScanPath("Homebrew");
 	local emulatorsDirectory = GetScanPath("Emulator");
 
@@ -256,37 +287,41 @@ function GetDestinationPath(path, type)
 		if applicationsDirectory ~= nil then
 			return applicationsDirectory .. path;
 		else
-			return "Hdd1:\\Apps\\" .. path;
+			return storageDevice .. "Apps\\" .. path;
 		end
 	elseif type == "Game" then
-		return "Hdd1:\\Games\\" .. path;
+		if gamesDirectory ~= nil then
+			return gamesDirectory .. path;
+		else
+			return storageDevice .. "Games\\" .. path;
+		end
 	elseif type == "Emulator" then
 		if emulatorsDirectory ~= nil then
 			return emulatorsDirectory .. path;
 		else
-			return "Hdd1:\\Emulators\\" .. path;
+			return storageDevice .. "Emulators\\" .. path;
 		end
 	elseif type == "Homebrew" then
 		if homebrewDirectory ~= nil then
 			return homebrewDirectory .. path;
 		else
-			return "Hdd1:\\Homebrew\\" .. path;
+			return storageDevice .. "Homebrew\\" .. path;
 		end
 	elseif type == "PublicProfile" then
-		return "Hdd1:\\Content\\0000000000000000\\" .. path;
+		return storageDevice .. "Content\\0000000000000000\\" .. path;
 	elseif type == "Profile" then
 		profileID = Profile.GetXUID(1);
 		if profileID == "0" then
 			Script.ShowMessageBox("ERROR", "You need to sign into a profile to download from this category.", "OK");
 		else
 			if string.len(profileID) == 16 then
-				return "Hdd1:\\Content\\" .. Profile.GetXUID(1) .. "\\" .. path;
+				return storageDevice .. "Content\\" .. Profile.GetXUID(1) .. "\\" .. path;
 			else
 				-- When signed into Xbox Live, profile XUID changes to a 13 character string
 				local profiles = Profile.EnumerateProfiles();
 				for i, profile in pairs(profiles) do
 					if profile.GamerTag == Profile.GetGamerTag(1) then
-						return "Hdd1:\\Content\\" .. profile.XUID .. "\\" .. path;
+						return storageDevice .. "Content\\" .. profile.XUID .. "\\" .. path;
 					end
 				end
 			end
