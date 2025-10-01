@@ -264,6 +264,8 @@ function GetScanPath(type)
 				return mountpoint .. v.Path .. "\\";
 			elseif type == "Emulator" and v.ScriptData == "Emulators" then
 				return mountpoint .. v.Path .. "\\";
+			elseif type == "Game" and v.ScriptData == "Games" then
+				return mountpoint .. v.Path .. "\\";
 			end
 		end
 	end
