@@ -11,7 +11,7 @@ require("MenuSystem")
 json = require("json")
 gizmo = require("Gizmo")
 
-local base_url = "https://tuxuser.github.io/AuroraSkins/"
+local base_url = "https://DanielmGM.github.io/AuroraSkins/"
 local b;
 
 paths = {
