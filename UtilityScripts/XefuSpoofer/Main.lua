@@ -1,6 +1,6 @@
 scriptTitle = "Xefu Spoofer"
 scriptAuthor = "Derf"
-scriptVersion = "4"
+scriptVersion = "5"
 scriptDescription = "Forces original Xbox games to use your selected xefu version. Compatibility list: ConsoleMods.org/fusion"
 scriptIcon = "icon.png"
 scriptPermissions = { "filesystem" }
@@ -13,6 +13,10 @@ xefubackup_folder = "Hddx:\\Compatibility\\XefuBackup\\";
 function main()
 	print("-- " .. scriptTitle .. " Started...");
 
+	if ParentalControlIsSet() == true then
+		Script.ShowMessageBox("WARNING","Parental Controls are enabled on your console.\n\nThis will likely prevent original Xbox games from booting!\n\nTo remove Parental Controls, visit:\nhttps://consolemods.org/wiki/Parental_Lock","OK");
+	end
+
 	if init() == false then
 		goto scriptend;
 	end
@@ -21,6 +25,21 @@ function main()
 	DoShowMenu();
 	
 	::scriptend::
+end
+
+-- Thanks jrobiche for this function!
+function ParentalControlIsSet()
+  -- Required Script Permissions: filesystem
+  -- Params: None
+  -- Returns:
+  --   true  - if PC is set
+  --   false - if PC is not set
+  --   nil   - if there was an issue loading the data containing PC information
+  local data=io.open("System:\\MobileB.dat", "rb"):read(67)
+  if data ~= nil then
+    return (string.byte(string.sub(data, 66, 67)) & 0x80) >> 7 == 1
+  end
+  return nil
 end
 
 function xefu_files_all_present(path)

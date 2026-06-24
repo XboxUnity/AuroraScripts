@@ -1,6 +1,6 @@
 scriptTitle = "Homebrew Store"
 scriptAuthor = "Derf / Cheato"
-scriptVersion = 4.0
+scriptVersion = 5
 scriptDescription = "Download homebrew from ConsoleMods.org and other repos!"
 scriptIcon = "icon.png"
 scriptPermissions = { "http", "sql", "filesystem" }
@@ -266,6 +266,8 @@ function GetScanPath(type)
 				return mountpoint .. v.Path .. "\\";
 			elseif type == "Game" and v.ScriptData == "Games" then
 				return mountpoint .. v.Path .. "\\";
+			elseif type == "PublicProfile" and v.ScriptData == "Live" then
+				return mountpoint .. v.Path .. "\\";
 			end
 		end
 	end
@@ -422,10 +424,11 @@ function HandleInstallation(selection, destinationPath, type)
 		-- Download files
 		local dlpath = "";
 		local successfulMove = false;
+		local tmpRandomString = math.random(1,100000000);
 		if string.match(dataurl, ".7z") then
-			dlpath = downloadsPath .. "tmp.7z";
+			dlpath = downloadsPath .. "tmp-" .. tmpRandomString .. ".7z";
 		else
-			dlpath = downloadsPath .. "tmp.bin";
+			dlpath = downloadsPath .. "tmp-" .. tmpRandomString .. ".bin";
 		end
 
 		Script.SetStatus("Downloading content (" .. current_part_index .. "/" .. total_parts .. ")...");
@@ -464,7 +467,7 @@ function HandleInstallation(selection, destinationPath, type)
 					Script.SetProgress(loadingProgress+7);
 					Script.SetStatus("Moving content (" .. current_part_index .. "/" .. total_parts .. ")...");
 					partFileName = string.match(dataurl, "^.*/([^/]+)$");
-					successfulMove = FileSystem.CopyFile(absoluteDownloadsPath .. "tmp.bin", destinationFullPath .. partFileName, true, CopyProgressRoutine);
+					successfulMove = FileSystem.CopyFile(absoluteDownloadsPath .. "tmp-" .. tmpRandomString .. ".bin", destinationFullPath .. partFileName, true, CopyProgressRoutine);
 					Script.SetProgress(loadingProgress+9);
 				end
 
