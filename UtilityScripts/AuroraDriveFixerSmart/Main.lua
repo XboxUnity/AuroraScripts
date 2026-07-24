@@ -1,7 +1,7 @@
 scriptTitle = "Aurora Drive Fixer Smart"
 scriptAuthor = "Eduardo Henrique/Canal Edu Dicas e Gameplay"
 scriptVersion = 1.0
-scriptDescription = "Corrige scanpaths e Title Updates após clonagem de drive, com tratamento inteligente e seguro de duplicatas."
+scriptDescription = "Fixes scanpaths and Title Updates after drive cloning, with intelligent and safe handling of duplicates."
 scriptIcon = "icon.png"
 scriptPermissions = { "filesystem", "sql" }
 

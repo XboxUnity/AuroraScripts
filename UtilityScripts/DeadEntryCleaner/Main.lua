@@ -1,7 +1,7 @@
 scriptTitle = "Dead Entry Cleaner (BETA)"
 scriptAuthor = "Eduardo Henrique/Canal Edu Dicas e Gameplay"
 scriptVersion = "1.0"
-scriptDescription = "Remove entradas fantasmas da Aurora (ContentItems). Não altera jogos, DLCs ou TUs. Pode exigir re-scan."
+scriptDescription = "Removes ghost entries from Aurora (ContentItems). Does not alter games, DLCs, or TUs. May require a re-scan."
 
 scriptPermissions = { "filesystem", "sql" }
 scriptIcon = "icon.png"
