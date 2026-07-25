@@ -1,5 +1,5 @@
 scriptTitle = "Aurora Drive Fixer Smart"
-scriptAuthor = "Eduardo Henrique/Canal Edu Dicas e Gameplay"
+scriptAuthor = "Eduardo Henrique/Channel Edu Dicas e Gameplay"
 scriptVersion = 1.0
 scriptDescription = "Fixes scanpaths and Title Updates after drive cloning, with intelligent and safe handling of duplicates."
 scriptIcon = "icon.png"
@@ -8,7 +8,7 @@ scriptPermissions = { "filesystem", "sql" }
 ExitTriggered = false
 
 --------------------------------------------------
--- SELECIONAR DRIVE (SERIAL)
+-- SELECT DRIVE (SERIAL)
 --------------------------------------------------
 function selectDrive()
 
@@ -27,8 +27,8 @@ function selectDrive()
     end
 
     local result = Script.ShowPopupList(
-        "Selecione o drive onde estão os jogos:",
-        "Nenhum dispositivo encontrado.",
+        "Select the drive containing your games:",
+        "No devices found.",
         dialog
     )
 
@@ -41,15 +41,15 @@ function selectDrive()
 end
 
 --------------------------------------------------
--- PERGUNTAR SE QUER PULAR SCANPATHS
+-- ASK WHETHER TO SKIP SCANPATHS
 --------------------------------------------------
 function askSkipScanpaths()
 
     local confirm = Script.ShowMessageBox(
         "Scanpaths",
-        "Deseja corrigir Scanpaths também?\n\n(Se não, apenas Title Updates serão corrigidos)",
-        "Sim",
-        "Apenas TUs"
+        "Do you also want to fix Scanpaths?\n\n(If not, only Title Updates will be fixed)",
+        "Yes",
+        "Only TUs"
     )
 
     return confirm.Button ~= 1
@@ -78,15 +78,15 @@ function fixScanpaths(newSerial)
     end
 
     if #rows == 0 then
-        Script.ShowMessageBox("Scanpaths", "Nenhum scanpath precisa ser alterado.", "OK")
+        Script.ShowMessageBox("Scanpaths", "No scanpaths need to be updated.", "OK")
         return 0, 0
     end
 
     local confirm = Script.ShowMessageBox(
-        "Scanpaths encontrados",
+        "Scanpaths Found",
         dialog,
-        "Corrigir",
-        "Cancelar"
+        "Fix",
+        "Cancel"
     )
 
     if confirm.Button ~= 1 then return 0, 0 end
@@ -106,7 +106,7 @@ function fixScanpaths(newSerial)
 end
 
 --------------------------------------------------
--- TITLE UPDATES (INTELIGENTE + VERSION)
+-- TITLE UPDATES (SMART + VERSION)
 --------------------------------------------------
 function fixTitleUpdates(newSerial)
 
@@ -128,15 +128,15 @@ function fixTitleUpdates(newSerial)
     end
 
     if #rows == 0 then
-        Script.ShowMessageBox("Title Updates", "Nenhum TU precisa ser alterado.", "OK")
+        Script.ShowMessageBox("Title Updates", "No Title Updates need to be updated.", "OK")
         return 0, 0, 0
     end
 
     local confirm = Script.ShowMessageBox(
-        "Title Updates encontrados",
+        "Title Updates Found",
         dialog,
-        "Corrigir",
-        "Pular"
+        "Fix",
+        "Skip"
     )
 
     if confirm.Button ~= 1 then return 0, 0, 0 end
@@ -155,7 +155,7 @@ function fixTitleUpdates(newSerial)
         )
 
         if exists and #exists > 0 then
-            -- remover duplicado REAL (mesma versão)
+            -- Remove REAL duplicate (same version)
             local ok = pcall(function()
                 Sql.Execute("DELETE FROM titleupdates WHERE id="..row["Id"])
             end)
@@ -163,7 +163,7 @@ function fixTitleUpdates(newSerial)
             if ok then removed = removed + 1 else failed = failed + 1 end
 
         else
-            -- atualizar normalmente
+            -- Update normally
             local ok = pcall(function()
                 Sql.Execute("UPDATE titleupdates SET livedeviceid='"..newSerial.."' WHERE id="..row["Id"])
             end)
@@ -181,18 +181,18 @@ end
 function main()
 
     --------------------------------------------------
-    -- AVISO DE BACKUP
+    -- BACKUP WARNING
     --------------------------------------------------
     local backupWarning = Script.ShowMessageBox(
-        "Aviso Importante",
-        "Antes de continuar, é altamente recomendado fazer um backup do banco de dados da Aurora.\n\n" ..
-        "Local padrão:\n" ..
+        "Important Warning",
+        "Before continuing, it is highly recommended to create a backup of the Aurora database.\n\n" ..
+        "Default location:\n" ..
         "Data\\Databases\\content.db\n" ..
-        "ou\n" ..
+        "or\n" ..
         "User\\Data\\Databases\\content.db\n\n" ..
-        "Deseja continuar mesmo assim?",
-        "Continuar",
-        "Cancelar"
+        "Do you want to continue anyway?",
+        "Continue",
+        "Cancel"
     )
 
     if backupWarning.Button ~= 1 then return end
@@ -201,13 +201,13 @@ function main()
     if not drive then return end
 
     local confirm = Script.ShowMessageBox(
-        "Confirmar",
-        "Dispositivo:\n\n" ..
+        "Confirm",
+        "Device:\n\n" ..
         drive.mount ..
         "\nSerial: " .. string.sub(drive.serial,1,16) ..
-        "\n\nContinuar?",
-        "Sim",
-        "Cancelar"
+        "\n\nContinue?",
+        "Yes",
+        "Cancel"
     )
 
     if confirm.Button ~= 1 then return end
@@ -222,18 +222,18 @@ function main()
     local tuOK, tuFail, tuRemoved = fixTitleUpdates(drive.serial)
 
     local msg =
-        "Scanpaths corrigidos: "..scanOK..
-        "\nFalhas scanpaths: "..scanFail..
-        "\n\nTUs corrigidos: "..tuOK..
-        "\nTUs removidos (duplicados reais): "..tuRemoved..
-        "\nFalhas TUs: "..tuFail..
-        "\n\nReinicie a Aurora para aplicar as mudanças."
+        "Scanpaths fixed: "..scanOK..
+        "\nScanpath failures: "..scanFail..
+        "\n\nTitle Updates fixed: "..tuOK..
+        "\nTitle Updates removed (real duplicates): "..tuRemoved..
+        "\nTitle Update failures: "..tuFail..
+        "\n\nRestart Aurora to apply the changes."
 
     local confirm = Script.ShowMessageBox(
-        "Concluído",
+        "Completed",
         msg,
-        "Reiniciar",
-        "Depois"
+        "Restart",
+        "Later"
     )
 
     if confirm.Button == 1 then

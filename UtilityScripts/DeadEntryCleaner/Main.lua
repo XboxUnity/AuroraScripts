@@ -1,5 +1,5 @@
 scriptTitle = "Dead Entry Cleaner (BETA)"
-scriptAuthor = "Eduardo Henrique/Canal Edu Dicas e Gameplay"
+scriptAuthor = "Eduardo Henrique/Channel Edu Dicas e Gameplay"
 scriptVersion = "1.0"
 scriptDescription = "Removes ghost entries from Aurora (ContentItems). Does not alter games, DLCs, or TUs. May require a re-scan."
 
@@ -7,7 +7,7 @@ scriptPermissions = { "filesystem", "sql" }
 scriptIcon = "icon.png"
 
 --------------------------------------------------
--- CONTADORES
+-- COUNTERS
 --------------------------------------------------
 
 local removedCount = 0
@@ -16,14 +16,14 @@ local scannedCount = 0
 local deadCount = 0
 
 --------------------------------------------------
--- LOG SYSTEM (USANDO DRIVE SELECIONADO)
+-- LOG SYSTEM (USING SELECTED DRIVE)
 --------------------------------------------------
 
 local LOG_PATH = nil
 local LOG_FILE = nil
 
 --------------------------------------------------
--- DATA/HORA SEGURA
+-- SAFE DATE/TIME
 --------------------------------------------------
 
 function getSafeDateTime()
@@ -36,7 +36,7 @@ function getSafeDateTime()
         return result
     end
 
-    return "DATA_INDISPONIVEL"
+    return "DATE_UNAVAILABLE"
 end
 
 --------------------------------------------------
@@ -93,7 +93,7 @@ function isValidTitleId(id)
 end
 
 --------------------------------------------------
--- SELEÇÃO DE DRIVE (UX MELHORADA)
+-- DRIVE SELECTION (IMPROVED UX)
 --------------------------------------------------
 
 function selectDrive()
@@ -111,11 +111,11 @@ function selectDrive()
         local label = ""
 
         if string.find(safeLower(mount), "hdd") then
-            label = "HDD (Armazenamento Interno)"
+            label = "HDD (Internal Storage)"
         elseif string.find(safeLower(mount), "usb") then
-            label = "USB (Dispositivo Externo)"
+            label = "USB (External Device)"
         else
-            label = "Dispositivo de Armazenamento"
+            label = "Storage Device"
         end
 
         drives[i] = {
@@ -130,8 +130,8 @@ function selectDrive()
     end
 
     local result = Script.ShowPopupList(
-        "SELECIONE O ARMAZENAMENTO PARA LIMPEZA",
-        "Nenhum dispositivo encontrado.",
+        "SELECT STORAGE TO CLEAN",
+        "No storage devices found.",
         dialog
     )
 
@@ -143,7 +143,7 @@ function selectDrive()
 end
 
 --------------------------------------------------
--- GOD CHECK SIMPLES
+-- SIMPLE GOD CHECK
 --------------------------------------------------
 
 local GOD_FOLDERS = {
@@ -169,7 +169,7 @@ function isValidGOD(directory)
 end
 
 --------------------------------------------------
--- PROTEÇÃO AVANÇADA (ANTI REMOÇÃO ACIDENTAL)
+-- ADVANCED PROTECTION (ACCIDENTAL REMOVAL PREVENTION)
 --------------------------------------------------
 
 function isProtectedEntry(item)
@@ -181,7 +181,7 @@ function isProtectedEntry(item)
     local titleId = tostring(item.TitleId or "")
 
     --------------------------------------------------
-    -- DASHBOARDS / SISTEMA
+    -- DASHBOARDS / SYSTEM
     --------------------------------------------------
 
     if string.find(title, "aurora") then return true end
@@ -190,7 +190,7 @@ function isProtectedEntry(item)
     if string.find(title, "dash launch") then return true end
     if string.find(title, "freestyle") then return true end
 
-    -- nomes curtos = exactMatch
+    -- short names = exactMatch
     if exactMatch(title, "fsd") then return true end
 
     if string.find(title, "quickboot") then return true end
@@ -201,7 +201,7 @@ function isProtectedEntry(item)
     if string.find(title, "xebuild") then return true end
 
     --------------------------------------------------
-    -- UTILITÁRIOS IMPORTANTES
+    -- IMPORTANT UTILITIES
     --------------------------------------------------
 
     if string.find(title, "xm360") then return true end
@@ -217,7 +217,7 @@ function isProtectedEntry(item)
     if string.find(title, "cpu key") then return true end
 
     --------------------------------------------------
-    -- EMULADORES IMPORTANTES
+    -- IMPORTANT EMULATORS
     --------------------------------------------------
 
     if string.find(title, "retroarch") then return true end
@@ -235,10 +235,10 @@ function isProtectedEntry(item)
     if string.find(title, "scummvm") then return true end
 
     --------------------------------------------------
-    -- SERVIÇOS / REDE / PLUGINS
+    -- SERVICES / NETWORK / PLUGINS
     --------------------------------------------------
 
-    -- nomes curtos/genéricos = exactMatch
+    -- short/generic names = exactMatch
     if exactMatch(title, "proto") then return true end
     if string.find(title, "xbdm") then return true end
     if exactMatch(title, "jrpc") then return true end
@@ -254,7 +254,7 @@ function isProtectedEntry(item)
     if exactMatch(title, "teapot") then return true end
 
     --------------------------------------------------
-    -- PROTEÇÃO POR DIRECTORY (MUITO IMPORTANTE)
+    -- DIRECTORY PROTECTION (VERY IMPORTANT)
     --------------------------------------------------
 
     if string.find(directory, "c0de9999") then return true end
@@ -269,7 +269,7 @@ function isProtectedEntry(item)
     if string.find(directory, "tools") then return true end
 
     --------------------------------------------------
-    -- PROTEÇÃO POR EXECUTABLE
+    -- EXECUTABLE PROTECTION
     --------------------------------------------------
 
     if string.find(executable, "aurora") then return true end
@@ -280,7 +280,7 @@ function isProtectedEntry(item)
     if string.find(executable, "retroarch") then return true end
 
     --------------------------------------------------
-    -- CONTENT TYPES CRÍTICOS
+    -- CRITICAL CONTENT TYPES
     --------------------------------------------------
 
     -- XeXMenu LIVE
@@ -290,14 +290,14 @@ function isProtectedEntry(item)
     if contentType == 20480 then return true end
 
     --------------------------------------------------
-    -- TITLEIDS ESPECIAIS
+    -- SPECIAL TITLEIDS
     --------------------------------------------------
 
     if titleId == "-1059153511" then return true end -- QuickBoot
     if titleId == "C0DE9999" then return true end
 
     --------------------------------------------------
-    -- SEGURANÇA EXTRA
+    -- EXTRA SAFETY
     --------------------------------------------------
 
     if title == "" and directory == "" then
@@ -308,7 +308,7 @@ function isProtectedEntry(item)
 end
 
 --------------------------------------------------
--- DETECÇÃO SEGURA
+-- SAFE DETECTION
 --------------------------------------------------
 
 function isDeadEntry(item, selectedMount)
@@ -319,27 +319,27 @@ function isDeadEntry(item, selectedMount)
     local titleId = tostring(item.TitleId or "")
 
     --------------------------------------------------
-    -- DIRECTORY VAZIO
+    -- EMPTY DIRECTORY
     --------------------------------------------------
 
     if directory == "" then
-    return true, "DIRECTORY_VAZIO"
+    return true, "EMPTY_DIRECTORY"
 end
 
     --------------------------------------------------
-    -- PROTEGIDO
+    -- PROTECTED
     --------------------------------------------------
 
     if isProtectedEntry(item) then
-        return false, "ENTRADA_PROTEGIDA"
+        return false, "PROTECTED_ENTRY"
     end
 
 --------------------------------------------------
--- VERIFICA SE A PASTA NÃO EXISTE (ESSENCIAL)
+-- CHECK IF DIRECTORY DOES NOT EXIST (ESSENTIAL)
 --------------------------------------------------
 
 if not dirExists(directory) then
-    return true, "DIRETORIO_NAO_EXISTE"
+    return true, "DIRECTORY_NOT_FOUND"
 end
 
     --------------------------------------------------
@@ -347,15 +347,15 @@ end
     --------------------------------------------------
 
     if tonumber(item.DiscsInSet or 1) > 1 then
-        return false, "MULTI_DISC_PROTEGIDO"
+        return false, "MULTI_DISC_PROTECTED"
     end
 
     --------------------------------------------------
-    -- TITLEID INVÁLIDO
+    -- INVALID TITLEID
     --------------------------------------------------
 
     if not isValidTitleId(titleId) then
-        return false, "TITLEID_INVALIDO"
+        return false, "INVALID_TITLEID"
     end
 
     --------------------------------------------------
@@ -365,18 +365,18 @@ end
     if executable ~= "" and string.sub(safeLower(executable), -4) == ".xex" then
 
         if fileExists(directory .. "\\" .. executable) then
-            return false, "XEX_EXISTE"
+            return false, "XEX_EXISTS"
         end
 
         if fileExists(directory .. "\\default.xex") then
-            return false, "DEFAULT_XEX_EXISTE"
+            return false, "DEFAULT_XEX_EXISTS"
         end
 
         if getFileCount(directory) > 0 then
-            return false, "DIRETORIO_COM_ARQUIVOS"
+            return false, "DIRECTORY_HAS_FILES"
         end
 
-        return true, "XEX_INEXISTENTE"
+        return true, "XEX_MISSING"
     end
 
     --------------------------------------------------
@@ -386,10 +386,10 @@ end
     if contentType == 28672 then
 
         if isValidGOD(directory) then
-            return false, "GOD_VALIDO"
+            return false, "VALID_GOD"
         end
 
-        return true, "GOD_INVALIDO"
+        return true, "INVALID_GOD"
     end
 
     --------------------------------------------------
@@ -397,10 +397,10 @@ end
     --------------------------------------------------
 
     if getFileCount(directory) > 0 then
-        return false, "FALLBACK_DIRETORIO_COM_ARQUIVOS"
+        return false, "FALLBACK_DIRECTORY_HAS_FILES"
     end
 
-    return true, "FALLBACK_ENTRADA_FANTASMA"
+    return true, "FALLBACK_GHOST_ENTRY"
 end
 
 --------------------------------------------------
@@ -423,28 +423,28 @@ end
 function main()
 
 --------------------------------------------------
--- CHECKLIST UX REFORÇADO
+-- ENHANCED UX CHECKLIST
 --------------------------------------------------
 
 local confirmStart = Script.ShowMessageBox(
-    "CHECKLIST DE SEGURANÇA",
-    "ANTES DE CONTINUAR:\n\n" ..
+    "SAFETY CHECKLIST",
+    "BEFORE CONTINUING:\n\n" ..
 
-    "✔ Não apaga jogos do armazenamento\n" ..
-    "✔ Não remove DLCs ou Title Updates\n" ..
-    "✔ Apenas limpa entradas inválidas da Aurora\n\n" ..
+    "✔ Does not delete games from storage\n" ..
+    "✔ Does not remove DLCs or Title Updates\n" ..
+    "✔ Only removes invalid Aurora entries\n\n" ..
 
-    "✔ A biblioteca pode ser reconstruída após re-scan\n" ..
-    "✔ Pode ser necessário re-escanear os caminhos após o uso\n\n" ..
+    "✔ The library can be rebuilt after a re-scan\n" ..
+    "✔ You may need to re-scan paths after use\n\n" ..
 
-    "✔ Backup do banco é recomendado (não obrigatório)\n" ..
-    "Locais comuns do banco:\n" ..
+    "✔ Database backup is recommended (not required)\n" ..
+    "Common database locations:\n" ..
     "Data\\Databases\\content.db\n" ..
     "User\\Data\\Databases\\content.db\n\n" ..
 
-    "Deseja continuar?",
-    "Continuar",
-    "Cancelar"
+    "Do you want to continue?",
+    "Continue",
+    "Cancel"
 )
 
 if confirmStart.Button ~= 1 then return end
@@ -459,11 +459,11 @@ if confirmStart.Button ~= 1 then return end
     local selectedMount = drive.mount
 
     local confirmDrive = Script.ShowMessageBox(
-        "CONFIRMAÇÃO",
-        "Armazenamento selecionado:\n" .. selectedMount .. "\n\n" ..
-        "A limpeza será aplicada apenas na base de dados da Aurora.\nNenhum conteúdo físico será alterado.\nContinuar?",
-        "Sim",
-        "Cancelar"
+        "CONFIRMATION",
+        "Selected storage:\n" .. selectedMount .. "\n\n" ..
+        "Cleaning will only be applied to the Aurora database.\nNo physical content will be modified.\nContinue?",
+        "Yes",
+        "Cancel"
     )
 
     if confirmDrive.Button ~= 1 then return end
@@ -478,7 +478,7 @@ local rows = Sql.ExecuteFetchRows([[
 ]])
 
 if not rows then
-    Script.ShowMessageBox("Erro", "Falha ao ler banco.", "OK")
+    Script.ShowMessageBox("Error", "Failed to read database.", "OK")
     return
 end
 
@@ -491,8 +491,8 @@ for i = 1, #rows do
     scannedCount = scannedCount + 1
 
     --------------------------------------------------
-    -- Agora isDeadEntry deve retornar:
-    -- return true/false, "MOTIVO"
+    -- Now isDeadEntry must return:
+    -- return true/false, "REASON"
     --------------------------------------------------
 
     local ok, dead, reason = pcall(function()
@@ -500,7 +500,7 @@ for i = 1, #rows do
     end)
 
     --------------------------------------------------
-    -- Se houve erro interno durante análise
+    -- If an internal error occurred during analysis
     --------------------------------------------------
 
     if not ok then
@@ -515,7 +515,7 @@ for i = 1, #rows do
             if deadCount <= 20 then
                 preview = preview ..
                     "- " .. (item.TitleName or "???") ..
-                    " | Motivo: " .. tostring(reason or "DESCONHECIDO") ..
+                    " | Reason: " .. tostring(reason or "UNKNOWN") ..
                     "\n"
             end
         end
@@ -526,7 +526,7 @@ if deadCount == 0 then
 
     Script.ShowMessageBox(
         "OK",
-        "Nenhuma entrada fantasma encontrada.",
+        "No ghost entries found.",
         "OK"
     )
 
@@ -534,21 +534,21 @@ if deadCount == 0 then
 end
 
     --------------------------------------------------
-    -- CONFIRMAÇÃO
+    -- CONFIRMATION
     --------------------------------------------------
 
     local confirmRemove = Script.ShowMessageBox(
-        "CONFIRMAR REMOÇÃO",
-        "Encontrados: " .. deadCount .. "\n\n" ..
-        preview .. "\n\nRemover do banco da Aurora?",
-        "Remover",
-        "Cancelar"
+        "CONFIRM REMOVAL",
+        "Found: " .. deadCount .. "\n\n" ..
+        preview .. "\n\nRemove from the Aurora database?",
+        "Remove",
+        "Cancel"
     )
 
     if confirmRemove.Button ~= 1 then return end
 
     --------------------------------------------------
-    -- REMOÇÃO
+    -- REMOVAL
     --------------------------------------------------
 
 for i = 1, #deadItems do
@@ -565,22 +565,22 @@ for i = 1, #deadItems do
 end
 
     --------------------------------------------------
-    -- FINAL
+    -- FINISHED
     --------------------------------------------------
 
 local restart = Script.ShowMessageBox(
-    "FINALIZADO",
-    "Escaneados: " .. scannedCount ..
-    "\nRemovidos: " .. removedCount ..
-    "\nFalhas: " .. failedCount ..
-    "\n\nReiniciar Aurora para aplicar mudanças?",
-    "Sim",
-    "Não"
+    "COMPLETED",
+    "Scanned: " .. scannedCount ..
+    "\nRemoved: " .. removedCount ..
+    "\nFailures: " .. failedCount ..
+    "\n\nRestart Aurora to apply the changes?",
+    "Yes",
+    "No"
 )
 
 if restart.Button == 1 then
     Aurora.Restart()
 else
-    -- não faz nada
+    -- do nothing
 end
 end
