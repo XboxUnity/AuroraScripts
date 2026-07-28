@@ -1,5 +1,5 @@
 scriptTitle = "Aurora Drive Fixer Smart"
-scriptAuthor = "Eduardo Henrique/Channel Edu Dicas e Gameplay"
+scriptAuthor = "Eduardo Henrique/Canal Edu Dicas e Gameplay"
 scriptVersion = 1.0
 scriptDescription = "Fixes scanpaths and Title Updates after drive cloning, with intelligent and safe handling of duplicates."
 scriptIcon = "icon.png"
@@ -27,8 +27,8 @@ function selectDrive()
     end
 
     local result = Script.ShowPopupList(
-        "Select the drive containing your games:",
-        "No devices found.",
+        "Select the drive where the games are located:",
+        "No device found.",
         dialog
     )
 
@@ -78,12 +78,12 @@ function fixScanpaths(newSerial)
     end
 
     if #rows == 0 then
-        Script.ShowMessageBox("Scanpaths", "No scanpaths need to be updated.", "OK")
+        Script.ShowMessageBox("Scanpaths", "No scanpath needs to be changed.", "OK")
         return 0, 0
     end
 
     local confirm = Script.ShowMessageBox(
-        "Scanpaths Found",
+        "Scanpaths found",
         dialog,
         "Fix",
         "Cancel"
@@ -113,7 +113,10 @@ function fixTitleUpdates(newSerial)
     local rows = {}
     local dialog = ""
 
-    for _, row in pairs(Sql.ExecuteFetchRows("SELECT id, titleid, filename, version, displayname, livedeviceid FROM titleupdates ORDER BY displayname ASC") or {}) do
+    for _, row in pairs(Sql.ExecuteFetchRows(
+    "SELECT id, titleid, mediaid, baseversion, version, hash, filename, displayname, livedeviceid " ..
+    "FROM titleupdates ORDER BY displayname ASC"
+) or {}) do
         if row["LiveDeviceId"] ~= newSerial then
             table.insert(rows, row)
 
@@ -128,12 +131,12 @@ function fixTitleUpdates(newSerial)
     end
 
     if #rows == 0 then
-        Script.ShowMessageBox("Title Updates", "No Title Updates need to be updated.", "OK")
+        Script.ShowMessageBox("Title Updates", "No Title Update needs to be changed.", "OK")
         return 0, 0, 0
     end
 
     local confirm = Script.ShowMessageBox(
-        "Title Updates Found",
+        "Title Updates found",
         dialog,
         "Fix",
         "Skip"
@@ -148,14 +151,19 @@ function fixTitleUpdates(newSerial)
     for _, row in pairs(rows) do
 
         local exists = Sql.ExecuteFetchRows(
-            "SELECT id FROM titleupdates WHERE filename='"..row["FileName"]..
-            "' AND titleid='"..row["TitleId"]..
-            "' AND version='"..row["Version"]..
-            "' AND livedeviceid='"..newSerial.."'"
-        )
+    "SELECT id FROM titleupdates " ..
+    "WHERE filename='" .. row["FileName"] ..
+    "' AND titleid='" .. row["TitleId"] ..
+    "' AND mediaid='" .. row["MediaId"] ..
+    "' AND baseversion='" .. row["BaseVersion"] ..
+    "' AND version='" .. row["Version"] ..
+    "' AND hash='" .. row["Hash"] ..
+    "' AND livedeviceid='" .. newSerial ..
+    "' AND id<>" .. row["Id"]
+)
 
         if exists and #exists > 0 then
-            -- Remove REAL duplicate (same version)
+            -- Remove true duplicate already existing on the target device.
             local ok = pcall(function()
                 Sql.Execute("DELETE FROM titleupdates WHERE id="..row["Id"])
             end)
@@ -163,7 +171,7 @@ function fixTitleUpdates(newSerial)
             if ok then removed = removed + 1 else failed = failed + 1 end
 
         else
-            -- Update normally
+            -- update normally
             local ok = pcall(function()
                 Sql.Execute("UPDATE titleupdates SET livedeviceid='"..newSerial.."' WHERE id="..row["Id"])
             end)
@@ -185,7 +193,7 @@ function main()
     --------------------------------------------------
     local backupWarning = Script.ShowMessageBox(
         "Important Warning",
-        "Before continuing, it is highly recommended to create a backup of the Aurora database.\n\n" ..
+        "Before continuing, it is highly recommended to back up the Aurora database.\n\n" ..
         "Default location:\n" ..
         "Data\\Databases\\content.db\n" ..
         "or\n" ..
@@ -224,9 +232,9 @@ function main()
     local msg =
         "Scanpaths fixed: "..scanOK..
         "\nScanpath failures: "..scanFail..
-        "\n\nTitle Updates fixed: "..tuOK..
-        "\nTitle Updates removed (real duplicates): "..tuRemoved..
-        "\nTitle Update failures: "..tuFail..
+        "\n\nTUs fixed: "..tuOK..
+        "\nTUs removed (true duplicates): "..tuRemoved..
+        "\nTU failures: "..tuFail..
         "\n\nRestart Aurora to apply the changes."
 
     local confirm = Script.ShowMessageBox(
