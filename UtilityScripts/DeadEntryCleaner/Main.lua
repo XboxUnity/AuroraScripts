@@ -88,7 +88,6 @@ end
 function isValidTitleId(id)
     if not id then return false end
     if string.len(id) ~= 8 then return false end
-    if id == "00000000" then return false end
     return true
 end
 
@@ -105,7 +104,7 @@ function selectDrive()
 
     for i, d in ipairs(list) do
 
-        local mount = d["MountPoint"]
+        local mount = d["MountPoint"] or "UNKNOWN"
         local serial = d["Serial"] or "UNKNOWN"
 
         local label = ""
@@ -115,7 +114,7 @@ function selectDrive()
         elseif string.find(safeLower(mount), "usb") then
             label = "USB (External Device)"
         else
-            label = "Storage Device"
+            label = "Storage Device (" .. mount .. ")"
         end
 
         drives[i] = {
@@ -286,9 +285,6 @@ function isProtectedEntry(item)
     -- XeXMenu LIVE
     if contentType == 524288 then return true end
 
-    -- Installed Xbox Classic
-    if contentType == 20480 then return true end
-
     --------------------------------------------------
     -- SPECIAL TITLEIDS
     --------------------------------------------------
@@ -378,6 +374,27 @@ end
 
         return true, "XEX_MISSING"
     end
+
+    --------------------------------------------------
+    -- XBE CHECK
+    --------------------------------------------------
+
+if executable ~= "" and string.sub(safeLower(executable), -4) == ".xbe" then
+
+    if fileExists(directory .. "\\" .. executable) then
+        return false, "XBE_EXISTS"
+    end
+
+    if fileExists(directory .. "\\default.xbe") then
+        return false, "DEFAULT_XBE_EXISTS"
+    end
+
+    if getFileCount(directory) > 0 then
+        return false, "DIRECTORY_HAS_FILES"
+    end
+
+    return true, "XBE_MISSING"
+end
 
     --------------------------------------------------
     -- GOD CHECK
