@@ -322,41 +322,69 @@ end
 
 function HandleSelection(selection, repo, menu)
 	local info = "";
+	local destinationPath = "";
 
-	-- Prompt the user to select a drive before showing the download confirmation
-	local drive = PromptContentDrive();
-	if drive == nil then
-		return nil;
-	end
+	if repo.type == "Other" then
+		destinationPath = GetDestinationPath(selection.path, repo.type);
+		if destinationPath == nil or destinationPath == "" then
+			return nil;
+		end
 
-	info = info .. "Name: " .. selection.itemTitle .. "\n";
+		info = info .. "Name: " .. selection.itemTitle .. "\n";
 
-	if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
-		info = info .. "Version: " .. selection.itemVersion .. "\n";
-	end
+		if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
+			info = info .. "Version: " .. selection.itemVersion .. "\n";
+		end
 
-	if selection.itemAuthor ~= nil and selection.itemAuthor ~= "" then
-		info = info .. "Author: " .. selection.itemAuthor .. "\n";
-	end
+		if selection.itemAuthor ~= nil and selection.itemAuthor ~= "" then
+			info = info .. "Author: " .. selection.itemAuthor .. "\n";
+		end
 
-	if selection.itemSize ~= nil and selection.itemSize ~= "" then
-		info = info .. "Size: " .. selection.itemSize .. "\n";
-	end
+		if selection.itemSize ~= nil and selection.itemSize ~= "" then
+			info = info .. "Size: " .. selection.itemSize .. "\n";
+		end
 
-	-- Compute the correct destination path using the selected drive mount point
-	local destinationPath = GetDestinationPath(selection.path, repo.type, drive.MountPoint);
+		if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
+			info = info .. "Description:\n" .. string.gsub(selection.itemDescription, "\\n", "\n") .. "\n\n";
+		end
 
-	if destinationPath ~= nil and destinationPath ~= "" then
-		info = info .. "Path: " .. destinationPath .. "\n";
+		info = info .. "Installation path:\n" .. destinationPath .. "\n\nThis package installs to a predefined location.\n\nDo you want to continue?";
 	else
-		return nil;
-	end
+		-- Prompt the user to select a drive before showing the download confirmation
+		local drive = PromptContentDrive();
+		if drive == nil then
+			return nil;
+		end
 
-	if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
-		info = info .. "Description:\n" .. string.gsub(selection.itemDescription, "\\n", "\n") .. "\n\n";
-	end
+		info = info .. "Name: " .. selection.itemTitle .. "\n";
 
-	info = info .. "\n\n\nDo you want to install this " .. repo.type .. " on " .. drive.MountPoint:gsub("\\", "") .. "?";
+		if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
+			info = info .. "Version: " .. selection.itemVersion .. "\n";
+		end
+
+		if selection.itemAuthor ~= nil and selection.itemAuthor ~= "" then
+			info = info .. "Author: " .. selection.itemAuthor .. "\n";
+		end
+
+		if selection.itemSize ~= nil and selection.itemSize ~= "" then
+			info = info .. "Size: " .. selection.itemSize .. "\n";
+		end
+
+		-- Compute the correct destination path using the selected drive mount point
+		destinationPath = GetDestinationPath(selection.path, repo.type, drive.MountPoint);
+
+		if destinationPath ~= nil and destinationPath ~= "" then
+			info = info .. "Path: " .. destinationPath .. "\n";
+		else
+			return nil;
+		end
+
+		if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
+			info = info .. "Description:\n" .. string.gsub(selection.itemDescription, "\\n", "\n") .. "\n\n";
+		end
+
+		info = info .. "\n\n\nDo you want to install this " .. repo.type .. " on " .. drive.MountPoint:gsub("\\", "") .. "?";
+	end
 
 	local ret = Script.ShowMessageBox("", info, "Yes", "No");
 

@@ -8,51 +8,25 @@ local SortAlphaBetically = false;
 
 _ShowMenu = function(menuItem)
 	local menu = {}
-	local displayToOriginal = {} -- Maps the displayed index to the original Lua table index
-
 	if SortAlphaBetically then
 		table.sort(menuItem, function(a, b) return type(a) == "table" and type(b) == "table" and a.Name < b.Name; end);
-	end
-
-	-- Safely iterate using the highest numeric index to avoid ipairs issues when the table contains gaps
-	local maxIndex = 0
-	for k, _ in pairs(menuItem) do
-		if type(k) == "number" and k > maxIndex then
-			maxIndex = k
-		end
-	end
-
-	for k = 1, maxIndex do
-		local v = menuItem[k]
-		if v ~= nil then
-			if type(v) == "table" then
-				table.insert(menu, v.Name)
-				table.insert(displayToOriginal, k)
-			else
-				if GoBackText ~= nil and GoBackText ~= "" then
-					table.insert(menu, GoBackText)
-					table.insert(displayToOriginal, k)
-				end
+	end	
+	for k, v in ipairs(menuItem) do
+		if type(v) == "table" then
+			menu[k] = v.Name;
+		else
+			if GoBackText ~= nil and GoBackText ~= "" then
+				menu[k] = GoBackText; -- Only show the "Go Back" option if we actually have it set to something
 			end
 		end
 	end
-
-	-- If the generated menu is empty, add a placeholder to prevent an empty list or crashes
-	if #menu == 0 then
-		table.insert(menu, "No Options Available")
-		table.insert(displayToOriginal, 1)
-	end
-
 	local ret = Script.ShowPopupList(TitleText, EmptyText, menu);
-
-	-- If the user canceled or selected "Go Back"
-	if ret.Canceled == true or (ret.Selected.Key ~= nil and menu[ret.Selected.Key] == GoBackText) then
+	if ret.Canceled == true or (ret.Selected.Key == 1 and ret.Selected.Value == GoBackText) then
 		if ret.Canceled == true then
 			if ExitOnCancel == true then
 				return nil, menuItem, ret.Canceled, nil;
 			end
 		end
-
 		if menuItem.Parent == nil or menuItem.Parent.Parent == nil then
 			return nil, menuItem, ret.Canceled, nil;
 		else
@@ -61,14 +35,7 @@ _ShowMenu = function(menuItem)
 			return _ShowMenu(menuItem.Parent.Parent);
 		end
 	else
-		-- Use the mapping to retrieve the correct original item, preventing index mismatches
-		local originalKey = displayToOriginal[ret.Selected.Key]
-		if originalKey == nil then
-			originalKey = ret.Selected.Key
-		end
-
-		ret = menuItem[originalKey];
-
+		ret = menuItem[ret.Selected.Key];
 		if ret.SubMenu == nil then
 			return ret.Data, menuItem, false, ret;
 		else
@@ -79,70 +46,57 @@ _ShowMenu = function(menuItem)
 end
 
 Menu = {
-	ShowMenu = function(menuItem)
-		return _ShowMenu(menuItem); -- Calls the modified function
+	ShowMenu = function(menuItem) 
+		return _ShowMenu(menuItem); -- Call the actual function^
 	end,
-
 	ShowMainMenu = function()
-		return _ShowMenu(TopLevelMenu.SubMenu); -- Displays the main menu
+		return _ShowMenu(TopLevelMenu.SubMenu); -- Show the main menu (TopLevelMenu.SubMenu)
 	end,
-
 	ResetMenu = function()
-		TopLevelMenu.SubMenu = {} -- Clears the menu
-		TitleText = "Menu"; -- Restores the default title
-		EmptyText = "No Menu Available"; -- Restores the default empty message
-		ExitOnCancel = false; -- Resets ExitOnCancel
-		GoBackText = "Go Back"; -- Restores the default Go Back text
+		TopLevelMenu.SubMenu = {} -- Reset the menu to be empty
+		TitleText = "Menu"; -- Reset title to the default one
+		EmptyText = "No Menu Available"; -- Reset empty text to the default one
+		ExitOnCancel = false; -- Reset ExitOnCancel to it's default value
+		GoBackText = "Go Back"; -- Reset GoBackText to it's default value
 	end,
-
 	MakeMenuItem = function(displayName, data)
 		return {
-			Name = displayName; -- Displayed menu item name
-			Data = data; -- Associated data
+			Name = displayName; -- Set the Name Property to be displayed in the menu
+			Data = data; -- Set the data property, if any...
 		}
 	end,
-
 	AddSubMenuItem = function(menuItem, subMenuItem)
-		if menuItem.SubMenu == nil then -- Create the submenu if it doesn't exist
-			menuItem.SubMenu = {}
-			menuItem.SubMenu[1] = GoBackText; -- Add "Go Back" as the first item
-			menuItem.SubMenu.Parent = menuItem; -- Set submenu parent
+		if menuItem.SubMenu == nil then -- Check if we have a SubMenu already or not
+			menuItem.SubMenu = {} -- Add the SubMenu table
+			menuItem.SubMenu[1] = GoBackText; -- Add a "Go Back" to the Sub Menu
+			menuItem.SubMenu.Parent = menuItem; -- Set the parent of the SubMenu to the menu we're adding it to
 		end
-
-		subMenuItem.Parent = menuItem.SubMenu; -- Set submenu item parent
-		table.insert(menuItem.SubMenu, subMenuItem); -- Add submenu item
+		subMenuItem.Parent = menuItem.SubMenu; -- Set the parent of the subMenuItem to the SubMenu table so we can go further up the chain
+		table.insert(menuItem.SubMenu, subMenuItem); -- Insert the subMenuItem to the menu
 	end,
-
 	AddMainMenuItem = function(menuItem)
-		if TopLevelMenu.SubMenu == nil then -- Create the main menu if necessary
-			TopLevelMenu.SubMenu = {}
-			TopLevelMenu.SubMenu.Parent = TopLevelMenu;
+		if TopLevelMenu.SubMenu == nil then -- Check if we have a SubMenu already or not
+			TopLevelMenu.SubMenu = {} -- Add the SubMenu table
+			TopLevelMenu.SubMenu.Parent = TopLevelMenu; -- Set SubMenu parent to TopLevelMenu
 		end
-
-		menuItem.Parent = TopLevelMenu.SubMenu;
-		table.insert(TopLevelMenu.SubMenu, menuItem); -- Add main menu item
+		menuItem.Parent = TopLevelMenu.SubMenu; -- Set the parent of the subMenuItem to the SubMenu table so we can go further up the chain
+		table.insert(TopLevelMenu.SubMenu, menuItem); -- Insert the menuItem to the menu
 	end,
-
 	SetTitle = function(title)
-		TitleText = title;
+		TitleText = title; -- Set the TitleText
 	end,
-
 	SetEmptyText = function(emptyText)
-		EmptyText = emptyText;
+		EmptyText = emptyText; -- Set the text to be shown if the menu is empty
 	end,
-
 	SetExitOnCancel = function(exitOnCancel)
-		ExitOnCancel = exitOnCancel == true;
+		ExitOnCancel = exitOnCancel == true; -- Set the flag that tells the menu system to exit upon being canceled (B being pressed)
 	end,
-
 	SetGoBackText = function(goBackText)
-		GoBackText = goBackText;
+		GoBackText = goBackText; -- Set the text for the return/back menu item
 	end,
-
 	SetSortAlphaBetically = function(sortAlphaBetically)
-		SortAlphaBetically = sortAlphaBetically == true;
+		SortAlphaBetically = sortAlphaBetically == true; -- Set the flag that tells us if we should sort alphabetically
 	end,
-
 	IsMainMenu = function(menu)
 		return menu == TopLevelMenu.SubMenu;
 	end
