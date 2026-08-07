@@ -81,13 +81,9 @@ function main()
 		goto scriptend;
 	end
 
-	local g_RestartMenu = true
-	while g_RestartMenu do
-		g_RestartMenu = false
-		Menu.ResetMenu();
-		MakeMainMenu();
-		DoShowMenu();
-	end
+	Menu.ResetMenu();
+	MakeMainMenu();
+	DoShowMenu();
 
 	if reloadRequired and not gAbortedOperation then
 		local ret = Script.ShowMessageBox(
@@ -215,7 +211,7 @@ function MakeMainMenu()
 end
 
 function DoShowMenu(menu)
-	if gAbortedOperation or g_RestartMenu then
+	if gAbortedOperation then
 		return;
 	end
 
@@ -294,17 +290,9 @@ function DoShowMenu(menu)
 			end
 		end
 
-		if g_RestartMenu then
-			return;
-		end
-
 		if menuItem.SubMenu ~= nil then
 			-- Open submenu
 			DoShowMenu(menuItem.SubMenu);
-
-			if g_RestartMenu then
-				return;
-			end
 
 		elseif not Menu.IsMainMenu(menu) then
 			-- Content item selected
