@@ -12,6 +12,7 @@ local downloadsPath = "Downloads\\";
 local gAbortedOperation = false;
 local absoluteDownloadsPath = "";
 local scanPathCache = nil;
+local g_RestartMenu = false;
 
 -- Unified temporary cleanup function (DRY / Reduced redundancy)
 local function Cleanup()
@@ -81,9 +82,13 @@ function main()
 		goto scriptend;
 	end
 
-	Menu.ResetMenu();
-	MakeMainMenu();
-	DoShowMenu();
+	g_RestartMenu = true
+	while g_RestartMenu do
+		g_RestartMenu = false
+		Menu.ResetMenu();
+		MakeMainMenu();
+		DoShowMenu();
+	end
 
 	if reloadRequired and not gAbortedOperation then
 		local ret = Script.ShowMessageBox(
@@ -104,8 +109,58 @@ function main()
 	::scriptend::
 end
 
--- Dynamic device prompt using the native Aurora FileSystem API
+-- Preferred storage device helpers for persistent configuration
+local function LoadPreferredDrive()
+	local iniPath = Script.GetBasePath() .. "settings.ini";
+	if FileSystem.FileExists(iniPath) then
+		local ini = IniFile.LoadFile("settings.ini");
+		if ini ~= nil then
+			local val = ini:ReadValue("Storage", "PreferredDrive", "");
+			if val ~= "" then
+				return val;
+			end
+		end
+	end
+	return nil;
+end
+
+local function SavePreferredDrive(mountPoint)
+	local cleanDrive = mountPoint or "";
+	local iniPath = Script.GetBasePath() .. "settings.ini";
+	if io ~= nil and io.open ~= nil then
+		local f = io.open(iniPath, "w");
+		if f ~= nil then
+			f:write("[Storage]\nPreferredDrive=" .. cleanDrive .. "\n");
+			f:close();
+		end
+	end
+end
+
+local function GetPreferredDrive()
+	local prefMount = LoadPreferredDrive();
+	if prefMount ~= nil and prefMount ~= "" then
+		-- Normalize drive string (e.g. "Hdd1:\", "Hdd1:", "Hdd1" -> "hdd1")
+		local cleanPref = string.lower(prefMount:gsub("[:\\/]", ""));
+		local drives = FileSystem.GetDrives(true);
+		if drives ~= nil then
+			for _, d in ipairs(drives) do
+				local cleanD = string.lower(d.MountPoint:gsub("[:\\/]", ""));
+				if cleanD == cleanPref then
+					return d;
+				end
+			end
+		end
+	end
+	return nil;
+end
+
+-- Dynamic device prompt using the native Aurora FileSystem API (with preferred drive fallback)
 function PromptContentDrive()
+	local pref = GetPreferredDrive();
+	if pref ~= nil then
+		return pref;
+	end
+
 	local drives = FileSystem.GetDrives(true); -- Content-capable drives only
 	local names = {};
 
@@ -208,10 +263,17 @@ function MakeMainMenu()
 		["name"] = "test",
 		["iniurl"] = "ENTER_URL",
 	}));
+
+	local pref = GetPreferredDrive();
+	local prefLabel = (pref ~= nil and pref.MountPoint:gsub("\\", "") or "Ask every time");
+	Menu.AddMainMenuItem(Menu.MakeMenuItem("Set Preferred Storage (" .. prefLabel .. ")", {
+		["name"] = "storage_settings",
+		["action"] = "set_storage",
+	}));
 end
 
 function DoShowMenu(menu)
-	if gAbortedOperation then
+	if gAbortedOperation or g_RestartMenu then
 		return;
 	end
 
@@ -258,6 +320,36 @@ function DoShowMenu(menu)
 				end
 
 				return
+			elseif (ret.action == "set_storage") then
+				-- Select and persist preferred storage drive
+				local drives = FileSystem.GetDrives(true);
+				local names = { "Ask every time (Default)" };
+				for i, d in ipairs(drives) do
+					local label = d.MountPoint;
+					if d.Name ~= nil and d.Name ~= "" then
+						label = label .. "  (" .. d.Name .. ")";
+					end
+					table.insert(names, label);
+				end
+
+				local pick = Script.ShowPopupList(
+					"Select Preferred Storage Drive",
+					"No content drives found",
+					names
+				);
+
+				if not pick.Canceled then
+					if pick.Selected.Key == 1 then
+						SavePreferredDrive("");
+						Script.ShowNotification("Storage set to: Ask every time");
+					else
+						local chosen = drives[pick.Selected.Key - 1];
+						SavePreferredDrive(chosen.MountPoint);
+						Script.ShowNotification("Preferred drive set to " .. chosen.MountPoint:gsub("\\", ""));
+					end
+				end
+				g_RestartMenu = true;
+				return
 			else
 				-- Load the .ini file from the repository entry
 				http = Http.Get(ret.iniurl);
@@ -290,9 +382,17 @@ function DoShowMenu(menu)
 			end
 		end
 
+		if g_RestartMenu then
+			return;
+		end
+
 		if menuItem.SubMenu ~= nil then
 			-- Open submenu
 			DoShowMenu(menuItem.SubMenu);
+
+			if g_RestartMenu then
+				return;
+			end
 
 		elseif not Menu.IsMainMenu(menu) then
 			-- Content item selected
@@ -312,50 +412,37 @@ function HandleSelection(selection, repo, menu)
 	local info = "";
 	local destinationPath = "";
 
+	-- Unified item information formatting (DRY / Deduplication)
+	info = info .. "Name: " .. selection.itemTitle .. "\n";
+
+	if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
+		info = info .. "Version: " .. selection.itemVersion .. "\n";
+	end
+
+	if selection.itemAuthor ~= nil and selection.itemAuthor ~= "" then
+		info = info .. "Author: " .. selection.itemAuthor .. "\n";
+	end
+
+	if selection.itemSize ~= nil and selection.itemSize ~= "" then
+		info = info .. "Size: " .. selection.itemSize .. "\n";
+	end
+
+	if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
+		info = info .. "Description:\n" .. string.gsub(selection.itemDescription, "\\n", "\n") .. "\n\n";
+	end
+
 	if repo.type == "Other" then
 		destinationPath = GetDestinationPath(selection.path, repo.type);
 		if destinationPath == nil or destinationPath == "" then
 			return nil;
 		end
 
-		info = info .. "Name: " .. selection.itemTitle .. "\n";
-
-		if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
-			info = info .. "Version: " .. selection.itemVersion .. "\n";
-		end
-
-		if selection.itemAuthor ~= nil and selection.itemAuthor ~= "" then
-			info = info .. "Author: " .. selection.itemAuthor .. "\n";
-		end
-
-		if selection.itemSize ~= nil and selection.itemSize ~= "" then
-			info = info .. "Size: " .. selection.itemSize .. "\n";
-		end
-
-		if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
-			info = info .. "Description:\n" .. string.gsub(selection.itemDescription, "\\n", "\n") .. "\n\n";
-		end
-
 		info = info .. "Installation path:\n" .. destinationPath .. "\n\nThis package installs to a predefined location.\n\nDo you want to continue?";
 	else
-		-- Prompt the user to select a drive before showing the download confirmation
+		-- Prompt or fetch preferred drive before showing confirmation
 		local drive = PromptContentDrive();
 		if drive == nil then
 			return nil;
-		end
-
-		info = info .. "Name: " .. selection.itemTitle .. "\n";
-
-		if selection.itemVersion ~= nil and selection.itemVersion ~= "" then
-			info = info .. "Version: " .. selection.itemVersion .. "\n";
-		end
-
-		if selection.itemAuthor ~= nil and selection.itemAuthor ~= "" then
-			info = info .. "Author: " .. selection.itemAuthor .. "\n";
-		end
-
-		if selection.itemSize ~= nil and selection.itemSize ~= "" then
-			info = info .. "Size: " .. selection.itemSize .. "\n";
 		end
 
 		-- Compute the correct destination path using the selected drive mount point
@@ -365,10 +452,6 @@ function HandleSelection(selection, repo, menu)
 			info = info .. "Path: " .. destinationPath .. "\n";
 		else
 			return nil;
-		end
-
-		if selection.itemDescription ~= nil and selection.itemDescription ~= "" then
-			info = info .. "Description:\n" .. string.gsub(selection.itemDescription, "\\n", "\n") .. "\n\n";
 		end
 
 		info = info .. "\n\n\nDo you want to install this " .. repo.type .. " on " .. drive.MountPoint:gsub("\\", "") .. "?";
